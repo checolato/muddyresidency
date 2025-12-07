@@ -1,0 +1,181 @@
+/* Layout for tutorial page */
+.tutorial-layout {
+  display: grid;
+  grid-template-columns: 1.3fr 1.1fr;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.tutorial-steps h1 {
+  font-size: 18px;
+  margin: 0 0 14px;
+}
+
+.tutorial-steps h2 {
+  font-size: 14px;
+  margin: 18px 0 6px;
+}
+
+.step-list {
+  font-size: 13px;
+  line-height: 1.5;
+  padding-left: 18px;
+  margin: 0 0 12px;
+}
+
+.body-text {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 10px;
+}
+
+.primary-btn,
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 16px;
+  font-size: 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+  margin: 6px 0 10px;
+}
+
+.primary-btn {
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+}
+
+.secondary-btn {
+  border: 1px solid #ccc;
+  background: #f7f7f7;
+  color: #444;
+}
+
+.small-note {
+  font-size: 11px;
+  color: #777;
+  margin: 0 0 12px;
+}
+
+/* Scan panel */
+.scan-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scan-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #eee;
+  background: #f8f8f8;
+}
+
+.scan-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Fake scanning overlay */
+.scan-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  display: none;
+  overflow: hidden;
+}
+
+.scan-overlay.active {
+  display: block;
+}
+
+.scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.9);
+  animation: scan-move 1.3s linear infinite;
+}
+
+@keyframes scan-move {
+  0% {
+    top: 0%;
+  }
+  50% {
+    top: 50%;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+.scan-status {
+  font-size: 12px;
+  color: #777;
+}
+
+/* Responsive: stack on small screens */
+@media (max-width: 800px) {
+  .tutorial-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .scan-panel {
+    order: -1;
+  }
+}
+
+/* Success popup animation */
+.success-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeOut 1.2s ease forwards;
+}
+
+.popup-box {
+  background: white;
+  padding: 16px 28px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: popupFade 1.2s ease forwards;
+}
+
+@keyframes popupFade {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; display: none; }
+}
+

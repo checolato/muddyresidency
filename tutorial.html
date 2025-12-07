@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Glaze Diary – Speckled Field Tutorial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="tutorial.css" />
+</head>
+<body>
+  <!-- side labels (reuse styling from index) -->
+  <div class="side-label left">your studio assistant</div>
+  <div class="side-label right">speckled field · beginner bowl</div>
+
+  <div class="page">
+    <header>
+      <div class="logo-mark">
+        <img src="assets/greenbowl.png" alt="Glaze Diary logo" />
+      </div>
+
+      <div class="brand-name">glaze diary</div>
+
+      <nav class="main-nav">
+        <a href="index.html">story</a>
+        <a href="tutorial.html">studio</a>
+        <a href="index.html">glaze archive</a>
+      </nav>
+
+      <div class="announcement">
+        <div class="announcement-icon">i</div>
+        <div>Speckled Field · beginner bowl tutorial · earthenware clay</div>
+      </div>
+    </header>
+
+    <main class="tutorial-layout">
+      <!-- LEFT: tutorial steps -->
+      <section class="tutorial-steps">
+        <h1>Speckled Field · hand-built bowl</h1>
+
+        <h2>1. Clay making</h2>
+        <ol class="step-list">
+          <li>Split the clay into 2 portions, roughly 1:4.</li>
+          <li>Make a ball from the larger portion.</li>
+          <li>
+            Use your finger or utensil 1 to pinch a hole in the middle of the ball and rotate outwards.
+          </li>
+          <li>
+            Slightly change the position of your hands and expand out to make a bowl shape.
+          </li>
+          <li>
+            Refine the edge of the bowl with your fingers and utensil 2 once you get the bowl shape.
+          </li>
+          <li>
+            Take the smaller portion and roll out a long strip with your palm to make the base.
+          </li>
+          <li>
+            Measure the base of your bowl and join the strip into a ring. Blend the ring edge with your hand and smooth the surface where they contact.
+          </li>
+          <li>
+            Use the sponge from the box, damp it slightly, then smooth over all surfaces and edges to make sure your piece is even and unwrinkled.
+          </li>
+        </ol>
+
+        <button class="primary-btn" id="check-bowl-btn">
+          check my bowl before bisque firing
+        </button>
+
+        <p class="small-note" id="check-result">
+          When you’re ready, tap the button to run a quick check.
+        </p>
+
+        <h2>2. Bisque fire somewhere else</h2>
+        <p class="body-text">
+          Let the bowl dry to leather-hard and then fully dry. Bring it to a local studio or community kiln for a bisque fire.
+        </p>
+        <a class="secondary-btn" href="bisque-schedule.html">
+          book a bisque firing session
+        </a>
+
+        <h2>3. Glazing</h2>
+        <ol class="step-list">
+          <li>Open the coloring set and the brushes. Remember: don’t add any water.</li>
+          <li>Use the coloring book to visualize the color after firing.</li>
+          <li>Glaze your bisque-fired bowl evenly, inside and outside.</li>
+        </ol>
+        <a class="secondary-btn" href="glaze-schedule.html">
+          book a glaze firing session
+        </a>
+
+        <h2>4. Firing somewhere else</h2>
+        <p class="body-text">
+          The studio will fire your glazed bowl in their kiln. This second firing develops the Speckled Field surface.
+        </p>
+
+        <h2>5. Receive the final piece</h2>
+        <p class="body-text">
+          Pick up your finished bowl from the studio and bring it back into your everyday routine.
+        </p>
+      </section>
+
+      <!-- RIGHT: fake AR / scan panel -->
+      <section class="scan-panel">
+        <div class="scan-frame">
+          <!-- You can replace this with a bowl photo later -->
+          <img
+            src="assets/AdobeStock_624796343.png"
+            alt="Speckled Field glaze reference"
+            class="scan-image"
+          />
+          <div class="scan-overlay" id="scan-overlay">
+            <div class="scan-line"></div>
+          </div>
+        </div>
+
+        <div class="scan-status" id="scan-status">
+          Point your bowl toward your camera and tap “check my bowl”.
+        </div>
+      </section>
+    </main>
+
+    <footer>© glaze diary</footer>
+  </div>
+
+  <script src="tutorial.js"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Glaze Diary – Glaze Firing Schedule</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="tutorial.css" />
+</head>
+<body>
+  <!-- side labels -->
+  <div class="side-label left">your studio assistant</div>
+  <div class="side-label right">glaze firing · second fire</div>
+
+  <div class="page">
+    <header>
+      <div class="logo-mark">
+        <img src="assets/greenbowl.png" alt="Glaze Diary logo" />
+      </div>
+
+      <div class="brand-name">glaze diary</div>
+
+      <nav class="main-nav">
+        <a href="index.html">story</a>
+        <a href="tutorial.html">studio</a>
+        <a href="index.html">glaze archive</a>
+      </nav>
+
+      <div class="announcement">
+        <div class="announcement-icon">i</div>
+        <div>Schedule the glaze firing for your Speckled Field bowl.</div>
+      </div>
+
+    <!-- Success popup animation -->
+    <div id="success-popup" class="success-popup">
+    <div class="popup-box">
+        <span>✓ Appointment Made!</span>
+    </div>
+    </div>
+
+    </header>
+
+    <main>
+      <h1 style="font-size:18px; margin:0 0 10px;">Glaze firing schedule</h1>
+      <p style="font-size:13px; max-width:520px; margin:0 0 16px;">
+        Once your bowl is glazed and dry, it’s ready for the second firing.
+        This firing melts the glaze and develops the Speckled Field surface.
+      </p>
+
+      <form
+        class="schedule-form"
+        style="
+          font-size:13px;
+          max-width:380px;
+          display:flex;
+          flex-direction:column;
+          gap:10px;
+          margin-bottom:24px;
+        "
+      >
+        <label>
+          Studio
+          <select style="width:100%; padding:6px; margin-top:4px;">
+            <option>Local Studio A</option>
+            <option>Community Kiln B</option>
+            <option>Pottery Cafe C</option>
+          </select>
+        </label>
+
+        <label>
+          Preferred date
+          <input type="date" style="width:100%; padding:6px; margin-top:4px;" />
+        </label>
+
+        <label>
+          Preferred time
+          <input type="time" style="width:100%; padding:6px; margin-top:4px;" />
+        </label>
+
+        <label>
+          Cone / firing details (optional)
+          <textarea
+            rows="3"
+            style="width:100%; padding:6px; margin-top:4px; resize:vertical;"
+            placeholder="Example: Cone 6 oxidation, Speckled Field test tile included…"
+          ></textarea>
+        </label>
+
+        <button type="submit" class="primary-btn" style="align-self:flex-start;">
+          request glaze firing
+        </button>
+      </form>
+
+      <p style="font-size:11px; color:#777; max-width:420px;">
+        This is a prototype form. In a full system, this request could be sent to a partner studio,
+        and your firing status could be tracked inside Glaze Diary.
+      </p>
+
+      <p style="font-size:12px; margin-top:16px;">
+        ← <a href="tutorial.html" style="text-decoration:underline;">back to Speckled Field tutorial</a>
+      </p>
+    </main>
+
+    <footer>© glaze diary</footer>
+  </div>
+
+    <script>
+    const form = document.querySelector(".schedule-form");
+    const popup = document.getElementById("success-popup");
+
+    form.addEventListener("submit", (e) => {
+        e.preventDefault(); // prevent page reload
+
+        // Show the popup
+        popup.style.display = "flex";
+
+        // Hide popup after animation (1.2s)
+        setTimeout(() => {
+        popup.style.display = "none";
+        }, 1200);
+    });
+    </script>
+</body>
+</html>
