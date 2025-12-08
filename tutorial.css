@@ -254,6 +254,79 @@
   object-fit: cover;
 }
 
+.scan-video {
+  display: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scan-video.active {
+  display: block;
+}
+
+.scan-image.hidden {
+  display: none;
+}
+
+.scan-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.scan-image.hidden {
+  display: none;
+}
+
+.scan-video {
+  display: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scan-video.active {
+  display: block;
+}
+
+/* shape overlay using shape.png */
+.shape-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.shape-overlay img {
+  max-width: 70%;
+  max-height: 70%;
+  opacity: 0.85;
+}
+
+.shape-overlay.active {
+  opacity: 1;
+}
+
+/* scan overlay already animates the line – keep your existing keyframes */
+
+#scan-start-btn {
+  display: none;          /* only shown once user clicks check-bowl */
+  margin-top: 8px;
+}
+
+/* greyed-out state before camera is ready */
+#scan-start-btn.is-disabled {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+
+
 /* fake scanning overlay */
 
 .scan-overlay {
@@ -417,3 +490,70 @@ header {
   background: #111;
   color: #fff;
 }
+
+.scan-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.scan-image.hidden {
+  display: none;
+}
+
+.scan-video {
+  display: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scan-video.active {
+  display: block;
+}
+
+/* bowl outline overlay */
+.bowl-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.bowl-overlay::before {
+  content: "";
+  width: 60%;
+  height: 45%;
+  border-radius: 50% 50% 45% 45%;
+  border: 2px dashed rgba(255, 255, 255, 0.9);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) inset;
+}
+
+/* when active, show the outline */
+.bowl-overlay.active {
+  opacity: 1;
+}
+
+/* scan overlay and scan line already exist, keep them */
+/* ... */
+
+/* "Scan and check" button is hidden until user clicks check-bowl-btn */
+#scan-start-btn {
+  display: none;
+  margin-top: 8px;
+}
+
+#next-step-btn {
+  display: none;
+  margin-top: 16px;
+  width: 100%;
+}
+
+#next-step-btn.visible {
+  display: inline-flex;
+}
+

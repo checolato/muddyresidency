@@ -8,9 +8,7 @@
   <link rel="stylesheet" href="tutorial.css" />
 </head>
 <body>
-  <!-- side labels -->
   <div class="page">
-
     <main class="tutorial-shell">
       <!-- LEFT: process menu -->
       <aside class="process-menu">
@@ -41,7 +39,7 @@
 
       <!-- RIGHT: full-screen process panels -->
       <section class="process-content">
-        <!-- PROCESS 1: CLAY MAKING + AR CHECK -->
+        <!-- PROCESS 1: CLAY MAKING + CHECK -->
         <section id="process-clay" class="process-screen active">
           <div class="process-header">
             <div class="process-tag">01 · clay making</div>
@@ -52,7 +50,11 @@
             <!-- clay stepper -->
             <div class="clay-column">
               <div class="clay-stepper">
-                <button class="step-arrow step-arrow-left" id="step-prev" aria-label="Previous step">
+                <button
+                  class="step-arrow step-arrow-left"
+                  id="step-prev"
+                  aria-label="Previous step"
+                >
                   ←
                 </button>
 
@@ -124,7 +126,11 @@
                   </div>
                 </div>
 
-                <button class="step-arrow step-arrow-right" id="step-next" aria-label="Next step">
+                <button
+                  class="step-arrow step-arrow-right"
+                  id="step-next"
+                  aria-label="Next step"
+                >
                   →
                 </button>
               </div>
@@ -138,23 +144,52 @@
               </p>
             </div>
 
-            <!-- AR / scan panel -->
+            <!-- Illustration / scan panel -->
             <div class="scan-panel">
-              <div class="scan-frame">
+            <div class="scan-frame">
+                <!-- step illustration -->
                 <img
-                  src="assets/AdobeStock_624796343.png"
-                  alt="Speckled Field glaze reference"
-                  class="scan-image"
+                src="assets/step 1.png"
+                alt="Step 1 – split the clay into two portions"
+                class="scan-image"
+                id="step-illustration"
                 />
-                <div class="scan-overlay" id="scan-overlay">
-                  <div class="scan-line"></div>
-                </div>
-              </div>
 
-              <div class="scan-status" id="scan-status">
-                Point your bowl toward your camera and tap “check my bowl”.
-              </div>
+                <!-- webcam preview, hidden by default -->
+                <video
+                id="scan-video"
+                class="scan-video"
+                autoplay
+                playsinline
+                muted
+                ></video>
+
+                <!-- alignment shape overlay -->
+                <div class="shape-overlay" id="shape-overlay">
+                <img src="assets/shape.png" alt="Bowl alignment guide" />
+                </div>
+
+                <!-- scanning overlay line (only during scan) -->
+                <div class="scan-overlay" id="scan-overlay">
+                <div class="scan-line"></div>
+                </div>
             </div>
+
+            <!-- user-controlled scan trigger -->
+            <button class="secondary-btn" id="scan-start-btn">
+                Scan and check
+            </button>
+
+            <div class="scan-status" id="scan-status">
+            Follow the clay steps. The checker will appear at the last step.
+            </div>
+
+            <button class="primary-btn next-step-btn" id="next-step-btn">
+            Next step →
+            </button>
+            </div>
+
+
           </div>
         </section>
 
