@@ -396,16 +396,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const glazeScanStatus  = document.getElementById('glaze-scan-status');
   const glazeScanOverlay = document.getElementById('glaze-scan-overlay');
 
-  const glazeModelEl    = document.getElementById('glaze-model');
-  const glazeMeta       = document.getElementById('glaze-meta');
-  const glazeSwatchWrap = document.getElementById('glaze-swatches');
-  const glazeNameEl     = document.getElementById('glaze-name');
-  const glazeNoteEl     = document.getElementById('glaze-note');
-  const glazeSwatches   = document.querySelectorAll('.glaze-swatch');
+  const glazeModelEl   = document.getElementById('glaze-model');
+  const glazeMeta      = document.getElementById('glaze-meta');
+  const glazeSwatchRow = document.getElementById('glaze-swatches');
+  const glazeNameEl    = document.getElementById('glaze-name');
+  const glazeNoteEl    = document.getElementById('glaze-note');
+  const glazeSwatches  = [...document.querySelectorAll('.glaze-swatch')];
 
-  let glazeStream   = null;
-  let glazeScanning = false;
-  let glazeMaterial = null;   // <— we’ll store the material here
+  let glazeStream    = null;
+  let glazeScanning  = false;
+  let glazeMaterials = []; // all materials on the bowl
 
   function stopGlazeVideo() {
     if (glazeStream) {
@@ -418,21 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // When the 3D model is ready, grab its first material and set a default color
-  if (glazeModelEl) {
-    glazeModelEl.addEventListener('load', () => {
-      const model = glazeModelEl.model;
-      if (model && model.materials && model.materials.length > 0) {
-        glazeMaterial = model.materials[0];
-
-        // default to Speckled Field color (same as first swatch data-color)
-        const defaultColor = [0.89, 0.86, 0.81, 1];
-        glazeMaterial.pbrMetallicRoughness.setBaseColorFactor(defaultColor);
-      }
-    });
-  }
-
-  // 5a. user taps “scan my bowl to start glazing”
+  // 5a. Scan flow
   if (glazeScanBtn && glazeVideo && glazeScanStatus) {
     glazeScanBtn.addEventListener('click', () => {
       if (glazeScanning) return;
@@ -448,9 +434,10 @@ document.addEventListener('DOMContentLoaded', () => {
             glazeVideo.classList.add('active');
 
             glazeScanStatus.textContent =
-              'Align your bowl. Scanning will start…';
+              'Align your bowl in the frame. We’ll run a quick scan…';
             glazeScanning = true;
 
+            // small delay → fake scan animation
             setTimeout(() => {
               if (glazeScanOverlay) glazeScanOverlay.classList.add('active');
               glazeScanStatus.textContent = 'Scanning your bowl…';
@@ -460,11 +447,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 stopGlazeVideo();
                 glazeScanning = false;
 
-                // hide video, show model + swatches
-                glazeVideo.classList.remove('active');
+                // show 3D model + swatches
                 if (glazeModelEl) glazeModelEl.classList.remove('hidden');
                 if (glazeMeta) glazeMeta.style.display = 'block';
-                if (glazeSwatchWrap) glazeSwatchWrap.style.display = 'flex';
+                if (glazeSwatchRow) glazeSwatchRow.style.display = 'flex';
 
                 glazeScanStatus.textContent =
                   'Scan complete. Rotate your bowl and try different glazes below.';
@@ -472,44 +458,54 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 800);
           })
           .catch(() => {
-            // camera failed – just show the model and swatches
+            // no camera → just show the model + swatches
             glazeScanStatus.textContent =
               'Camera not available. Here’s a sample bowl you can still try colors on.';
             if (glazeModelEl) glazeModelEl.classList.remove('hidden');
             if (glazeMeta) glazeMeta.style.display = 'block';
-            if (glazeSwatchWrap) glazeSwatchWrap.style.display = 'flex';
+            if (glazeSwatchRow) glazeSwatchRow.style.display = 'flex';
           });
       } else {
-        // no camera support – show preview directly
         glazeScanStatus.textContent =
           'Camera not available. Here’s a sample bowl you can still try colors on.';
         if (glazeModelEl) glazeModelEl.classList.remove('hidden');
         if (glazeMeta) glazeMeta.style.display = 'block';
-        if (glazeSwatchWrap) glazeSwatchWrap.style.display = 'flex';
+        if (glazeSwatchRow) glazeSwatchRow.style.display = 'flex';
       }
     });
   }
 
-  // 5b. Swatches → update glaze text + 3D color
-  if (glazeNameEl && glazeNoteEl && glazeSwatches.length) {
-    glazeSwatches.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const name  = btn.getAttribute('data-name');
-        const note  = btn.getAttribute('data-note');
-        const color = btn.getAttribute('data-color'); // "r,g,b"
+  // 5b. Once the model is ready, wire up swatches to recolor **all** materials
+  if (glazeModelEl && glazeSwatches.length && glazeNameEl && glazeNoteEl) {
+    glazeModelEl.addEventListener('load', () => {
+      const model = glazeModelEl.model;
 
-        glazeSwatches.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+      // Collect every material on the GLB so the whole bowl changes color
+      glazeMaterials = model && model.materials ? [...model.materials] : [];
 
-        if (name) glazeNameEl.textContent = name;
-        if (note) glazeNoteEl.textContent = note;
+      glazeSwatches.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const colorStr = btn.getAttribute('data-color'); // "0.89,0.86,0.81"
+          const name     = btn.getAttribute('data-name') || '';
+          const note     = btn.getAttribute('data-note') || '';
 
-        // If we have the material and a color string, recolor the bowl
-        if (glazeMaterial && color) {
-          const [r, g, b] = color.split(',').map(parseFloat);
-          glazeMaterial.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1]);
-        }
+          // update active state + labels
+          glazeSwatches.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          glazeNameEl.textContent = name;
+          glazeNoteEl.textContent = note;
+
+          if (!colorStr || !glazeMaterials.length) return;
+
+          const [r, g, b] = colorStr.split(',').map(Number);
+
+          // apply color to every material on the bowl
+          glazeMaterials.forEach(mat => {
+            if (mat && mat.pbrMetallicRoughness) {
+              mat.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1]);
+            }
+          });
+        });
       });
     });
   }
-
