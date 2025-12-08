@@ -105,19 +105,30 @@
   </div>
 
     <script>
-    const form = document.querySelector(".schedule-form");
-    const popup = document.getElementById("success-popup");
+    document.addEventListener('DOMContentLoaded', () => {
+        const form   = document.querySelector('.schedule-form');
+        const popup  = document.getElementById('success-popup');
 
-    form.addEventListener("submit", (e) => {
+        if (!form || !popup) return;
+
+        form.addEventListener('submit', (e) => {
         e.preventDefault(); // prevent page reload
 
-        // Show the popup
-        popup.style.display = "flex";
+        // Trigger animation
+        popup.classList.add('show');
 
-        // Hide popup after animation (1.2s)
+        // Optional: change button state
+        const button = form.querySelector('button[type="submit"]');
+        if (button) {
+            button.textContent = 'appointment requested';
+            button.disabled = true;
+        }
+
+        // Remove the show class after 1.2s (matches CSS animation)
         setTimeout(() => {
-        popup.style.display = "none";
+            popup.classList.remove('show');
         }, 1200);
+        });
     });
     </script>
 

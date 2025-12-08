@@ -14,7 +14,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   navItems.forEach(item => {
-    item.addEventListener('click', () => showProcess(item.dataset.target));
+    item.addEventListener('click', () => {
+      const target = item.dataset.target;
+      if (!target) return;
+
+      // ⬇️ just switch sections inside tutorial.html
+      showProcess(target);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   });
 
   // Default to clay screen
@@ -221,12 +228,80 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* -----------------------------
-   * 3c. "Next step →"
+   * 3c. "Next step →" — show Bisque step in-place
    * ----------------------------*/
   nextStepBtn?.addEventListener('click', () => {
     showProcess('process-bisque');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     nextStepBtn.classList.remove('visible');
   });
+
+    // ------------------------------------------------------
+    // 4) Bisque schedule form: "Appointment Made!" animation
+    // ------------------------------------------------------
+    const bisqueForm  = document.querySelector('#process-bisque .schedule-form');
+    const bisquePopup = document.getElementById('success-popup');
+    const bisqueNext  = document.getElementById('bisque-next-btn');
+
+    if (bisqueForm && bisquePopup) {
+    bisqueForm.addEventListener('submit', (e) => {
+        e.preventDefault(); // don’t actually submit anywhere
+
+        // play success popup
+        bisquePopup.classList.add('show');
+
+        // update submit button
+        const submitBtn = bisqueForm.querySelector('button[type="submit"]');
+        if (submitBtn) {
+        submitBtn.textContent = 'appointment requested';
+        submitBtn.disabled = true;
+        }
+
+        // reveal NEXT STEP button
+        if (bisqueNext) {
+        bisqueNext.style.display = 'inline-flex';
+        }
+
+        // hide popup after animation
+        setTimeout(() => {
+        bisquePopup.classList.remove('show');
+        }, 1200);
+    });
+    }
+
+    // When NEXT STEP is clicked → jump to glazing section
+    bisqueNext?.addEventListener('click', () => {
+    showProcess('process-glazing');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ------------------------------------------------------
+    // 5) Glaze preview: switch bowl image + text by swatch
+    // ------------------------------------------------------
+    const glazeImg   = document.getElementById('glaze-bowl-image');
+    const glazeName  = document.getElementById('glaze-name');
+    const glazeNote  = document.getElementById('glaze-note');
+    const glazeBtns  = document.querySelectorAll('.glaze-swatch');
+
+    if (glazeImg && glazeName && glazeNote && glazeBtns.length) {
+        glazeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const img  = btn.getAttribute('data-image');
+            const name = btn.getAttribute('data-name');
+            const note = btn.getAttribute('data-note');
+
+            // update active state
+            glazeBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // swap content
+            if (img)  glazeImg.src  = img;
+            if (name) glazeName.textContent = name;
+            if (note) glazeNote.textContent = note;
+        });
+        });
+    }
+
+
 
 });
