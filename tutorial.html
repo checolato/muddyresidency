@@ -8,113 +8,245 @@
   <link rel="stylesheet" href="tutorial.css" />
 </head>
 <body>
-  <!-- side labels (reuse styling from index) -->
-  <div class="side-label left">your studio assistant</div>
-  <div class="side-label right">speckled field · beginner bowl</div>
-
+  <!-- side labels -->
   <div class="page">
-    <header>
-      <div class="logo-mark">
-        <img src="assets/greenbowl.png" alt="Glaze Diary logo" />
-      </div>
 
-      <div class="brand-name">glaze diary</div>
-
-      <nav class="main-nav">
-        <a href="index.html">story</a>
-        <a href="tutorial.html">studio</a>
-        <a href="index.html">glaze archive</a>
-      </nav>
-
-      <div class="announcement">
-        <div class="announcement-icon">i</div>
-        <div>Speckled Field · beginner bowl tutorial · earthenware clay</div>
-      </div>
-    </header>
-
-    <main class="tutorial-layout">
-      <!-- LEFT: tutorial steps -->
-      <section class="tutorial-steps">
-        <h1>Speckled Field · hand-built bowl</h1>
-
-        <h2>1. Clay making</h2>
-        <ol class="step-list">
-          <li>Split the clay into 2 portions, roughly 1:4.</li>
-          <li>Make a ball from the larger portion.</li>
-          <li>
-            Use your finger or utensil 1 to pinch a hole in the middle of the ball and rotate outwards.
+    <main class="tutorial-shell">
+      <!-- LEFT: process menu -->
+      <aside class="process-menu">
+        <div class="process-menu-title">process</div>
+        <ul class="process-nav">
+          <li class="process-nav-item active" data-target="process-clay">
+            <span class="process-index">01</span>
+            <span class="process-label">clay making</span>
           </li>
-          <li>
-            Slightly change the position of your hands and expand out to make a bowl shape.
+          <li class="process-nav-item" data-target="process-bisque">
+            <span class="process-index">02</span>
+            <span class="process-label">bisque fire</span>
           </li>
-          <li>
-            Refine the edge of the bowl with your fingers and utensil 2 once you get the bowl shape.
+          <li class="process-nav-item" data-target="process-glazing">
+            <span class="process-index">03</span>
+            <span class="process-label">glazing</span>
           </li>
-          <li>
-            Take the smaller portion and roll out a long strip with your palm to make the base.
+          <li class="process-nav-item" data-target="process-glaze-fire">
+            <span class="process-index">04</span>
+            <span class="process-label">glaze firing</span>
           </li>
-          <li>
-            Measure the base of your bowl and join the strip into a ring. Blend the ring edge with your hand and smooth the surface where they contact.
+          <li class="process-nav-item" data-target="process-final">
+            <span class="process-index">05</span>
+            <span class="process-label">final piece</span>
           </li>
-          <li>
-            Use the sponge from the box, damp it slightly, then smooth over all surfaces and edges to make sure your piece is even and unwrinkled.
-          </li>
-        </ol>
+        </ul>
+      </aside>
 
-        <button class="primary-btn" id="check-bowl-btn">
-          check my bowl before bisque firing
-        </button>
-
-        <p class="small-note" id="check-result">
-          When you’re ready, tap the button to run a quick check.
-        </p>
-
-        <h2>2. Bisque fire somewhere else</h2>
-        <p class="body-text">
-          Let the bowl dry to leather-hard and then fully dry. Bring it to a local studio or community kiln for a bisque fire.
-        </p>
-        <a class="secondary-btn" href="bisque-schedule.html">
-          book a bisque firing session
-        </a>
-
-        <h2>3. Glazing</h2>
-        <ol class="step-list">
-          <li>Open the coloring set and the brushes. Remember: don’t add any water.</li>
-          <li>Use the coloring book to visualize the color after firing.</li>
-          <li>Glaze your bisque-fired bowl evenly, inside and outside.</li>
-        </ol>
-        <a class="secondary-btn" href="glaze-schedule.html">
-          book a glaze firing session
-        </a>
-
-        <h2>4. Firing somewhere else</h2>
-        <p class="body-text">
-          The studio will fire your glazed bowl in their kiln. This second firing develops the Speckled Field surface.
-        </p>
-
-        <h2>5. Receive the final piece</h2>
-        <p class="body-text">
-          Pick up your finished bowl from the studio and bring it back into your everyday routine.
-        </p>
-      </section>
-
-      <!-- RIGHT: fake AR / scan panel -->
-      <section class="scan-panel">
-        <div class="scan-frame">
-          <!-- You can replace this with a bowl photo later -->
-          <img
-            src="assets/AdobeStock_624796343.png"
-            alt="Speckled Field glaze reference"
-            class="scan-image"
-          />
-          <div class="scan-overlay" id="scan-overlay">
-            <div class="scan-line"></div>
+      <!-- RIGHT: full-screen process panels -->
+      <section class="process-content">
+        <!-- PROCESS 1: CLAY MAKING + AR CHECK -->
+        <section id="process-clay" class="process-screen active">
+          <div class="process-header">
+            <div class="process-tag">01 · clay making</div>
+            <h1>Speckled Field · hand-built bowl</h1>
           </div>
-        </div>
 
-        <div class="scan-status" id="scan-status">
-          Point your bowl toward your camera and tap “check my bowl”.
-        </div>
+          <div class="clay-layout">
+            <!-- clay stepper -->
+            <div class="clay-column">
+              <div class="clay-stepper">
+                <button class="step-arrow step-arrow-left" id="step-prev" aria-label="Previous step">
+                  ←
+                </button>
+
+                <div class="clay-step-wrapper">
+                  <!-- Step 1 -->
+                  <div class="clay-step active" data-step="1">
+                    <div class="step-label">Step 1 / 8</div>
+                    <p class="step-body">
+                      Split the clay into 2 portions, roughly 1:4. Keep both portions covered so they don’t dry out.
+                    </p>
+                  </div>
+
+                  <!-- Step 2 -->
+                  <div class="clay-step" data-step="2">
+                    <div class="step-label">Step 2 / 8</div>
+                    <p class="step-body">
+                      Make a smooth ball from the larger portion. This will become the main body of your bowl.
+                    </p>
+                  </div>
+
+                  <!-- Step 3 -->
+                  <div class="clay-step" data-step="3">
+                    <div class="step-label">Step 3 / 8</div>
+                    <p class="step-body">
+                      Use your finger or utensil 1 to pinch a hole in the middle of the ball and gently rotate outwards.
+                    </p>
+                  </div>
+
+                  <!-- Step 4 -->
+                  <div class="clay-step" data-step="4">
+                    <div class="step-label">Step 4 / 8</div>
+                    <p class="step-body">
+                      Slightly change the position of your hands and continue expanding out to form a bowl shape.
+                    </p>
+                  </div>
+
+                  <!-- Step 5 -->
+                  <div class="clay-step" data-step="5">
+                    <div class="step-label">Step 5 / 8</div>
+                    <p class="step-body">
+                      Refine the edge of the bowl with your fingers and utensil 2 once you’re happy with the overall form.
+                    </p>
+                  </div>
+
+                  <!-- Step 6 -->
+                  <div class="clay-step" data-step="6">
+                    <div class="step-label">Step 6 / 8</div>
+                    <p class="step-body">
+                      Take the smaller portion of clay and roll out a long strip with your palm to create the base ring.
+                    </p>
+                  </div>
+
+                  <!-- Step 7 -->
+                  <div class="clay-step" data-step="7">
+                    <div class="step-label">Step 7 / 8</div>
+                    <p class="step-body">
+                      Measure the base of your bowl, join the strip into a ring, and blend the seam. Smooth where the bowl
+                      and ring meet.
+                    </p>
+                  </div>
+
+                  <!-- Step 8 -->
+                  <div class="clay-step" data-step="8">
+                    <div class="step-label">Step 8 / 8</div>
+                    <p class="step-body">
+                      Use the sponge from the box, damp it slightly, and smooth over all surfaces and edges until your piece
+                      is even and unwrinkled.
+                    </p>
+                  </div>
+                </div>
+
+                <button class="step-arrow step-arrow-right" id="step-next" aria-label="Next step">
+                  →
+                </button>
+              </div>
+
+              <button class="primary-btn" id="check-bowl-btn">
+                check my bowl before bisque firing
+              </button>
+
+              <p class="small-note" id="check-result">
+                Move through all the clay steps, then tap the button to run a quick check.
+              </p>
+            </div>
+
+            <!-- AR / scan panel -->
+            <div class="scan-panel">
+              <div class="scan-frame">
+                <img
+                  src="assets/AdobeStock_624796343.png"
+                  alt="Speckled Field glaze reference"
+                  class="scan-image"
+                />
+                <div class="scan-overlay" id="scan-overlay">
+                  <div class="scan-line"></div>
+                </div>
+              </div>
+
+              <div class="scan-status" id="scan-status">
+                Point your bowl toward your camera and tap “check my bowl”.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PROCESS 2: BISQUE FIRE -->
+        <section id="process-bisque" class="process-screen">
+          <div class="process-header">
+            <div class="process-tag">02 · bisque fire somewhere else</div>
+            <h1>First firing · turning clay into ceramic</h1>
+          </div>
+
+          <p class="body-text">
+            After your bowl is leather-hard and then fully dry, it’s ready for its first firing. This stage burns out
+            moisture and organic materials and prepares the piece for glaze.
+          </p>
+          <p class="body-text">
+            Place your bowl carefully in a box or padded bag and bring it to a local studio or community kiln.
+            Tell them you’re looking for a <strong>bisque fire</strong> for earthenware clay.
+          </p>
+
+          <a class="secondary-btn" href="bisque-schedule.html">
+            book a bisque firing session
+          </a>
+
+          <p class="small-note">
+            In a full version of Glaze Diary, this step could be connected directly to partner studios, so you can book
+            and track your firing online.
+          </p>
+        </section>
+
+        <!-- PROCESS 3: GLAZING -->
+        <section id="process-glazing" class="process-screen">
+          <div class="process-header">
+            <div class="process-tag">03 · glazing</div>
+            <h1>Coloring with Speckled Field</h1>
+          </div>
+
+          <ol class="step-list">
+            <li>Open the Speckled Field coloring set and the brushes.</li>
+            <li>Remember: don’t add any water to the glaze.</li>
+            <li>
+              Use the coloring guide to imagine how the surface will shift after firing. Speckles will grow stronger as the
+              glaze melts.
+            </li>
+            <li>Glaze your bisque-fired bowl evenly, inside and outside. Avoid leaving thick drips on the foot.</li>
+          </ol>
+
+          <p class="body-text">
+            Let the glaze dry completely before bringing the bowl back to the studio for the final firing.
+          </p>
+
+          <a class="secondary-btn" href="glaze-schedule.html">
+            book a glaze firing session
+          </a>
+        </section>
+
+        <!-- PROCESS 4: GLAZE FIRING -->
+        <section id="process-glaze-fire" class="process-screen">
+          <div class="process-header">
+            <div class="process-tag">04 · glaze firing somewhere else</div>
+            <h1>Second firing · melting the surface</h1>
+          </div>
+
+          <p class="body-text">
+            The studio will load your glazed bowl into the kiln for a second firing. At this temperature, the glaze melts,
+            the speckles open up, and the surface becomes food-safe and sealed.
+          </p>
+          <p class="body-text">
+            Ask the studio which cone and atmosphere they use for this glaze. Over time, you can learn how firing conditions
+            shape the exact color and texture of Speckled Field.
+          </p>
+        </section>
+
+        <!-- PROCESS 5: FINAL PIECE -->
+        <section id="process-final" class="process-screen">
+          <div class="process-header">
+            <div class="process-tag">05 · receive the final piece</div>
+            <h1>Bringing the bowl back home</h1>
+          </div>
+
+          <p class="body-text">
+            Pick up your finished bowl from the studio and bring it back into your everyday routine — on your desk, in your
+            kitchen, or wherever you want a quiet reminder of the making process.
+          </p>
+          <p class="body-text">
+            Over time, Glaze Diary could store a record of each piece you fire: clay body, glaze, firing notes, and photos
+            from daily use.
+          </p>
+
+          <p class="small-note">
+            You can return to any step from the menu on the left if you want to revisit the process.
+          </p>
+        </section>
       </section>
     </main>
 

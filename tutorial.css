@@ -1,20 +1,115 @@
-/* Layout for tutorial page */
-.tutorial-layout {
+/* ========== SHELL LAYOUT ========== */
+
+.tutorial-shell {
   display: grid;
-  grid-template-columns: 1.3fr 1.1fr;
-  gap: 32px;
-  align-items: flex-start;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 24px;
+  min-height: 70vh;
 }
 
-.tutorial-steps h1 {
+/* left menu */
+
+.process-menu {
+  border-right: 1px solid #eee;
+  padding-right: 12px;
+  padding-top: 4px;
+}
+
+.process-menu-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #999;
+  margin-bottom: 8px;
+}
+
+.process-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.process-nav-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #777;
+}
+
+.process-nav-item:hover {
+  background: #f4f4f4;
+}
+
+.process-nav-item.active {
+  background: #111;
+  color: #fff;
+}
+
+.process-index {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.process-label {
+  flex: 1;
+}
+
+/* right content area */
+
+.process-content {
+  position: relative;
+}
+
+/* each process screen takes over the content area */
+
+.process-screen {
+  display: none;
+  animation: fadeInProcess 0.25s ease-out;
+  min-height: 60vh;
+}
+
+.process-screen.active {
+  display: block;
+}
+
+@keyframes fadeInProcess {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* process header */
+
+.process-header {
+  margin-bottom: 16px;
+}
+
+.process-header h1 {
   font-size: 18px;
-  margin: 0 0 14px;
+  margin: 2px 0 0;
 }
 
-.tutorial-steps h2 {
-  font-size: 14px;
-  margin: 18px 0 6px;
+.process-tag {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #999;
 }
+
+/* shared text styles */
 
 .step-list {
   font-size: 13px;
@@ -60,7 +155,83 @@
   margin: 0 0 12px;
 }
 
-/* Scan panel */
+/* ========== CLAY PROCESS LAYOUT ========== */
+
+.clay-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr);
+  gap: 18px;
+  align-items: flex-start;
+}
+
+/* clay stepper */
+
+.clay-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.clay-stepper {
+  position: relative;
+  margin: 6px 0 4px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clay-step-wrapper {
+  flex: 1;
+  min-height: 80px;
+}
+
+.clay-step {
+  display: none;
+}
+
+.clay-step.active {
+  display: block;
+}
+
+.step-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #999;
+  margin-bottom: 4px;
+}
+
+.step-body {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.step-arrow {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.step-arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* scan panel */
+
 .scan-panel {
   display: flex;
   flex-direction: column;
@@ -83,7 +254,8 @@
   object-fit: cover;
 }
 
-/* Fake scanning overlay */
+/* fake scanning overlay */
+
 .scan-overlay {
   position: absolute;
   inset: 0;
@@ -123,18 +295,8 @@
   color: #777;
 }
 
-/* Responsive: stack on small screens */
-@media (max-width: 800px) {
-  .tutorial-layout {
-    grid-template-columns: 1fr;
-  }
+/* ========== SUCCESS POPUP (for schedule pages) ========== */
 
-  .scan-panel {
-    order: -1;
-  }
-}
-
-/* Success popup animation */
 .success-popup {
   position: fixed;
   inset: 0;
@@ -153,7 +315,7 @@
   font-size: 14px;
   font-weight: 600;
   color: #111;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
   opacity: 0;
   transform: translateY(10px);
   animation: popupFade 1.2s ease forwards;
@@ -174,8 +336,84 @@
 }
 
 @keyframes fadeOut {
-  0% { opacity: 1; }
-  70% { opacity: 1; }
-  100% { opacity: 0; display: none; }
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    display: none;
+  }
 }
 
+/* ========== RESPONSIVE ========== */
+
+@media (max-width: 900px) {
+  .tutorial-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .process-menu {
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+  }
+
+  .clay-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .clay-stepper {
+    padding: 12px 10px;
+  }
+
+  .step-arrow {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+
+  .step-body {
+    font-size: 12px;
+  }
+}
+
+/* Remove top spacing reserved for header */
+.page {
+  padding-top: 100px !important;
+}
+
+/* Tutorial page shouldn’t show side labels */
+.side-label {
+  display: none !important;
+}
+
+/* Remove the empty space that header used to take */
+header {
+  display: none !important;
+}
+
+.announcement {
+  display: none !important;
+}
+
+.primary-btn {
+  background: #fff;
+  color: #111;
+  border: 1px solid #111;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.primary-btn:hover {
+  background: #111;
+  color: #fff;
+}
