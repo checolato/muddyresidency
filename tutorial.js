@@ -387,3 +387,129 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+  /* ------------------------------------------------------------------------
+   * 5) GLAZING — fake scan + 3D bowl + color swatches
+   * ----------------------------------------------------------------------*/
+  const glazeVideo       = document.getElementById('glaze-video');
+  const glazeScanBtn     = document.getElementById('glaze-scan-btn');
+  const glazeScanStatus  = document.getElementById('glaze-scan-status');
+  const glazeScanOverlay = document.getElementById('glaze-scan-overlay');
+
+  const glazeModelEl    = document.getElementById('glaze-model');
+  const glazeMeta       = document.getElementById('glaze-meta');
+  const glazeSwatchWrap = document.getElementById('glaze-swatches');
+  const glazeNameEl     = document.getElementById('glaze-name');
+  const glazeNoteEl     = document.getElementById('glaze-note');
+  const glazeSwatches   = document.querySelectorAll('.glaze-swatch');
+
+  let glazeStream   = null;
+  let glazeScanning = false;
+  let glazeMaterial = null;   // <— we’ll store the material here
+
+  function stopGlazeVideo() {
+    if (glazeStream) {
+      glazeStream.getTracks().forEach(t => t.stop());
+      glazeStream = null;
+    }
+    if (glazeVideo) {
+      glazeVideo.classList.remove('active');
+      glazeVideo.srcObject = null;
+    }
+  }
+
+  // When the 3D model is ready, grab its first material and set a default color
+  if (glazeModelEl) {
+    glazeModelEl.addEventListener('load', () => {
+      const model = glazeModelEl.model;
+      if (model && model.materials && model.materials.length > 0) {
+        glazeMaterial = model.materials[0];
+
+        // default to Speckled Field color (same as first swatch data-color)
+        const defaultColor = [0.89, 0.86, 0.81, 1];
+        glazeMaterial.pbrMetallicRoughness.setBaseColorFactor(defaultColor);
+      }
+    });
+  }
+
+  // 5a. user taps “scan my bowl to start glazing”
+  if (glazeScanBtn && glazeVideo && glazeScanStatus) {
+    glazeScanBtn.addEventListener('click', () => {
+      if (glazeScanning) return;
+
+      glazeScanStatus.textContent =
+        'We’re opening your camera. Allow access to start the scan.';
+
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(stream => {
+            glazeStream = stream;
+            glazeVideo.srcObject = stream;
+            glazeVideo.classList.add('active');
+
+            glazeScanStatus.textContent =
+              'Align your bowl. Scanning will start…';
+            glazeScanning = true;
+
+            setTimeout(() => {
+              if (glazeScanOverlay) glazeScanOverlay.classList.add('active');
+              glazeScanStatus.textContent = 'Scanning your bowl…';
+
+              setTimeout(() => {
+                if (glazeScanOverlay) glazeScanOverlay.classList.remove('active');
+                stopGlazeVideo();
+                glazeScanning = false;
+
+                // hide video, show model + swatches
+                glazeVideo.classList.remove('active');
+                if (glazeModelEl) glazeModelEl.classList.remove('hidden');
+                if (glazeMeta) glazeMeta.style.display = 'block';
+                if (glazeSwatchWrap) glazeSwatchWrap.style.display = 'flex';
+
+                glazeScanStatus.textContent =
+                  'Scan complete. Rotate your bowl and try different glazes below.';
+              }, 2000);
+            }, 800);
+          })
+          .catch(() => {
+            // camera failed – just show the model and swatches
+            glazeScanStatus.textContent =
+              'Camera not available. Here’s a sample bowl you can still try colors on.';
+            if (glazeModelEl) glazeModelEl.classList.remove('hidden');
+            if (glazeMeta) glazeMeta.style.display = 'block';
+            if (glazeSwatchWrap) glazeSwatchWrap.style.display = 'flex';
+          });
+      } else {
+        // no camera support – show preview directly
+        glazeScanStatus.textContent =
+          'Camera not available. Here’s a sample bowl you can still try colors on.';
+        if (glazeModelEl) glazeModelEl.classList.remove('hidden');
+        if (glazeMeta) glazeMeta.style.display = 'block';
+        if (glazeSwatchWrap) glazeSwatchWrap.style.display = 'flex';
+      }
+    });
+  }
+
+  // 5b. Swatches → update glaze text + 3D color
+  if (glazeNameEl && glazeNoteEl && glazeSwatches.length) {
+    glazeSwatches.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const name  = btn.getAttribute('data-name');
+        const note  = btn.getAttribute('data-note');
+        const color = btn.getAttribute('data-color'); // "r,g,b"
+
+        glazeSwatches.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        if (name) glazeNameEl.textContent = name;
+        if (note) glazeNoteEl.textContent = note;
+
+        // If we have the material and a color string, recolor the bowl
+        if (glazeMaterial && color) {
+          const [r, g, b] = color.split(',').map(parseFloat);
+          glazeMaterial.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1]);
+        }
+      });
+    });
+  }
+
