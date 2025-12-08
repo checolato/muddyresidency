@@ -282,124 +282,120 @@
 
         <!-- PROCESS 3: GLAZING -->
         <section id="process-glazing" class="process-screen">
-          <div class="process-header">
+        <div class="process-header">
             <div class="process-tag">03 · glazing</div>
             <h1>Glazing · see your bowl in color</h1>
-          </div>
+        </div>
 
-          <div class="glaze-layout">
+        <div class="glaze-layout">
             <!-- LEFT: instructions -->
             <div class="glaze-column glaze-instructions">
-              <ol class="step-list">
+            <ol class="step-list">
                 <li>Open the Speckled Field coloring set and the brushes.</li>
                 <li>Remember: don’t add any water to the glaze.</li>
                 <li>
-                  Use the scan on the right to “lock in” your bowl, then try different
-                  glaze colors to preview how they look after firing.
+                Use the scan on the right to “lock in” your bowl, then try different
+                glaze colors to preview how they look after firing.
                 </li>
                 <li>
-                  Once you’re happy with the color, glaze your bisque-fired bowl evenly,
-                  inside and outside. Avoid leaving thick drips on the foot.
+                Once you’re happy with the color, glaze your bisque-fired bowl evenly,
+                inside and outside. Avoid leaving thick drips on the foot.
                 </li>
-              </ol>
+            </ol>
 
-              <p class="body-text">
+            <p class="body-text">
                 Let the glaze dry completely before bringing the bowl back to the studio
                 for the final firing.
-              </p>
+            </p>
             </div>
 
             <!-- RIGHT: scan + 3D preview -->
             <div class="glaze-column glaze-preview">
-              <div class="scan-frame">
+            <div class="scan-frame">
                 <!-- webcam feed (before / during scan) -->
                 <video
-                  id="glaze-video"
-                  class="scan-video"
-                  autoplay
-                  playsinline
-                  muted
+                id="glaze-video"
+                class="scan-video"
+                autoplay
+                playsinline
+                muted
                 ></video>
 
                 <!-- 3D bowl model (shown after scan completes) -->
                 <model-viewer
-                  id="glaze-model"
-                  class="glaze-model hidden"
-                  src="assets/bowl-white.glb"
-                  alt="Glazed bowl preview"
-                  camera-controls
-                  auto-rotate
-                  interaction-prompt="auto"
-                  exposure="1"
-                  style="width:100%; height:100%;"
+                id="glaze-model"
+                class="glaze-model hidden"
+                src="assets/bowl-white.glb"
+                alt="Glazed bowl preview"
+                camera-controls
+                auto-rotate
+                interaction-prompt="auto"
+                exposure="1"
+                style="width:100%; height:100%;"
                 ></model-viewer>
 
                 <!-- fake scanning overlay -->
                 <div class="scan-overlay" id="glaze-scan-overlay">
-                  <div class="scan-line"></div>
+                <div class="scan-line"></div>
                 </div>
+            </div> <!-- /scan-frame -->
 
-                <!-- alignment overlay -->
-                <div class="shape-overlay" id="glaze-shape-overlay">
-                  <img src="assets/shape.png" alt="Bowl alignment guide" />
-                </div>
-              </div>
-
-              <!-- scan button + status -->
-              <button class="primary-btn" id="glaze-scan-btn">
+            <!-- scan button + status -->
+            <button class="primary-btn" id="glaze-scan-btn">
                 scan my bowl to start glazing
-              </button>
+            </button>
 
-              <p class="scan-status" id="glaze-scan-status">
+            <p class="scan-status" id="glaze-scan-status">
                 When you’re ready, tap “scan my bowl to start glazing”.
-              </p>
+            </p>
 
-              <!-- After scan: glaze info + swatches (hidden at first) -->
-              <div class="glaze-meta" id="glaze-meta" style="display:none;">
+            <!-- After scan: glaze info + swatches (hidden at first) -->
+            <div class="glaze-meta" id="glaze-meta" style="display:none;">
                 <div class="glaze-meta-name" id="glaze-name">Speckled Field</div>
                 <div class="glaze-meta-note" id="glaze-note">
-                  Soft off-white with warm speckles. Speckles open up and darken
-                  slightly after firing.
+                Soft off-white with warm speckles. Speckles open up and darken
+                slightly after firing.
                 </div>
-              </div>
+            </div>
 
-              <div class="glaze-swatches" id="glaze-swatches" style="display:none;">
+            <div class="glaze-swatches" id="glaze-swatches" style="display:none;">
                 <!-- Swatch 1: Speckled Field -->
                 <button
-                  class="glaze-swatch active"
-                  data-color="0.89,0.86,0.81"
-                  data-name="Speckled Field"
-                  data-note="Soft off-white base with warm speckles. Tone warms slightly after firing."
+                class="glaze-swatch active"
+                data-color="0.89,0.86,0.81"
+                data-name="Speckled Field"
+                data-note="Soft off-white base with warm speckles. Tone warms slightly after firing."
                 >
-                  <span class="swatch-chip" style="background:#e3dccf;"></span>
-                  <span class="swatch-label">Speckled Field</span>
+                <span class="swatch-chip" style="background:#e3dccf;"></span>
+                <span class="swatch-label">Speckled Field</span>
                 </button>
 
                 <!-- Swatch 2: Celadon -->
                 <button
-                  class="glaze-swatch"
-                  data-color="0.76,0.84,0.78"
-                  data-name="Celadon Green"
-                  data-note="Pale translucent green that pools deeper and breaks lighter at the rim."
+                class="glaze-swatch"
+                data-color="0.76,0.84,0.78"
+                data-name="Celadon Green"
+                data-note="Pale translucent green that pools deeper and breaks lighter at the rim."
                 >
-                  <span class="swatch-chip" style="background:#c4d8c8;"></span>
-                  <span class="swatch-label">Celadon Green</span>
+                <span class="swatch-chip" style="background:#c4d8c8;"></span>
+                <span class="swatch-label">Celadon Green</span>
                 </button>
 
                 <!-- Swatch 3: Milk White -->
                 <button
-                  class="glaze-swatch"
-                  data-color="0.95,0.95,0.92"
-                  data-name="Milk White"
-                  data-note="Smooth satin white with a warm undertone. Brush strokes soften after firing."
+                class="glaze-swatch"
+                data-color="0.95,0.95,0.92"
+                data-name="Milk White"
+                data-note="Smooth satin white with a warm undertone. Brush strokes soften after firing."
                 >
-                  <span class="swatch-chip" style="background:#f3f1eb;"></span>
-                  <span class="swatch-label">Milk White</span>
+                <span class="swatch-chip" style="background:#f3f1eb;"></span>
+                <span class="swatch-label">Milk White</span>
                 </button>
-              </div>
             </div>
-          </div>
+            </div> <!-- /glaze-column glaze-preview -->
+        </div> <!-- /glaze-layout -->
         </section>
+
 
 
         <!-- PROCESS 4: GLAZE FIRING -->
