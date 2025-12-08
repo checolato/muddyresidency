@@ -686,3 +686,22 @@ header {
   display: none !important;
 }
 
+.exit-tutorial-btn {
+  position: fixed;
+  top: 22px;
+  left: 26px;
+  z-index: 9999;
+  font-size: 22px;
+  text-decoration: none;
+  color: #000;
+  opacity: 0.7;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.exit-tutorial-btn:hover {
+  opacity: 1;
+  color: #000;
+  background: #f2f2f2;
+}
