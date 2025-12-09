@@ -294,12 +294,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ------------------------------------------------------------------------
-   * 5) GLAZING — fake scan + 3D bowl + color swatches
+   * 5) GLAZING — fake scan + 3D bowl + color swatches + texture overlay
    * ----------------------------------------------------------------------*/
-  const glazeVideo       = document.getElementById('glaze-video');
-  const glazeScanBtn     = document.getElementById('glaze-scan-btn');
-  const glazeScanStatus  = document.getElementById('glaze-scan-status');
-  const glazeScanOverlay = document.getElementById('glaze-scan-overlay');
+  const glazeVideo          = document.getElementById('glaze-video');
+  const glazeScanBtn        = document.getElementById('glaze-scan-btn');
+  const glazeScanStatus     = document.getElementById('glaze-scan-status');
+  const glazeScanOverlay    = document.getElementById('glaze-scan-overlay');
+  const glazeTextureOverlay = document.getElementById('glaze-texture-overlay');
 
   const glazeModelEl   = document.getElementById('glaze-model');
   const glazeMeta      = document.getElementById('glaze-meta');
@@ -388,15 +389,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
       glazeSwatches.forEach(btn => {
         btn.addEventListener('click', () => {
-          const colorStr = btn.getAttribute('data-color'); // "0.89,0.86,0.81"
-          const name     = btn.getAttribute('data-name') || '';
-          const note     = btn.getAttribute('data-note') || '';
+          const colorStr    = btn.getAttribute('data-color'); // "0.89,0.86,0.81"
+          const name        = btn.getAttribute('data-name') || '';
+          const note        = btn.getAttribute('data-note') || '';
+          const isSpeckled  = btn.hasAttribute('data-speckled');
 
           // update active state + labels
           glazeSwatches.forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           glazeNameEl.textContent = name;
           glazeNoteEl.textContent = note;
+
+          // toggle texture overlay
+          if (glazeTextureOverlay) {
+            glazeTextureOverlay.style.display = isSpeckled ? 'block' : 'none';
+          }
 
           if (!colorStr || !glazeMaterials.length) return;
 

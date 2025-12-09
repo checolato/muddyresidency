@@ -18,9 +18,9 @@
   <div class="page">
     <a href="index.html" class="exit-tutorial-btn" aria-label="Exit tutorial">✕</a>
     <div id="success-popup" class="success-popup">
-    <div class="popup-box">
+      <div class="popup-box">
         <span>✓ Appointment Made!</span>
-    </div>
+      </div>
     </div>
 
     <main class="tutorial-shell">
@@ -145,7 +145,7 @@
                   id="step-next"
                   aria-label="Next step"
                 >
-                  →
+                  → 
                 </button>
               </div>
 
@@ -160,321 +160,318 @@
 
             <!-- Illustration / scan panel -->
             <div class="scan-panel">
-            <div class="scan-frame">
+              <div class="scan-frame">
                 <!-- step illustration -->
                 <img
-                src="assets/step 1.png"
-                alt="Step 1 – split the clay into two portions"
-                class="scan-image"
-                id="step-illustration"
+                  src="assets/step 1.png"
+                  alt="Step 1 – split the clay into two portions"
+                  class="scan-image"
+                  id="step-illustration"
                 />
 
                 <!-- webcam preview, hidden by default -->
                 <video
-                id="scan-video"
-                class="scan-video"
-                autoplay
-                playsinline
-                muted
+                  id="scan-video"
+                  class="scan-video"
+                  autoplay
+                  playsinline
+                  muted
                 ></video>
 
                 <!-- alignment shape overlay -->
                 <div class="shape-overlay" id="shape-overlay">
-                <img src="assets/shape.png" alt="Bowl alignment guide" />
+                  <img src="assets/shape.png" alt="Bowl alignment guide" />
                 </div>
 
                 <!-- scanning overlay line (only during scan) -->
                 <div class="scan-overlay" id="scan-overlay">
-                <div class="scan-line"></div>
+                  <div class="scan-line"></div>
                 </div>
-            </div>
+              </div>
 
-            <!-- user-controlled scan trigger -->
-            <button class="secondary-btn" id="scan-start-btn">
+              <!-- user-controlled scan trigger -->
+              <button class="secondary-btn" id="scan-start-btn">
                 Scan and check
-            </button>
+              </button>
 
-            <div class="scan-status" id="scan-status">
-            Follow the clay steps. The checker will appear at the last step.
+              <div class="scan-status" id="scan-status">
+                Follow the clay steps. The checker will appear at the last step.
+              </div>
+
+              <button class="primary-btn next-step-btn" id="next-step-btn">
+                Next step →
+              </button>
             </div>
-
-            <button class="primary-btn next-step-btn" id="next-step-btn">
-            Next step →
-            </button>
-            </div>
-
-
           </div>
         </section>
 
         <!-- PROCESS 2: BISQUE FIRE – booking form inside tutorial -->
         <section id="process-bisque" class="process-screen">
-        <div class="process-header">
+          <div class="process-header">
             <div class="process-tag">02 · bisque fire</div>
             <h1>Bisque firing schedule</h1>
-        </div>
+          </div>
 
-        <p class="body-text" style="font-size:13px; max-width:520px; margin:0 0 16px;">
+          <p class="body-text" style="font-size:13px; max-width:520px; margin:0 0 16px;">
             After your bowl is leather-hard and then fully dry, it’s ready for its first firing.
             Use this page as a prototype to imagine how Glaze Diary could connect with local studios
             and community kilns.
-        </p>
+          </p>
 
-        <form
+          <form
             class="schedule-form"
             style="
-            font-size:13px;
-            max-width:380px;
-            display:flex;
-            flex-direction:column;
-            gap:10px;
-            margin-bottom:24px;
+              font-size:13px;
+              max-width:380px;
+              display:flex;
+              flex-direction:column;
+              gap:10px;
+              margin-bottom:24px;
             "
-        >
+          >
             <label>
-            Studio
-            <select style="width:100%; padding:6px; margin-top:4px;">
+              Studio
+              <select style="width:100%; padding:6px; margin-top:4px;">
                 <option>Local Studio A</option>
                 <option>Community Kiln B</option>
                 <option>Pottery Cafe C</option>
-            </select>
+              </select>
             </label>
 
             <label>
-            Preferred date
-            <input type="date" style="width:100%; padding:6px; margin-top:4px;" />
+              Preferred date
+              <input type="date" style="width:100%; padding:6px; margin-top:4px;" />
             </label>
 
             <label>
-            Preferred time
-            <input type="time" style="width:100%; padding:6px; margin-top:4px;" />
+              Preferred time
+              <input type="time" style="width:100%; padding:6px; margin-top:4px;" />
             </label>
 
             <label>
-            Notes for the studio (optional)
-            <textarea
+              Notes for the studio (optional)
+              <textarea
                 rows="3"
                 style="width:100%; padding:6px; margin-top:4px; resize:vertical;"
                 placeholder="Number of pieces, clay body, any special requests…"
-            ></textarea>
+              ></textarea>
             </label>
 
             <button type="submit" class="primary-btn" style="align-self:flex-start;">
-            request bisque firing
+              request bisque firing
             </button>
 
             <button
-            type="button"
-            id="bisque-next-btn"
-            class="secondary-btn"
-            style="display:none; margin-top:10px;"
+              type="button"
+              id="bisque-next-btn"
+              class="secondary-btn"
+              style="display:none; margin-top:10px;"
             >
-            Next step →
+              Next step →
             </button>
+          </form>
 
-        </form>
-
-        <p style="font-size:11px; color:#777; max-width:420px;">
+          <p style="font-size:11px; color:#777; max-width:420px;">
             This is a prototype form. In a full version, your request could be sent directly to a partner studio,
             or connected to an online calendar or email system.
-        </p>
+          </p>
         </section>
-
 
         <!-- PROCESS 3: GLAZING -->
         <section id="process-glazing" class="process-screen">
-        <div class="process-header">
+          <div class="process-header">
             <div class="process-tag">03 · glazing</div>
             <h1>Glazing · see your bowl in color</h1>
-        </div>
+          </div>
 
-        <div class="glaze-layout">
+          <div class="glaze-layout">
             <!-- LEFT: instructions -->
             <div class="glaze-column glaze-instructions">
-            <ol class="step-list">
+              <ol class="step-list">
                 <li>Open the Speckled Field coloring set and the brushes.</li>
                 <li>Remember: don’t add any water to the glaze.</li>
                 <li>
-                Use the scan on the right to “lock in” your bowl, then try different
-                glaze colors to preview how they look after firing.
+                  Use the scan on the right to “lock in” your bowl, then try different
+                  glaze colors to preview how they look after firing.
                 </li>
                 <li>
-                Once you’re happy with the color, glaze your bisque-fired bowl evenly,
-                inside and outside. Avoid leaving thick drips on the foot.
+                  Once you’re happy with the color, glaze your bisque-fired bowl evenly,
+                  inside and outside. Avoid leaving thick drips on the foot.
                 </li>
-            </ol>
+              </ol>
 
-            <p class="body-text">
+              <p class="body-text">
                 Let the glaze dry completely before bringing the bowl back to the studio
                 for the final firing.
-            </p>
+              </p>
             </div>
 
             <!-- RIGHT: scan + 3D preview -->
             <div class="glaze-column glaze-preview">
-            <div class="scan-frame">
+              <div class="scan-frame">
                 <!-- webcam feed (before / during scan) -->
                 <video
-                id="glaze-video"
-                class="scan-video"
-                autoplay
-                playsinline
-                muted
+                  id="glaze-video"
+                  class="scan-video"
+                  autoplay
+                  playsinline
+                  muted
                 ></video>
 
                 <!-- 3D bowl model (shown after scan completes) -->
                 <model-viewer
-                id="glaze-model"
-                class="glaze-model hidden"
-                src="assets/bowl-white.glb"
-                alt="Glazed bowl preview"
-                camera-controls
-                auto-rotate
-                interaction-prompt="auto"
-                exposure="1"
-                style="width:100%; height:100%;"
+                  id="glaze-model"
+                  class="glaze-model hidden"
+                  src="assets/bowl-white.glb"
+                  alt="Glazed bowl preview"
+                  camera-controls
+                  auto-rotate
+                  interaction-prompt="auto"
+                  exposure="1"
+                  style="width:100%; height:100%;"
                 ></model-viewer>
+
+                <!-- NEW: speckle / watercolor overlay -->
+                <div id="glaze-texture-overlay" class="glaze-texture-overlay"></div>
 
                 <!-- fake scanning overlay -->
                 <div class="scan-overlay" id="glaze-scan-overlay">
-                <div class="scan-line"></div>
+                  <div class="scan-line"></div>
                 </div>
-            </div> <!-- /scan-frame -->
+              </div> <!-- /scan-frame -->
 
-            <!-- scan button + status -->
-            <button class="primary-btn" id="glaze-scan-btn">
+              <!-- scan button + status -->
+              <button class="primary-btn" id="glaze-scan-btn">
                 scan my bowl to start glazing
-            </button>
+              </button>
 
-            <p class="scan-status" id="glaze-scan-status">
+              <p class="scan-status" id="glaze-scan-status">
                 When you’re ready, tap “scan my bowl to start glazing”.
-            </p>
+              </p>
 
-            <!-- After scan: glaze info + swatches (hidden at first) -->
-            <div class="glaze-meta" id="glaze-meta" style="display:none;">
+              <!-- After scan: glaze info + swatches (hidden at first) -->
+              <div class="glaze-meta" id="glaze-meta" style="display:none;">
                 <div class="glaze-meta-name" id="glaze-name">Speckled Field</div>
                 <div class="glaze-meta-note" id="glaze-note">
-                Soft off-white with warm speckles. Speckles open up and darken
-                slightly after firing.
+                  Soft off-white with warm speckles. Speckles open up and darken
+                  slightly after firing.
                 </div>
-            </div>
+              </div>
 
-            <div class="glaze-swatches" id="glaze-swatches" style="display:none;">
+              <div class="glaze-swatches" id="glaze-swatches" style="display:none;">
                 <!-- Swatch 1: Speckled Field -->
                 <button
-                class="glaze-swatch active"
-                data-color="0.89,0.86,0.81"
-                data-name="Speckled Field"
-                data-note="Soft off-white base with warm speckles. Tone warms slightly after firing."
+                  class="glaze-swatch active"
+                  data-color="0.89,0.86,0.81"
+                  data-name="Speckled Field"
+                  data-note="Soft off-white base with warm speckles. Tone warms slightly after firing."
+                  data-speckled
                 >
-                <span class="swatch-chip" style="background:#e3dccf;"></span>
-                <span class="swatch-label">Speckled Field</span>
+                  <span class="swatch-chip" style="background:#e3dccf;"></span>
+                  <span class="swatch-label">Speckled Field</span>
                 </button>
 
                 <!-- Swatch 2: Celadon -->
                 <button
-                class="glaze-swatch"
-                data-color="0.76,0.84,0.78"
-                data-name="Celadon Green"
-                data-note="Pale translucent green that pools deeper and breaks lighter at the rim."
+                  class="glaze-swatch"
+                  data-color="0.76,0.84,0.78"
+                  data-name="Celadon Green"
+                  data-note="Pale translucent green that pools deeper and breaks lighter at the rim."
                 >
-                <span class="swatch-chip" style="background:#c4d8c8;"></span>
-                <span class="swatch-label">Celadon Green</span>
+                  <span class="swatch-chip" style="background:#c4d8c8;"></span>
+                  <span class="swatch-label">Celadon Green</span>
                 </button>
 
                 <!-- Swatch 3: Milk White -->
                 <button
-                class="glaze-swatch"
-                data-color="0.95,0.95,0.92"
-                data-name="Milk White"
-                data-note="Smooth satin white with a warm undertone. Brush strokes soften after firing."
+                  class="glaze-swatch"
+                  data-color="0.95,0.95,0.92"
+                  data-name="Milk White"
+                  data-note="Smooth satin white with a warm undertone. Brush strokes soften after firing."
                 >
-                <span class="swatch-chip" style="background:#f3f1eb;"></span>
-                <span class="swatch-label">Milk White</span>
+                  <span class="swatch-chip" style="background:#f3f1eb;"></span>
+                  <span class="swatch-label">Milk White</span>
                 </button>
 
+                <!-- Swatch 4: Soft Mauve White (your illustration color) -->
                 <button
-                class="glaze-swatch"
-                data-color="0.86,0.78,0.79"
-                data-name="Soft Mauve White"
-                data-note="Soft off-white with a mauve tint, similar to the Speckled Field bowl illustration."
-              >
-                <span class="swatch-chip" style="background:#dcc7ca;"></span>
-                <span class="swatch-label">Soft Mauve White</span>
-              </button>
-              
-            </div>
+                  class="glaze-swatch"
+                  data-color="0.86,0.78,0.79"
+                  data-name="Soft Mauve White"
+                  data-note="Soft off-white with a mauve tint, similar to the Speckled Field bowl illustration."
+                  data-speckled
+                >
+                  <span class="swatch-chip" style="background:#dcc7ca;"></span>
+                  <span class="swatch-label">Soft Mauve White</span>
+                </button>
+              </div>
             </div> <!-- /glaze-column glaze-preview -->
-        </div> <!-- /glaze-layout -->
+          </div> <!-- /glaze-layout -->
         </section>
-
-
 
         <!-- PROCESS 4: GLAZE FIRE – booking form inside tutorial -->
         <section id="process-glaze-fire" class="process-screen">
-        <div class="process-header">
+          <div class="process-header">
             <div class="process-tag">04 · glaze fire</div>
             <h1>Glaze firing schedule</h1>
-        </div>
+          </div>
 
-        <p class="body-text" style="font-size:13px; max-width:520px; margin:0 0 16px;">
+          <p class="body-text" style="font-size:13px; max-width:520px; margin:0 0 16px;">
             Book a firing session for you bowl right now. The best time will be probably 3 days after you finishing glazing.
-        </p>
+          </p>
 
-        <form
+          <form
             class="schedule-form"
             style="
-            font-size:13px;
-            max-width:380px;
-            display:flex;
-            flex-direction:column;
-            gap:10px;
-            margin-bottom:24px;
+              font-size:13px;
+              max-width:380px;
+              display:flex;
+              flex-direction:column;
+              gap:10px;
+              margin-bottom:24px;
             "
-        >
+          >
             <label>
-            Studio
-            <select style="width:100%; padding:6px; margin-top:4px;">
+              Studio
+              <select style="width:100%; padding:6px; margin-top:4px;">
                 <option>Local Studio A</option>
                 <option>Community Kiln B</option>
                 <option>Pottery Cafe C</option>
-            </select>
+              </select>
             </label>
 
             <label>
-            Preferred date
-            <input type="date" style="width:100%; padding:6px; margin-top:4px;" />
+              Preferred date
+              <input type="date" style="width:100%; padding:6px; margin-top:4px;" />
             </label>
 
             <label>
-            Preferred time
-            <input type="time" style="width:100%; padding:6px; margin-top:4px;" />
+              Preferred time
+              <input type="time" style="width:100%; padding:6px; margin-top:4px;" />
             </label>
 
             <label>
-            Notes for the studio (optional)
-            <textarea
+              Notes for the studio (optional)
+              <textarea
                 rows="3"
                 style="width:100%; padding:6px; margin-top:4px; resize:vertical;"
                 placeholder="Number of pieces, clay body, any special requests…"
-            ></textarea>
+              ></textarea>
             </label>
 
             <button type="submit" class="primary-btn" style="align-self:flex-start;">
-            request glaze firing
+              request glaze firing
             </button>
 
             <button
-            type="button"
-            id="glaze-next-btn"
-            class="secondary-btn"
-            style="display:none; margin-top:10px;"
-          >
-            Next step →
-          </button>
-
-
-        </form>
+              type="button"
+              id="glaze-next-btn"
+              class="secondary-btn"
+              style="display:none; margin-top:10px;"
+            >
+              Next step →
+            </button>
+          </form>
         </section>
 
         <!-- PROCESS 5: FINAL PIECE -->
@@ -504,6 +501,5 @@
   </div>
 
   <script src="tutorial.js"></script>
-
 </body>
 </html>
