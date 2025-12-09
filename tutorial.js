@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ------------------------------------------------------------------------
-   * 5) GLAZING — fake scan + 3D bowl + color swatches + texture + firing
+   * 5) GLAZING — fake scan + 3D bowl + color swatches + texture + fired lookup
    * ----------------------------------------------------------------------*/
   const glazeVideo          = document.getElementById('glaze-video');
   const glazeScanBtn        = document.getElementById('glaze-scan-btn');
@@ -310,11 +310,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const glazeSwatches  = [...document.querySelectorAll('.glaze-swatch')];
   const glazeFireBtn   = document.getElementById('glaze-fire-btn');
 
-  let glazeStream      = null;
-  let glazeScanning    = false;
-  let glazeMaterials   = [];
-  let currentGlazeStr  = null;   // "r,g,b" for unfired color
-  let currentSwatchEl  = null;   // reference to selected swatch
+  let glazeStream     = null;
+  let glazeScanning   = false;
+  let glazeMaterials  = [];
+  let currentGlazeStr = null;   // "r,g,b" for unfired color
+  let currentSwatchEl = null;   // reference to selected swatch
+
+  // 🔥 Fired color lookup (0–1 RGB)
+  const firedColorMap = {
+    "Speckled Field": {
+      color: "0.78,0.72,0.61"
+    },
+    "Celadon Green": {
+      color: "0.60,0.72,0.62"
+    },
+    "Milk White": {
+      color: "0.90,0.89,0.82"
+    },
+    // English Rose–like fired mauve
+    "Soft Mauve White": {
+      color: "0.61,0.33,0.40"
+    }
+  };
 
   function stopGlazeVideo() {
     if (glazeStream) {
@@ -360,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (glazeModelEl) glazeModelEl.classList.remove('hidden');
                 if (glazeMeta) glazeMeta.style.display = 'block';
                 if (glazeSwatchRow) glazeSwatchRow.style.display = 'flex';
-                if (glazeFireBtn) glazeFireBtn.style.display = 'inline-flex'; // show fire button
+                if (glazeFireBtn) glazeFireBtn.style.display = 'inline-flex';
 
                 glazeScanStatus.textContent =
                   'Scan complete. Rotate your bowl and try different glazes below.';
@@ -374,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (glazeModelEl) glazeModelEl.classList.remove('hidden');
             if (glazeMeta) glazeMeta.style.display = 'block';
             if (glazeSwatchRow) glazeSwatchRow.style.display = 'flex';
-            if (glazeFireBtn) glazeFireBtn.style.display = 'inline-flex'; // show fire button
+            if (glazeFireBtn) glazeFireBtn.style.display = 'inline-flex';
           });
       } else {
         glazeScanStatus.textContent =
@@ -382,12 +399,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (glazeModelEl) glazeModelEl.classList.remove('hidden');
         if (glazeMeta) glazeMeta.style.display = 'block';
         if (glazeSwatchRow) glazeSwatchRow.style.display = 'flex';
-        if (glazeFireBtn) glazeFireBtn.style.display = 'inline-flex'; // show fire button
+        if (glazeFireBtn) glazeFireBtn.style.display = 'inline-flex';
       }
     });
   }
 
-  // 5b. Once the model is ready, wire up swatches + firing
+  // 5b. Once the model is ready, wire up swatches + texture + enable fire
   if (glazeModelEl && glazeSwatches.length && glazeNameEl && glazeNoteEl) {
     glazeModelEl.addEventListener('load', () => {
       const model = glazeModelEl.model;
@@ -409,9 +426,14 @@ document.addEventListener('DOMContentLoaded', () => {
           glazeNameEl.textContent = name;
           glazeNoteEl.textContent = note;
 
-          // toggle texture overlay
+          // texture overlay using classes
           if (glazeTextureOverlay) {
-            glazeTextureOverlay.style.display = isSpeckled ? 'block' : 'none';
+            if (isSpeckled) {
+              glazeTextureOverlay.classList.add('has-speckles');
+              glazeTextureOverlay.classList.remove('fired');
+            } else {
+              glazeTextureOverlay.classList.remove('has-speckles', 'fired');
+            }
           }
 
           // reset fire button for this glaze
@@ -435,29 +457,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 5c. Fire button → darken current glaze (after firing)
+  // 5c. Fire button → use lookup table (or darken fallback)
   if (glazeFireBtn) {
     glazeFireBtn.addEventListener('click', () => {
-      if (!currentGlazeStr || !glazeMaterials.length) return;
+      if (!currentSwatchEl || !currentGlazeStr || !glazeMaterials.length) return;
 
-      const [r, g, b] = currentGlazeStr.split(',').map(Number);
-      const factor = 0.85; // slightly darker after firing
+      const glazeName = currentSwatchEl.getAttribute('data-name') || '';
+      const firedInfo = firedColorMap[glazeName];
 
-      const dr = Math.max(0, r * factor);
-      const dg = Math.max(0, g * factor);
-      const db = Math.max(0, b * factor);
+      let finalRGB;
+
+      if (firedInfo && firedInfo.color) {
+        finalRGB = firedInfo.color.split(',').map(Number);
+      } else {
+        // fallback: generic darken
+        const [r, g, b] = currentGlazeStr.split(',').map(Number);
+        const factor = 0.75;
+        finalRGB = [r * factor, g * factor, b * factor];
+      }
 
       glazeMaterials.forEach(mat => {
         if (mat && mat.pbrMetallicRoughness) {
-          mat.pbrMetallicRoughness.setBaseColorFactor([dr, dg, db, 1]);
+          mat.pbrMetallicRoughness.setBaseColorFactor([...finalRGB, 1]);
         }
       });
 
-      // update note to "after firing" version (without stacking text)
-      if (glazeNoteEl && currentSwatchEl) {
+      // stronger speckles after firing for speckled glazes
+      if (glazeTextureOverlay && currentSwatchEl.hasAttribute('data-speckled')) {
+        glazeTextureOverlay.classList.add('fired');
+      }
+
+      if (glazeNoteEl) {
         const baseNote = currentSwatchEl.getAttribute('data-note') || '';
-        glazeNoteEl.textContent = baseNote +
-          ' After firing, the glaze deepens in tone and looks slightly richer.';
+        glazeNoteEl.textContent =
+          baseNote + ' After firing, the color deepens and the surface looks richer.';
       }
 
       glazeFireBtn.disabled = true;
