@@ -158,9 +158,9 @@
 /* ========== CLAY PROCESS LAYOUT ========== */
 
 .clay-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr);
+  gap: 18px;
   align-items: flex-start;
 }
 
@@ -704,69 +704,4 @@ header {
   opacity: 1;
   color: #000;
   background: #f2f2f2;
-}
-
-.clay-hero {
-  width: 800px;
-  height: 400px;
-  margin-bottom: 16px;
-}
-
-.clay-hero-frame {
-  border-radius: 16px;
-  width: 800px;
-  height: 400px;
-  overflow: hidden;
-  background: #faf7f3;
-  border: 1px solid #f0ebe5;
-}
-
-.clay-hero-frame img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.clay-hero-note {
-  margin-top: 8px;
-}
-
-/* NEW unified container for the clay page */
-.clay-container {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-  margin-left: 260px; /* aligns perfectly under the header/title in your screenshot */
-  padding-bottom: 40px;
-}
-
-/* Hero (big illustration) */
-.clay-hero {
-  width: 800px;
-  max-width: 800px;
-}
-
-#clay-hero-img {
-  width: 100%;
-  height: auto;
-  border-radius: 14px;
-  display: block;
-}
-
-/* Stepper block */
-.clay-instructions {
-  width: 800px;
-  max-width: 800px;
-}
-
-/* Make the stepper card wider & centered under the hero */
-.clay-stepper {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* Remove the old grid that breaks the layout */
-.clay-layout {
-  display: none !important;
 }

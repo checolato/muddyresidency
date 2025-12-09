@@ -1,5 +1,4 @@
 // tutorial.js
-
 document.addEventListener('DOMContentLoaded', () => {
   /* ------------------------------------------------------------------------
    * 1) PROCESS MENU — Only one major section shown at a time
@@ -132,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let videoStream = null;
   let isScanning  = false;
 
-  function stopVideo() {
+  function stopClayVideo() {
     if (videoStream) {
       videoStream.getTracks().forEach(t => t.stop());
       videoStream = null;
@@ -145,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (shapeOverlay) shapeOverlay.classList.remove('active');
   }
 
-  // initial state for clay check
+  // initial state
   if (checkBtn && scanStartBtn && nextStepBtn) {
     checkBtn.style.display = 'none';
     scanStartBtn.style.display = 'none';
@@ -227,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'Looks good! You can refine the rim one last time if you want.';
         }
 
-        stopVideo();
+        stopClayVideo();
         isScanning = false;
 
         if (nextStepBtn) nextStepBtn.classList.add('visible');
@@ -241,37 +240,46 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ------------------------------------------------------------------------
-   * 4) BISQUE FORM — “Appointment Made!” popup + Next step → glazing
+   * 4) SHARED APPOINTMENT HANDLER (bisque + glaze fire)
    * ----------------------------------------------------------------------*/
+  const popup       = document.getElementById('success-popup');
+
   const bisqueForm  = document.querySelector('#process-bisque .schedule-form');
-  const bisquePopup = document.getElementById('success-popup');
   const bisqueNext  = document.getElementById('bisque-next-btn');
 
-  if (bisqueForm && bisquePopup) {
-    bisqueForm.addEventListener('submit', (e) => {
-      e.preventDefault();
+  const glazeFireForm = document.querySelector('#process-glaze-fire .schedule-form');
+  const glazeNext     = document.getElementById('glaze-next-btn');
+
+  function wireAppointmentForm(formEl, nextBtn) {
+    if (!formEl || !popup) return;
+
+    formEl.addEventListener('submit', (e) => {
+      e.preventDefault(); // stay on this process screen
 
       // show popup
-      bisquePopup.classList.add('show');
+      popup.classList.add('show');
 
-      // update submit button state
-      const submitBtn = bisqueForm.querySelector('button[type="submit"]');
+      // disable submit + change label
+      const submitBtn = formEl.querySelector('button[type="submit"]');
       if (submitBtn) {
         submitBtn.textContent = 'appointment requested';
         submitBtn.disabled = true;
       }
 
       // show “Next step →” button
-      if (bisqueNext) {
-        bisqueNext.style.display = 'inline-flex';
+      if (nextBtn) {
+        nextBtn.style.display = 'inline-flex';
       }
 
       // hide popup after 1.2s
       setTimeout(() => {
-        bisquePopup.classList.remove('show');
+        popup.classList.remove('show');
       }, 1200);
     });
   }
+
+  wireAppointmentForm(bisqueForm, bisqueNext);
+  wireAppointmentForm(glazeFireForm, glazeNext);
 
   if (bisqueNext) {
     bisqueNext.addEventListener('click', () => {
@@ -279,114 +287,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ------------------------------------------------------------------------
-   * 5) GLAZING — fake scan + 3D bowl + color swatches
-   * ----------------------------------------------------------------------*/
-  const glazeVideo       = document.getElementById('glaze-video');
-  const glazeScanBtn     = document.getElementById('glaze-scan-btn');
-  const glazeScanStatus  = document.getElementById('glaze-scan-status');
-  const glazeScanOverlay = document.getElementById('glaze-scan-overlay');
-
-  const glazeModelEl    = document.getElementById('glaze-model');
-  const glazeMeta       = document.getElementById('glaze-meta');
-  const glazeSwatchWrap = document.getElementById('glaze-swatches');
-  const glazeNameEl     = document.getElementById('glaze-name');
-  const glazeNoteEl     = document.getElementById('glaze-note');
-  const glazeSwatches   = [...document.querySelectorAll('.glaze-swatch')];
-
-  let glazeStream   = null;
-  let glazeScanning = false;
-
-  function stopGlazeVideo() {
-    if (glazeStream) {
-      glazeStream.getTracks().forEach(t => t.stop());
-      glazeStream = null;
-    }
-    if (glazeVideo) {
-      glazeVideo.classList.remove('active');
-      glazeVideo.srcObject = null;
-    }
-  }
-
-  // 5a. user taps “scan my bowl to start glazing”
-  if (glazeScanBtn && glazeVideo && glazeScanStatus) {
-    glazeScanBtn.addEventListener('click', () => {
-      if (glazeScanning) return;
-
-      glazeScanStatus.textContent =
-        'We’re opening your camera. Allow access to start the scan.';
-
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-          .then(stream => {
-            glazeStream = stream;
-            glazeVideo.srcObject = stream;
-            glazeVideo.classList.add('active');
-
-            glazeScanStatus.textContent =
-              'Hold your bowl in front of the camera. Scanning will start…';
-            glazeScanning = true;
-
-            // start fake scan after a short delay
-            setTimeout(() => {
-              if (glazeScanOverlay) glazeScanOverlay.classList.add('active');
-              glazeScanStatus.textContent = 'Scanning your bowl…';
-
-              setTimeout(() => {
-                // finish scan
-                if (glazeScanOverlay) glazeScanOverlay.classList.remove('active');
-                stopGlazeVideo();
-                glazeScanning = false;
-
-                // hide video, show 3D model + swatches
-                if (glazeVideo) glazeVideo.classList.remove('active');
-                if (glazeModelEl) glazeModelEl.classList.remove('hidden');
-                if (glazeMeta) glazeMeta.style.display = 'block';
-                if (glazeSwatchWrap) glazeSwatchWrap.style.display = 'flex';
-
-                glazeScanStatus.textContent =
-                  'Scan complete. Rotate your bowl and try different glazes below.';
-              }, 2000);
-            }, 800);
-          })
-          .catch(() => {
-            // camera failed – show preview directly
-            glazeScanStatus.textContent =
-              'Camera not available. Here’s a sample bowl you can still try colors on.';
-            if (glazeModelEl) glazeModelEl.classList.remove('hidden');
-            if (glazeMeta) glazeMeta.style.display = 'block';
-            if (glazeSwatchWrap) glazeSwatchWrap.style.display = 'flex';
-          });
-      } else {
-        // no camera support – show preview directly
-        glazeScanStatus.textContent =
-          'Camera not available. Here’s a sample bowl you can still try colors on.';
-        if (glazeModelEl) glazeModelEl.classList.remove('hidden');
-        if (glazeMeta) glazeMeta.style.display = 'block';
-        if (glazeSwatchWrap) glazeSwatchWrap.style.display = 'flex';
-      }
+  if (glazeNext) {
+    glazeNext.addEventListener('click', () => {
+      showProcess('process-final');
     });
   }
-
-  // 5b. Swatches → update glaze name/note
-  if (glazeModelEl && glazeNameEl && glazeNoteEl && glazeSwatches.length) {
-    glazeSwatches.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const name = btn.getAttribute('data-name');
-        const note = btn.getAttribute('data-note');
-
-        glazeSwatches.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        if (name) glazeNameEl.textContent = name;
-        if (note) glazeNoteEl.textContent = note;
-
-        // Optional: if you later add data-color + material logic,
-        // you can recolor the 3D bowl here.
-      });
-    });
-  }
-});
 
   /* ------------------------------------------------------------------------
    * 5) GLAZING — fake scan + 3D bowl + color swatches
@@ -405,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let glazeStream    = null;
   let glazeScanning  = false;
-  let glazeMaterials = []; // all materials on the bowl
+  let glazeMaterials = [];
 
   function stopGlazeVideo() {
     if (glazeStream) {
@@ -475,12 +380,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 5b. Once the model is ready, wire up swatches to recolor **all** materials
+  // 5b. Once the model is ready, wire up swatches to recolor all materials
   if (glazeModelEl && glazeSwatches.length && glazeNameEl && glazeNoteEl) {
     glazeModelEl.addEventListener('load', () => {
       const model = glazeModelEl.model;
-
-      // Collect every material on the GLB so the whole bowl changes color
       glazeMaterials = model && model.materials ? [...model.materials] : [];
 
       glazeSwatches.forEach(btn => {
@@ -509,3 +412,4 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
+});
