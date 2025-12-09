@@ -360,6 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (glazeModelEl) glazeModelEl.classList.remove('hidden');
                 if (glazeMeta) glazeMeta.style.display = 'block';
                 if (glazeSwatchRow) glazeSwatchRow.style.display = 'flex';
+                if (glazeFireBtn) glazeFireBtn.style.display = 'inline-flex'; // show fire button
 
                 glazeScanStatus.textContent =
                   'Scan complete. Rotate your bowl and try different glazes below.';
@@ -373,6 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (glazeModelEl) glazeModelEl.classList.remove('hidden');
             if (glazeMeta) glazeMeta.style.display = 'block';
             if (glazeSwatchRow) glazeSwatchRow.style.display = 'flex';
+            if (glazeFireBtn) glazeFireBtn.style.display = 'inline-flex'; // show fire button
           });
       } else {
         glazeScanStatus.textContent =
@@ -380,6 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (glazeModelEl) glazeModelEl.classList.remove('hidden');
         if (glazeMeta) glazeMeta.style.display = 'block';
         if (glazeSwatchRow) glazeSwatchRow.style.display = 'flex';
+        if (glazeFireBtn) glazeFireBtn.style.display = 'inline-flex'; // show fire button
       }
     });
   }
