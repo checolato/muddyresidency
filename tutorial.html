@@ -53,123 +53,137 @@
 
       <!-- RIGHT: full-screen process panels -->
       <section class="process-content">
-        <!-- PROCESS 1: CLAY MAKING + CHECK -->
+       <!-- PROCESS 1: CLAY MAKING + CHECK -->
         <section id="process-clay" class="process-screen active">
-          <div class="process-header">
+        <div class="process-header">
             <div class="process-tag">01 · clay making</div>
             <h1>Speckled Field · hand-built bowl</h1>
-          </div>
+        </div>
 
-          <div class="clay-layout">
-            <!-- clay stepper -->
+        <!-- HERO ILLUSTRATION BLOCK -->
+        <div class="clay-hero">
+            <div class="clay-hero-frame">
+            <img
+                src="assets/step 1.png"
+                alt="Step 1 – split the clay into two portions"
+                id="step-illustration"
+            />
+            </div>
+            <p class="small-note clay-hero-note">
+            Follow the clay steps. The checker will appear at the last step.
+            </p>
+        </div>
+
+        <!-- STEPPER + AR CHECK STACKED UNDER HERO -->
+        <div class="clay-layout">
+        
+            <!-- clay stepper + check button -->
             <div class="clay-column">
-              <div class="clay-stepper">
+            <div class="clay-stepper">
                 <button
-                  class="step-arrow step-arrow-left"
-                  id="step-prev"
-                  aria-label="Previous step"
+                class="step-arrow step-arrow-left"
+                id="step-prev"
+                aria-label="Previous step"
                 >
-                  ←
+                ←
                 </button>
 
                 <div class="clay-step-wrapper">
-                  <!-- Step 1 -->
-                  <div class="clay-step active" data-step="1">
+                <!-- Step 1 -->
+                <div class="clay-step active" data-step="1">
                     <div class="step-label">Step 1 / 8</div>
                     <p class="step-body">
-                      Split the clay into 2 portions, roughly 1:4. Keep both portions covered so they don’t dry out.
+                    Split the clay into 2 portions, roughly 1:4. Keep both portions
+                    covered so they don’t dry out.
                     </p>
-                  </div>
+                </div>
 
-                  <!-- Step 2 -->
-                  <div class="clay-step" data-step="2">
+                <!-- Step 2 -->
+                <div class="clay-step" data-step="2">
                     <div class="step-label">Step 2 / 8</div>
                     <p class="step-body">
-                      Make a smooth ball from the larger portion. This will become the main body of your bowl.
+                    Make a smooth ball from the larger portion. This will become the
+                    main body of your bowl.
                     </p>
-                  </div>
+                </div>
 
-                  <!-- Step 3 -->
-                  <div class="clay-step" data-step="3">
+                <!-- Step 3 -->
+                <div class="clay-step" data-step="3">
                     <div class="step-label">Step 3 / 8</div>
                     <p class="step-body">
-                      Use your finger or utensil 1 to pinch a hole in the middle of the ball and gently rotate outwards.
+                    Use your finger or utensil 1 to pinch a hole in the middle of the
+                    ball and gently rotate outwards.
                     </p>
-                  </div>
+                </div>
 
-                  <!-- Step 4 -->
-                  <div class="clay-step" data-step="4">
+                <!-- Step 4 -->
+                <div class="clay-step" data-step="4">
                     <div class="step-label">Step 4 / 8</div>
                     <p class="step-body">
-                      Slightly change the position of your hands and continue expanding out to form a bowl shape.
+                    Slightly change the position of your hands and continue expanding
+                    out to form a bowl shape.
                     </p>
-                  </div>
+                </div>
 
-                  <!-- Step 5 -->
-                  <div class="clay-step" data-step="5">
+                <!-- Step 5 -->
+                <div class="clay-step" data-step="5">
                     <div class="step-label">Step 5 / 8</div>
                     <p class="step-body">
-                      Refine the edge of the bowl with your fingers and utensil 2 once you’re happy with the overall form.
+                    Refine the edge of the bowl with your fingers and utensil 2 once
+                    you’re happy with the overall form.
                     </p>
-                  </div>
+                </div>
 
-                  <!-- Step 6 -->
-                  <div class="clay-step" data-step="6">
+                <!-- Step 6 -->
+                <div class="clay-step" data-step="6">
                     <div class="step-label">Step 6 / 8</div>
                     <p class="step-body">
-                      Take the smaller portion of clay and roll out a long strip with your palm to create the base ring.
+                    Take the smaller portion of clay and roll out a long strip with
+                    your palm to create the base ring.
                     </p>
-                  </div>
+                </div>
 
-                  <!-- Step 7 -->
-                  <div class="clay-step" data-step="7">
+                <!-- Step 7 -->
+                <div class="clay-step" data-step="7">
                     <div class="step-label">Step 7 / 8</div>
                     <p class="step-body">
-                      Measure the base of your bowl, join the strip into a ring, and blend the seam. Smooth where the bowl
-                      and ring meet.
+                    Measure the base of your bowl, join the strip into a ring, and
+                    blend the seam. Smooth where the bowl and ring meet.
                     </p>
-                  </div>
+                </div>
 
-                  <!-- Step 8 -->
-                  <div class="clay-step" data-step="8">
+                <!-- Step 8 -->
+                <div class="clay-step" data-step="8">
                     <div class="step-label">Step 8 / 8</div>
                     <p class="step-body">
-                      Use the sponge from the box, damp it slightly, and smooth over all surfaces and edges until your piece
-                      is even and unwrinkled.
+                    Use the sponge from the box, damp it slightly, and smooth over all
+                    surfaces and edges until your piece is even and unwrinkled.
                     </p>
-                  </div>
+                </div>
                 </div>
 
                 <button
-                  class="step-arrow step-arrow-right"
-                  id="step-next"
-                  aria-label="Next step"
+                class="step-arrow step-arrow-right"
+                id="step-next"
+                aria-label="Next step"
                 >
-                  →
+                →
                 </button>
-              </div>
-
-              <button class="primary-btn" id="check-bowl-btn">
-                check my bowl before bisque firing
-              </button>
-
-              <p class="small-note" id="check-result">
-                Move through all the clay steps, then tap the button to run a quick check.
-              </p>
             </div>
 
-            <!-- Illustration / scan panel -->
+            <button class="primary-btn" id="check-bowl-btn">
+                check my bowl before bisque firing
+            </button>
+
+            <p class="small-note" id="check-result">
+                Follow the clay steps. The checker will appear at the last step.
+            </p>
+            </div>
+
+            <!-- AR scan panel (stacked below; same IDs so JS still works) -->
             <div class="scan-panel">
             <div class="scan-frame">
-                <!-- step illustration -->
-                <img
-                src="assets/step 1.png"
-                alt="Step 1 – split the clay into two portions"
-                class="scan-image"
-                id="step-illustration"
-                />
-
-                <!-- webcam preview, hidden by default -->
+                <!-- webcam preview -->
                 <video
                 id="scan-video"
                 class="scan-video"
@@ -195,17 +209,16 @@
             </button>
 
             <div class="scan-status" id="scan-status">
-            Follow the clay steps. The checker will appear at the last step.
+                Follow the clay steps. The checker will appear at the last step.
             </div>
 
             <button class="primary-btn next-step-btn" id="next-step-btn">
-            Next step →
+                Next step →
             </button>
             </div>
-
-
-          </div>
+        </div>
         </section>
+
 
         <!-- PROCESS 2: BISQUE FIRE – booking form inside tutorial -->
         <section id="process-bisque" class="process-screen">
