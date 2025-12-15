@@ -158,15 +158,24 @@
 /* ========== CLAY PROCESS LAYOUT ========== */
 
 .clay-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr);
-  gap: 18px;
+  display: flex;
+  flex-direction: column;   /* keep this */
   align-items: flex-start;
+  gap: 24px;
+  width: 800px;        /* unified width */
+  max-width: 100%;
+}
+
+/* reverse the natural order inside the layout */
+.clay-layout > .scan-panel {
+  order: -1;   /* puts scan panel first */
 }
 
 /* clay stepper */
 
 .clay-column {
+  width: 100%; 
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -233,15 +242,17 @@
 /* scan panel */
 
 .scan-panel {
+  width: 100%;         
+  max-width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .scan-frame {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 4 / 2.3;
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid #eee;
