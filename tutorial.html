@@ -28,10 +28,25 @@
       <aside class="process-menu">
         <div class="process-menu-title">process</div>
         <ul class="process-nav">
-          <li class="process-nav-item active" data-target="process-clay">
-            <span class="process-index">01</span>
-            <span class="process-label">clay making</span>
+          <li class="process-nav-item process-nav-item--has-steps active" data-target="process-clay">
+            <div class="process-main">
+              <span class="process-index">01</span>
+              <span class="process-label">clay making</span>
+            </div>
+
+            <!-- NEW: clay step sub-menu -->
+            <ul class="clay-step-menu">
+              <li class="clay-step-menu-item active" data-step="1">Step 1 · split the clay</li>
+              <li class="clay-step-menu-item" data-step="2">Step 2 · make a ball</li>
+              <li class="clay-step-menu-item" data-step="3">Step 3 · pinch the center</li>
+              <li class="clay-step-menu-item" data-step="4">Step 4 · expand to bowl</li>
+              <li class="clay-step-menu-item" data-step="5">Step 5 · refine the rim</li>
+              <li class="clay-step-menu-item" data-step="6">Step 6 · roll the base strip</li>
+              <li class="clay-step-menu-item" data-step="7">Step 7 · join the ring</li>
+              <li class="clay-step-menu-item" data-step="8">Step 8 · sponge & smooth</li>
+            </ul>
           </li>
+
           <li class="process-nav-item" data-target="process-bisque">
             <span class="process-index">02</span>
             <span class="process-label">bisque fire</span>

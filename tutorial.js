@@ -25,9 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ------------------------------------------------------------------------
-   * 2) CLAY STEPPER — steps + step illustrations
+   * 2) CLAY STEPPER — steps + step illustrations + LEFT MENU STEP TABS
    * ----------------------------------------------------------------------*/
   const steps        = [...document.querySelectorAll('.clay-step')];
+  const stepMenuItems = [...document.querySelectorAll('.clay-step-menu-item')]; // NEW
   const prevBtn      = document.getElementById('step-prev');
   const nextBtn      = document.getElementById('step-next');
   const illustration = document.getElementById('step-illustration');
@@ -78,13 +79,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (steps.length && prevBtn && nextBtn && checkBtn && resultText) {
-    let currentIndex = 0;
+    let currentIndex = 0; // 0-based index (step 1 = 0, step 2 = 1, ...)
 
     function updateSteps() {
+      // right column: show only current step
       steps.forEach((step, i) => {
         step.classList.toggle('active', i === currentIndex);
       });
 
+      // left column: highlight current step tab
+      const currentStepNumber = currentIndex + 1; // data-step is 1-based
+      stepMenuItems.forEach(item => {
+        const stepNum = Number(item.dataset.step);
+        item.classList.toggle('active', stepNum === currentStepNumber);
+      });
+
+      // arrows
       prevBtn.disabled = currentIndex === 0;
       nextBtn.disabled = currentIndex === steps.length - 1;
 
@@ -105,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    // arrow buttons
     prevBtn.addEventListener('click', () => {
       if (currentIndex > 0) {
         currentIndex--;
@@ -119,6 +130,21 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // LEFT MENU STEP TABS
+    stepMenuItems.forEach(item => {
+      item.addEventListener('click', (event) => {
+        // don’t trigger the parent process-nav-item click
+        event.stopPropagation();
+
+        const stepNum = Number(item.dataset.step); // 1–8
+        if (!Number.isNaN(stepNum)) {
+          currentIndex = stepNum - 1; // convert to 0-based
+          updateSteps();
+        }
+      });
+    });
+
+    // initial state
     updateSteps();
   }
 
