@@ -34,7 +34,7 @@
               <span class="process-label">clay making</span>
             </div>
 
-            <!-- NEW: clay step sub-menu -->
+            <!-- clay step sub-menu -->
             <ul class="clay-step-menu">
               <li class="clay-step-menu-item active" data-step="1">Step 1 · split the clay</li>
               <li class="clay-step-menu-item" data-step="2">Step 2 · make a ball</li>
@@ -43,7 +43,8 @@
               <li class="clay-step-menu-item" data-step="5">Step 5 · refine the rim</li>
               <li class="clay-step-menu-item" data-step="6">Step 6 · roll the base strip</li>
               <li class="clay-step-menu-item" data-step="7">Step 7 · join the ring</li>
-              <li class="clay-step-menu-item" data-step="8">Step 8 · sponge & smooth</li>
+              <li class="clay-step-menu-item" data-step="8">Step 8 · check the bowl</li>
+              <li class="clay-step-menu-item" data-step="9">Step 9 · sponge & smooth</li>
             </ul>
           </li>
 
@@ -78,6 +79,11 @@
           <div class="clay-layout">
             <!-- clay stepper -->
             <div class="clay-column">
+
+              <button class="primary-btn" id="check-bowl-btn">
+                check my bowl before bisque firing
+              </button>
+              
               <div class="clay-stepper">
                 <button
                   class="step-arrow step-arrow-left"
@@ -90,7 +96,7 @@
                 <div class="clay-step-wrapper">
                   <!-- Step 1 -->
                   <div class="clay-step active" data-step="1">
-                    <div class="step-label">Step 1 / 8</div>
+                    <div class="step-label">Step 1 / 9</div>
                     <p class="step-body">
                       Split the clay into 2 portions, roughly 1:4. Keep both portions covered so they don’t dry out.
                     </p>
@@ -98,7 +104,7 @@
 
                   <!-- Step 2 -->
                   <div class="clay-step" data-step="2">
-                    <div class="step-label">Step 2 / 8</div>
+                    <div class="step-label">Step 2 / 9</div>
                     <p class="step-body">
                       Make a smooth ball from the larger portion. This will become the main body of your bowl.
                     </p>
@@ -106,7 +112,7 @@
 
                   <!-- Step 3 -->
                   <div class="clay-step" data-step="3">
-                    <div class="step-label">Step 3 / 8</div>
+                    <div class="step-label">Step 3 / 9</div>
                     <p class="step-body">
                       Use your finger or utensil 1 to pinch a hole in the middle of the ball and gently rotate outwards.
                     </p>
@@ -114,7 +120,7 @@
 
                   <!-- Step 4 -->
                   <div class="clay-step" data-step="4">
-                    <div class="step-label">Step 4 / 8</div>
+                    <div class="step-label">Step 4 / 9</div>
                     <p class="step-body">
                       Slightly change the position of your hands and continue expanding out to form a bowl shape.
                     </p>
@@ -122,7 +128,7 @@
 
                   <!-- Step 5 -->
                   <div class="clay-step" data-step="5">
-                    <div class="step-label">Step 5 / 8</div>
+                    <div class="step-label">Step 5 / 9</div>
                     <p class="step-body">
                       Refine the edge of the bowl with your fingers and utensil 2 once you’re happy with the overall form.
                     </p>
@@ -130,7 +136,7 @@
 
                   <!-- Step 6 -->
                   <div class="clay-step" data-step="6">
-                    <div class="step-label">Step 6 / 8</div>
+                    <div class="step-label">Step 6 / 9</div>
                     <p class="step-body">
                       Take the smaller portion of clay and roll out a long strip with your palm to create the base ring.
                     </p>
@@ -138,19 +144,27 @@
 
                   <!-- Step 7 -->
                   <div class="clay-step" data-step="7">
-                    <div class="step-label">Step 7 / 8</div>
+                    <div class="step-label">Step 7 / 9</div>
                     <p class="step-body">
                       Measure the base of your bowl, join the strip into a ring, and blend the seam. Smooth where the bowl
                       and ring meet.
                     </p>
                   </div>
 
-                  <!-- Step 8 -->
+                  <!-- Step 8 – check the bowl -->
                   <div class="clay-step" data-step="8">
-                    <div class="step-label">Step 8 / 8</div>
+                    <div class="step-label">Step 8 / 9</div>
                     <p class="step-body">
-                      Use the sponge from the box, damp it slightly, and smooth over all surfaces and edges until your piece
-                      is even and unwrinkled.
+                      Open the webcam and scan the bowl to check if there’s improvement needed.
+                    </p>
+                  </div>
+
+                  <!-- Step 9 – sponge & smooth -->
+                  <div class="clay-step" data-step="9">
+                    <div class="step-label">Step 9 / 9</div>
+                    <p class="step-body">
+                      Use the sponge from the box, damp it slightly, and smooth over all surfaces and edges
+                      until your piece is even and unwrinkled.
                     </p>
                   </div>
                 </div>
@@ -164,12 +178,9 @@
                 </button>
               </div>
 
-              <button class="primary-btn" id="check-bowl-btn">
-                check my bowl before bisque firing
-              </button>
-
-              <p class="small-note" id="check-result">
-                Move through all the clay steps, then tap the button to run a quick check.
+              <!-- keep this for JS, but hide it so no note shows -->
+              <p class="small-note" id="check-result" style="display:none;">
+                Follow the clay steps. The checker will appear at step 8.
               </p>
             </div>
 
@@ -202,16 +213,26 @@
                 <div class="scan-overlay" id="scan-overlay">
                   <div class="scan-line"></div>
                 </div>
+
+                <!-- instruction label -->
+                <div class="scan-instruction" id="scan-instruction">
+                  Align your bowl inside the shape, then tap “Scan and check”.
+                </div>
+
+                <!-- SCAN SUCCESS POPUP (now INSIDE scan-frame) -->
+                <div id="scan-success-popup" class="scan-success-popup">
+                  <div class="scan-success-box">
+                    <div class="scan-success-icon">✓</div>
+                    <div class="scan-success-title">Scan complete</div>
+                    <div class="scan-success-sub">Your bowl looks great!</div>
+                  </div>
+                </div>
               </div>
 
               <!-- user-controlled scan trigger -->
               <button class="secondary-btn" id="scan-start-btn">
                 Scan and check
               </button>
-
-              <div class="scan-status" id="scan-status">
-                Follow the clay steps. The checker will appear at the last step.
-              </div>
 
               <button class="primary-btn next-step-btn" id="next-step-btn">
                 Next step →
@@ -304,8 +325,8 @@
             <div class="glaze-column glaze-instructions">
               <ol class="step-list">
                 <li>Open the Speckled Field coloring set and the brushes.</li>
-                <li>Be sure to apply mutiple layer of glaze on you bowl.</li>
-                <li>Brush the stroke in opposite direction for each layer.</li>
+                <li>Be sure to apply multiple layers of glaze on your bowl.</li>
+                <li>Brush the stroke in opposite directions for each layer.</li>
                 <li>
                   Use the scan on the right to “lock in” your bowl, then try different
                   glaze colors to preview how they look after firing.
@@ -347,7 +368,7 @@
                   style="width:100%; height:100%;"
                 ></model-viewer>
 
-                <!-- NEW: speckle / watercolor overlay -->
+                <!-- speckle / watercolor overlay -->
                 <div id="glaze-texture-overlay" class="glaze-texture-overlay"></div>
 
                 <!-- fake scanning overlay -->
@@ -429,7 +450,6 @@
                 >
                   fire this glaze →
                 </button>
-
               </div>
             </div> <!-- /glaze-column glaze-preview -->
           </div> <!-- /glaze-layout -->
@@ -443,7 +463,7 @@
           </div>
 
           <p class="body-text" style="font-size:13px; max-width:520px; margin:0 0 16px;">
-            Book a firing session for you bowl right now. The best time will be probably 3 days after you finishing glazing.
+            Book a firing session for your bowl. The best time will probably be about 3 days after you finish glazing.
           </p>
 
           <form
@@ -521,6 +541,7 @@
           </p>
         </section>
       </section>
+
     </main>
 
     <footer>© glaze diary</footer>

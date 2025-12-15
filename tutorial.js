@@ -27,11 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ------------------------------------------------------------------------
    * 2) CLAY STEPPER — steps + step illustrations + LEFT MENU STEP TABS
    * ----------------------------------------------------------------------*/
-  const steps        = [...document.querySelectorAll('.clay-step')];
-  const stepMenuItems = [...document.querySelectorAll('.clay-step-menu-item')]; // NEW
-  const prevBtn      = document.getElementById('step-prev');
-  const nextBtn      = document.getElementById('step-next');
-  const illustration = document.getElementById('step-illustration');
+  const steps         = [...document.querySelectorAll('.clay-step')];
+  const stepMenuItems = [...document.querySelectorAll('.clay-step-menu-item')];
+  const prevBtn       = document.getElementById('step-prev');
+  const nextBtn       = document.getElementById('step-next');
+  const illustration  = document.getElementById('step-illustration');
 
   const stepImages = [
     'assets/step 1.png',
@@ -41,7 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
     'assets/step 5.png',
     'assets/step 6.png',
     'assets/step 7.png',
-    'assets/step 8.png'
+    'assets/step 8.png',
+    'assets/step 9.png'
   ];
 
   const stepAlts = [
@@ -52,43 +53,62 @@ document.addEventListener('DOMContentLoaded', () => {
     'Step 5 – refine the rim with your fingers and tools',
     'Step 6 – roll a strip from the smaller portion for the base ring',
     'Step 7 – join the ring and blend the seam where bowl and base meet',
-    'Step 8 – smooth all surfaces with a damp sponge'
+    'Step 8 – check your bowl using the guide and scanner',
+    'Step 9 – sponge and smooth the surfaces one last time'
   ];
 
-  const checkBtn     = document.getElementById('check-bowl-btn');
-  const resultText   = document.getElementById('check-result');
-  const scanStatus   = document.getElementById('scan-status');
-  const scanStartBtn = document.getElementById('scan-start-btn');
-  const shapeOverlay = document.getElementById('shape-overlay');
-  const nextStepBtn  = document.getElementById('next-step-btn');
+  const checkBtn        = document.getElementById('check-bowl-btn');
+  const resultText      = document.getElementById('check-result');
+  const scanStatus      = document.getElementById('scan-status');
+  const scanStartBtn    = document.getElementById('scan-start-btn'); // will stay hidden
+  const shapeOverlay    = document.getElementById('shape-overlay');
+  const nextStepBtn     = document.getElementById('next-step-btn');
+  const scanInstruction = document.getElementById('scan-instruction');
+
+  let canScan = false; // false = first click opens camera, true = second click scans
 
   function resetScanUI() {
+    canScan = false;
+
     if (scanStartBtn) {
       scanStartBtn.style.display = 'none';
       scanStartBtn.classList.add('is-disabled');
       scanStartBtn.disabled = true;
     }
     if (scanStatus) {
-      scanStatus.textContent = 'Follow the clay steps. The checker will appear at the last step.';
+      scanStatus.textContent = 'Follow the clay steps. The checker will appear at step 8.';
     }
     if (resultText) {
-      resultText.textContent = 'Follow the clay steps. The checker will appear at the last step.';
+      resultText.textContent = 'Follow the clay steps. The checker will appear at step 8.';
     }
     if (nextStepBtn) nextStepBtn.classList.remove('visible');
     if (shapeOverlay) shapeOverlay.classList.remove('active');
+    if (scanInstruction) scanInstruction.classList.remove('visible');
+    if (checkBtn) {
+      checkBtn.textContent = 'check my bowl before bisque firing';
+      checkBtn.classList.remove('is-scan-mode');
+    }
   }
 
   if (steps.length && prevBtn && nextBtn && checkBtn && resultText) {
-    let currentIndex = 0; // 0-based index (step 1 = 0, step 2 = 1, ...)
+    let currentIndex = 0;
+    const totalSteps = steps.length;        // should be 9
+    const SCAN_STEP_INDEX = totalSteps - 2; // second-to-last step (index 7 when 9 steps)
+
+    function clampIndex(i) {
+      return Math.max(0, Math.min(totalSteps - 1, i));
+    }
 
     function updateSteps() {
+      currentIndex = clampIndex(currentIndex);
+
       // right column: show only current step
       steps.forEach((step, i) => {
         step.classList.toggle('active', i === currentIndex);
       });
 
       // left column: highlight current step tab
-      const currentStepNumber = currentIndex + 1; // data-step is 1-based
+      const currentStepNumber = currentIndex + 1;
       stepMenuItems.forEach(item => {
         const stepNum = Number(item.dataset.step);
         item.classList.toggle('active', stepNum === currentStepNumber);
@@ -96,19 +116,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // arrows
       prevBtn.disabled = currentIndex === 0;
-      nextBtn.disabled = currentIndex === steps.length - 1;
+      nextBtn.disabled = currentIndex === totalSteps - 1;
 
-      // update illustration
+      // illustration
       if (illustration && stepImages[currentIndex]) {
         illustration.src = stepImages[currentIndex];
         illustration.alt = stepAlts[currentIndex] || '';
       }
 
-      // show check button only at last step
-      if (currentIndex === steps.length - 1) {
+      // show main button only on SCAN_STEP_INDEX (step 8)
+      if (currentIndex === SCAN_STEP_INDEX) {
         checkBtn.style.display = 'inline-flex';
-        resultText.textContent =
-          'You’ve reached the last step. Tap the button to set up the checker.';
+        if (!canScan) {
+          // first time arriving to step 8 → pre-scan state
+          resultText.textContent =
+            'You’ve reached “check your bowl”. Tap the button to set up the checker.';
+        }
+        if (scanInstruction && canScan) {
+          // if camera already open and we come back here
+          scanInstruction.classList.add('visible');
+        }
       } else {
         checkBtn.style.display = 'none';
         resetScanUI();
@@ -117,28 +144,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // arrow buttons
     prevBtn.addEventListener('click', () => {
-      if (currentIndex > 0) {
-        currentIndex--;
-        updateSteps();
-      }
+      currentIndex = clampIndex(currentIndex - 1);
+      updateSteps();
     });
 
     nextBtn.addEventListener('click', () => {
-      if (currentIndex < steps.length - 1) {
-        currentIndex++;
-        updateSteps();
-      }
+      currentIndex = clampIndex(currentIndex + 1);
+      updateSteps();
     });
 
     // LEFT MENU STEP TABS
     stepMenuItems.forEach(item => {
       item.addEventListener('click', (event) => {
-        // don’t trigger the parent process-nav-item click
         event.stopPropagation();
 
-        const stepNum = Number(item.dataset.step); // 1–8
+        const stepNum = Number(item.dataset.step); // 1–9
         if (!Number.isNaN(stepNum)) {
-          currentIndex = stepNum - 1; // convert to 0-based
+          currentIndex = clampIndex(stepNum - 1);
           updateSteps();
         }
       });
@@ -171,70 +193,82 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // initial state
-  if (checkBtn && scanStartBtn && nextStepBtn) {
-    checkBtn.style.display = 'none';
-    scanStartBtn.style.display = 'none';
-    scanStartBtn.classList.add('is-disabled');
-    scanStartBtn.disabled = true;
-    nextStepBtn.classList.remove('visible');
-
-    // 3a. user taps “check my bowl…”
-    checkBtn.addEventListener('click', () => {
-      if (shapeOverlay) shapeOverlay.classList.add('active');
-      scanStartBtn.style.display = 'inline-flex';
+  if (checkBtn && nextStepBtn) {
+    // hide secondary scan button completely (we won't use it anymore)
+    if (scanStartBtn) {
+      scanStartBtn.style.display = 'none';
       scanStartBtn.classList.add('is-disabled');
       scanStartBtn.disabled = true;
+    }
+    nextStepBtn.classList.remove('visible');
 
-      if (scanStatus) {
-        scanStatus.textContent =
-          'We’re opening your camera. Allow access, then you can start scanning.';
-      }
-      if (resultText) {
-        resultText.textContent =
-          'When the camera appears, place your bowl roughly inside the shape.';
-      }
+    // ONE BUTTON FLOW
+    checkBtn.addEventListener('click', () => {
+      // If we are not yet in "ready to scan" mode → open camera
+      if (!canScan) {
+        if (shapeOverlay) shapeOverlay.classList.add('active');
 
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-          .then(stream => {
-            videoStream = stream;
-            if (video) {
-              video.srcObject = stream;
-              video.classList.add('active');
-            }
-            if (illustration) illustration.classList.add('hidden');
-            if (shapeOverlay) shapeOverlay.classList.add('active');
-
-            if (scanStatus) {
-              scanStatus.textContent =
-                'Align your bowl inside the shape, then tap “Scan and check”.';
-            }
-
-            scanStartBtn.classList.remove('is-disabled');
-            scanStartBtn.disabled = false;
-          })
-          .catch(() => {
-            if (scanStatus) {
-              scanStatus.textContent =
-                'Camera not available. You can still tap “Scan and check” to continue.';
-            }
-            scanStartBtn.classList.remove('is-disabled');
-            scanStartBtn.disabled = false;
-          });
-      } else {
         if (scanStatus) {
           scanStatus.textContent =
-            'Camera not available. You can still tap “Scan and check” to continue.';
+            'We’re opening your camera. Allow access, then you can start scanning.';
         }
-        scanStartBtn.classList.remove('is-disabled');
-        scanStartBtn.disabled = false;
-      }
-    });
+        if (resultText) {
+          resultText.textContent =
+            'When the camera appears, place your bowl roughly inside the shape.';
+        }
 
-    // 3b. user taps “Scan and check”
-    scanStartBtn.addEventListener('click', () => {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+              videoStream = stream;
+              if (video) {
+                video.srcObject = stream;
+                video.classList.add('active');
+              }
+              if (illustration) illustration.classList.add('hidden');
+              if (shapeOverlay) shapeOverlay.classList.add('active');
+
+              if (scanStatus) {
+                scanStatus.textContent =
+                  'Align your bowl inside the shape, then tap “Scan and check”.';
+              }
+
+              // switch button into "scan" mode
+              canScan = true;
+              checkBtn.textContent = 'Scan and check';
+              checkBtn.classList.add('is-scan-mode');
+              if (scanInstruction) scanInstruction.classList.add('visible');
+            })
+            .catch(() => {
+              // even if camera fails, we still let them run the fake scan
+              if (scanStatus) {
+                scanStatus.textContent =
+                  'Camera not available. You can still tap “Scan and check” to continue.';
+              }
+              canScan = true;
+              checkBtn.textContent = 'Scan and check';
+              checkBtn.classList.add('is-scan-mode');
+              if (scanInstruction) scanInstruction.classList.add('visible');
+            });
+        } else {
+          // no camera support
+          if (scanStatus) {
+            scanStatus.textContent =
+              'Camera not available. You can still tap “Scan and check” to continue.';
+          }
+          canScan = true;
+          checkBtn.textContent = 'Scan and check';
+          checkBtn.classList.add('is-scan-mode');
+          if (scanInstruction) scanInstruction.classList.add('visible');
+        }
+        return;
+      }
+
+      // Already in scan mode → this click actually runs the scan
       if (isScanning || !overlay) return;
       isScanning = true;
+
+      if (scanInstruction) scanInstruction.classList.remove('visible');
 
       overlay.classList.add('active');
       if (scanStatus) scanStatus.textContent = 'Scanning your bowl… hold still.';
@@ -256,10 +290,20 @@ document.addEventListener('DOMContentLoaded', () => {
         isScanning = false;
 
         if (nextStepBtn) nextStepBtn.classList.add('visible');
+
+        // NEW SUCCESS POPUP
+        const scanSuccessPopup = document.getElementById('scan-success-popup');
+        scanSuccessPopup.classList.add('show');
+        setTimeout(() => {
+          scanSuccessPopup.classList.remove('show');
+        }, 3500);
+
+        checkBtn.disabled = true;
       }, 2500);
+
     });
 
-    // 3c. Next step → jump to bisque section
+    // Next step → jump to bisque section
     nextStepBtn.addEventListener('click', () => {
       showProcess('process-bisque');
     });
