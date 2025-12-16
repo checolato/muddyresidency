@@ -1,33 +1,38 @@
 // tutorial.js
 document.addEventListener('DOMContentLoaded', () => {
-  /* ------------------------------------------------------------------------
-   * 1) PROCESS MENU — Only one major section shown at a time
-   * ----------------------------------------------------------------------*/
-  const navItems = [...document.querySelectorAll('.process-nav-item')];
-  const screens  = [...document.querySelectorAll('.process-screen')];
+  /* =========================================================================
+   * Helpers
+   * ========================================================================= */
+  const qs  = (sel, root = document) => root.querySelector(sel);
+  const qsa = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+  /* =========================================================================
+   * 1) PROCESS MENU — only one screen visible
+   * ========================================================================= */
+  const navItems = qsa('.process-nav-item');
+  const screens  = qsa('.process-screen');
 
   function showProcess(id) {
     screens.forEach(s => s.classList.toggle('active', s.id === id));
     navItems.forEach(n => n.classList.toggle('active', n.dataset.target === id));
   }
 
-  // Default screen (if none active)
+  // Ensure there is an active screen
   if (!screens.some(s => s.classList.contains('active')) && screens.length) {
     showProcess('process-clay');
   }
 
-  /* ------------------------------------------------------------------------
-   * 2) CLAY STEPPER — steps + step illustrations + LEFT MENU STEP TABS
-   *    IMPORTANT FIX: scope clay step menu items to ONLY process-clay
-   * ----------------------------------------------------------------------*/
-  const steps         = [...document.querySelectorAll('.clay-step')];
+  /* =========================================================================
+   * 2) PROCESS 1 — CLAY STEPPER + LEFT MENU STEP TABS
+   * ========================================================================= */
+  const clayScreen    = qs('#process-clay');
+  const claySteps     = qsa('.clay-step', clayScreen || document);
+  const prevBtn       = qs('#step-prev');
+  const nextBtn       = qs('#step-next');
+  const illustration  = qs('#step-illustration');
 
-  const clayNav       = document.querySelector('.process-nav-item[data-target="process-clay"]');
-  const stepMenuItems = clayNav ? [...clayNav.querySelectorAll('.clay-step-menu-item')] : [];
-
-  const prevBtn       = document.getElementById('step-prev');
-  const nextBtn       = document.getElementById('step-next');
-  const illustration  = document.getElementById('step-illustration');
+  const clayNav       = qs('.process-nav-item[data-target="process-clay"]');
+  const clayMenuItems = clayNav ? qsa('.clay-step-menu-item', clayNav) : [];
 
   const stepImages = [
     'assets/step 1.png',
@@ -53,57 +58,43 @@ document.addEventListener('DOMContentLoaded', () => {
     'Step 9 - sponge and smooth the surfaces one last time'
   ];
 
-  const checkBtn        = document.getElementById('check-bowl-btn');
-  const resultText      = document.getElementById('check-result');
-  const scanStatus      = document.getElementById('scan-status'); // ok if null
-  const scanStartBtn    = document.getElementById('scan-start-btn');
-  const shapeOverlay    = document.getElementById('shape-overlay');
-  const nextStepBtn     = document.getElementById('next-step-btn');
-  const scanInstruction = document.getElementById('scan-instruction');
+  let clayIndex = 0;
 
-  // Popups
-  const scanSuccessPopup = document.getElementById('scan-success-popup');
-  const scanIssuesPopup  = document.getElementById('scan-issues-popup');
+  // Clay scan/check UI (Process 1 step 8)
+  const checkBtn        = qs('#check-bowl-btn');
+  const resultText      = qs('#check-result');
+  const scanStatus      = qs('#scan-status'); // optional
+  const shapeOverlay    = qs('#shape-overlay');
+  const shapeImg        = qs('#shape-overlay-img');
+  const scanInstruction = qs('#scan-instruction');
+  const overlay         = qs('#scan-overlay');
+  const video           = qs('#scan-video');
 
-  // Issue summary list (right side)
-  const scanIssueSummary = document.getElementById('scan-issue-summary');
+  const scanSuccessPopup = qs('#scan-success-popup');
+  const scanIssuesPopup  = qs('#scan-issues-popup');
+  const scanIssueSummary = qs('#scan-issue-summary');
 
-  // Shape image swap
-  const shapeImg      = document.getElementById('shape-overlay-img');
   const goodShapeSrc  = 'assets/shape.png';
   const badShapeSrc   = 'assets/shapebad.png';
 
-  // Scan overlay + video
-  const overlay = document.getElementById('scan-overlay');
-  const video   = document.getElementById('scan-video');
-
   let canScan        = false;
   let hasShownIssues = false;
-
-  // Stepper state + callable updater (outer scope)
-  let currentIndex = 0;
-  let updateSteps  = () => {};
-
-  let videoStream = null;
-  let isScanning  = false;
+  let videoStream    = null;
+  let isScanning     = false;
 
   function hideScanPopups() {
     if (scanSuccessPopup) scanSuccessPopup.classList.remove('show');
     if (scanIssuesPopup)  scanIssuesPopup.classList.remove('show');
   }
-
   function hideIssueSummary() {
     if (scanIssueSummary) scanIssueSummary.classList.remove('show');
   }
-
   function showIssueSummary() {
     if (scanIssueSummary) scanIssueSummary.classList.add('show');
   }
-
   function setShapeGood() {
     if (shapeImg) shapeImg.src = goodShapeSrc;
   }
-
   function setShapeBad() {
     if (shapeImg) shapeImg.src = badShapeSrc;
   }
@@ -125,23 +116,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function resetScanUI() {
     canScan = false;
     hasShownIssues = false;
+    isScanning = false;
 
     setShapeGood();
     hideIssueSummary();
     hideScanPopups();
 
-    if (scanStartBtn) {
-      scanStartBtn.style.display = 'none';
-      scanStartBtn.classList.add('is-disabled');
-      scanStartBtn.disabled = true;
-    }
-
     if (scanStatus) scanStatus.textContent = 'Follow the clay steps. The checker will appear at step 8.';
     if (resultText) resultText.textContent = 'Follow the clay steps. The checker will appear at step 8.';
-
-    // keep the old button hidden forever
-    if (nextStepBtn) nextStepBtn.classList.remove('visible');
-
     if (shapeOverlay) shapeOverlay.classList.remove('active');
     if (scanInstruction) scanInstruction.classList.remove('visible');
 
@@ -152,95 +134,72 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function resetClayStepUI() {
-    stepMenuItems.forEach(item => item.classList.remove('active'));
+  function cleanupClayOverlaysAndCamera() {
+    stopClayVideo();
+    resetScanUI();
+    clayMenuItems.forEach(i => i.classList.remove('active'));
     if (checkBtn) checkBtn.style.display = 'none';
     if (scanInstruction) scanInstruction.classList.remove('visible');
   }
 
-  function cleanupClayOverlaysAndCamera() {
-    stopClayVideo();
-    resetScanUI();
-    resetClayStepUI();
+  function clamp(i, min, max) {
+    return Math.max(min, Math.min(max, i));
   }
 
-  // Process menu clicks (always work)
-  navItems.forEach(item => {
-    item.addEventListener('click', () => {
-      const target = item.dataset.target;
-      if (!target) return;
+  function updateClay() {
+    if (!claySteps.length) return;
 
-      if (target !== 'process-clay') cleanupClayOverlaysAndCamera();
-      showProcess(target);
+    const totalSteps = claySteps.length;
+    clayIndex = clamp(clayIndex, 0, totalSteps - 1);
+    const stepNum = clayIndex + 1;
 
-      if (target === 'process-clay') updateSteps();
+    claySteps.forEach((el, i) => el.classList.toggle('active', i === clayIndex));
 
-      // If user clicks "02 bisque fire" main row, default to bisque step 1
-      if (target === 'process-bisque') {
-        showBisqueStep(1);
-        setBisqueMenuActive(1);
-      }
+    // left menu highlight (only inside process 1 nav)
+    clayMenuItems.forEach(item => {
+      const n = Number(item.dataset.step);
+      item.classList.toggle('active', n === stepNum);
     });
-  });
 
-  /* ------------------------------------------------------------------------
-   * 2B) CLAY STEPPER LOGIC
-   * ----------------------------------------------------------------------*/
-  if (steps.length && prevBtn && nextBtn && resultText) {
-    const totalSteps = steps.length;
-    const SCAN_STEP_INDEX = totalSteps - 2; // Step 8 (index 7)
+    if (prevBtn) prevBtn.disabled = clayIndex === 0;
+    if (nextBtn) nextBtn.disabled = false;
 
-    function clampIndex(i) {
-      return Math.max(0, Math.min(totalSteps - 1, i));
+    if (illustration && stepImages[clayIndex]) {
+      illustration.src = stepImages[clayIndex];
+      illustration.alt = stepAlts[clayIndex] || '';
     }
 
-    updateSteps = function () {
-      currentIndex = clampIndex(currentIndex);
-
-      steps.forEach((step, i) => step.classList.toggle('active', i === currentIndex));
-
-      const currentStepNumber = currentIndex + 1;
-      stepMenuItems.forEach(item => {
-        const stepNum = Number(item.dataset.step);
-        item.classList.toggle('active', stepNum === currentStepNumber);
-      });
-
-      prevBtn.disabled = currentIndex === 0;
-
-      // keep right arrow usable
-      nextBtn.disabled = false;
-
-      if (illustration && stepImages[currentIndex]) {
-        illustration.src = stepImages[currentIndex];
-        illustration.alt = stepAlts[currentIndex] || '';
-      }
-
-      // Show scan button only on Step 8
-      if (checkBtn) {
-        if (currentIndex === SCAN_STEP_INDEX) {
-          checkBtn.style.display = 'inline-flex';
-
-          if (!canScan) {
-            resultText.textContent =
-              "You've reached 'check your bowl'. Tap the button to set up the checker.";
-          } else {
-            if (scanInstruction) scanInstruction.classList.add('visible');
-          }
+    // Scan button only on step 8 (index 7)
+    const SCAN_STEP_INDEX = totalSteps - 2;
+    if (checkBtn) {
+      if (clayIndex === SCAN_STEP_INDEX) {
+        checkBtn.style.display = 'inline-flex';
+        if (!canScan) {
+          if (resultText) resultText.textContent =
+            "You've reached 'check your bowl'. Tap the button to set up the checker.";
         } else {
-          checkBtn.style.display = 'none';
-          resetScanUI();
+          if (scanInstruction) scanInstruction.classList.add('visible');
         }
+      } else {
+        checkBtn.style.display = 'none';
+        resetScanUI();
       }
-    };
+    }
+  }
 
+  if (prevBtn) {
     prevBtn.addEventListener('click', () => {
-      currentIndex = clampIndex(currentIndex - 1);
-      updateSteps();
+      clayIndex -= 1;
+      updateClay();
     });
+  }
 
+  if (nextBtn) {
     nextBtn.addEventListener('click', () => {
-      // Step 9 -> Process 2 (bisque) step 1
-      if (currentIndex === totalSteps - 1) {
+      const totalSteps = claySteps.length || 0;
+
+      // Step 9 -> Process 2 Step 1
+      if (totalSteps && clayIndex === totalSteps - 1) {
         cleanupClayOverlaysAndCamera();
         showProcess('process-bisque');
         showBisqueStep(1);
@@ -248,97 +207,27 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      currentIndex = clampIndex(currentIndex + 1);
-      updateSteps();
+      clayIndex += 1;
+      updateClay();
     });
+  }
 
-    // Clay step menu items (ONLY inside process-clay now)
-    stepMenuItems.forEach(item => {
-      item.addEventListener('click', (event) => {
-        event.stopPropagation();
-
-        showProcess('process-clay');
-
-        const stepNum = Number(item.dataset.step);
-        if (!Number.isNaN(stepNum)) {
-          currentIndex = clampIndex(stepNum - 1);
-          updateSteps();
-        }
-      });
+  clayMenuItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showProcess('process-clay');
+      const n = Number(item.dataset.step);
+      if (!Number.isNaN(n)) {
+        clayIndex = n - 1;
+        updateClay();
+      }
     });
+  });
 
-    updateSteps();
-  }
-
-  /* ------------------------------------------------------------------------
-   * 2C) BISQUE (PROCESS 2) SUBSTEPS — Step 1 schedule / Step 2 timeline
-   * ----------------------------------------------------------------------*/
-  const bisqueStep1 = document.getElementById('bisque-step-1');
-  const bisqueStep2 = document.getElementById('bisque-step-2');
-
-  function showBisqueStep(stepNum) {
-    if (!bisqueStep1 || !bisqueStep2) return;
-    const is1 = Number(stepNum) === 1;
-    bisqueStep1.style.display = is1 ? 'block' : 'none';
-    bisqueStep2.style.display = is1 ? 'none' : 'block';
-  }
-
-  function setBisqueMenuActive(stepNum) {
-    const bisqueNav = document.querySelector('.process-nav-item[data-target="process-bisque"]');
-    if (!bisqueNav) return;
-
-    // support either class name (in case your HTML still uses clay-step-menu-item)
-    const items = [
-      ...bisqueNav.querySelectorAll('.bisque-step-menu-item'),
-      ...bisqueNav.querySelectorAll('.clay-step-menu-item')
-    ];
-
-    items.forEach(el => el.classList.toggle('active', Number(el.dataset.step) === Number(stepNum)));
-  }
-
-  // Bind clicks for bisque step items (scoped INSIDE process-bisque nav item)
-  const bisqueNav = document.querySelector('.process-nav-item[data-target="process-bisque"]');
-  if (bisqueNav) {
-    const bisqueStepItems = [
-      ...bisqueNav.querySelectorAll('.bisque-step-menu-item'),
-      ...bisqueNav.querySelectorAll('.clay-step-menu-item') // fallback
-    ];
-
-    bisqueStepItems.forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showProcess('process-bisque');
-        showBisqueStep(item.dataset.step);
-        setBisqueMenuActive(item.dataset.step);
-      });
-    });
-
-    // Clicking the main row defaults to step 1
-    const mainRow = bisqueNav.querySelector('.process-main');
-    if (mainRow) {
-      mainRow.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showProcess('process-bisque');
-        showBisqueStep(1);
-        setBisqueMenuActive(1);
-      });
-    }
-  }
-
-  /* ------------------------------------------------------------------------
-   * 3) CLAY FAKE AR SCAN — webcam + overlay + TWO-PASS RESULT
-   * ----------------------------------------------------------------------*/
+  // Clay scan/check click
   if (checkBtn) {
-    // hide unused old scan-start + next-step buttons
-    if (scanStartBtn) {
-      scanStartBtn.style.display = 'none';
-      scanStartBtn.classList.add('is-disabled');
-      scanStartBtn.disabled = true;
-    }
-    if (nextStepBtn) nextStepBtn.classList.remove('visible');
-
     checkBtn.addEventListener('click', () => {
-      // PASS 0: open camera, switch to scan mode
+      // PASS 0: open camera + enter scan mode
       if (!canScan) {
         hideScanPopups();
         hideIssueSummary();
@@ -347,14 +236,10 @@ document.addEventListener('DOMContentLoaded', () => {
         setShapeGood();
         if (shapeOverlay) shapeOverlay.classList.add('active');
 
-        if (scanStatus) {
-          scanStatus.textContent =
-            'We are opening your camera. Allow access, then you can start scanning.';
-        }
-        if (resultText) {
-          resultText.textContent =
-            'When the camera appears, place your bowl roughly inside the shape.';
-        }
+        if (scanStatus) scanStatus.textContent =
+          'We are opening your camera. Allow access, then you can start scanning.';
+        if (resultText) resultText.textContent =
+          'When the camera appears, place your bowl roughly inside the shape.';
 
         const enterScanMode = () => {
           canScan = true;
@@ -362,55 +247,43 @@ document.addEventListener('DOMContentLoaded', () => {
           checkBtn.textContent = 'Scan and check';
           checkBtn.classList.add('is-scan-mode');
           if (scanInstruction) scanInstruction.classList.add('visible');
-          if (scanStatus) {
-            scanStatus.textContent =
-              'Align your bowl inside the shape, then tap Scan and check.';
-          }
+          if (scanStatus) scanStatus.textContent =
+            'Align your bowl inside the shape, then tap Scan and check.';
         };
 
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        if (navigator.mediaDevices?.getUserMedia && video) {
           navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
               videoStream = stream;
+              video.srcObject = stream;
+              video.classList.add('active');
 
-              if (video) {
-                video.srcObject = stream;
-                video.classList.add('active');
-
-                const onReady = () => {
-                  video.removeEventListener('loadedmetadata', onReady);
-                  if (illustration) illustration.classList.add('hidden');
-                  if (shapeOverlay) shapeOverlay.classList.add('active');
-                  enterScanMode();
-                };
-                video.addEventListener('loadedmetadata', onReady);
-              } else {
+              const onReady = () => {
+                video.removeEventListener('loadedmetadata', onReady);
+                if (illustration) illustration.classList.add('hidden');
+                if (shapeOverlay) shapeOverlay.classList.add('active');
                 enterScanMode();
-              }
+              };
+              video.addEventListener('loadedmetadata', onReady);
             })
             .catch(() => {
-              if (scanStatus) {
-                scanStatus.textContent =
-                  'Camera not available. You can still tap Scan and check to continue.';
-              }
+              if (scanStatus) scanStatus.textContent =
+                'Camera not available. You can still tap Scan and check to continue.';
               enterScanMode();
             });
         } else {
-          if (scanStatus) {
-            scanStatus.textContent =
-              'Camera not available. You can still tap Scan and check to continue.';
-          }
+          if (scanStatus) scanStatus.textContent =
+            'Camera not available. You can still tap Scan and check to continue.';
           enterScanMode();
         }
         return;
       }
 
-      // PASS 1 / PASS 2: run scan
+      // PASS 1/2: run scan
       if (isScanning || !overlay) return;
       isScanning = true;
 
       checkBtn.disabled = true;
-
       if (scanInstruction) scanInstruction.classList.remove('visible');
       hideScanPopups();
       hideIssueSummary();
@@ -429,14 +302,10 @@ document.addEventListener('DOMContentLoaded', () => {
           setShapeBad();
           showIssueSummary();
 
-          if (scanStatus) {
-            scanStatus.textContent =
-              'We found a few areas to improve. Smooth the highlighted spots, then scan again.';
-          }
-          if (resultText) {
-            resultText.textContent =
-              'Focus on smoothing the rim and evening the wall thickness, then scan again.';
-          }
+          if (scanStatus) scanStatus.textContent =
+            'We found a few areas to improve. Smooth the highlighted spots, then scan again.';
+          if (resultText) resultText.textContent =
+            'Focus on smoothing the rim and evening the wall thickness, then scan again.';
 
           if (scanIssuesPopup) {
             scanIssuesPopup.classList.add('show');
@@ -455,14 +324,10 @@ document.addEventListener('DOMContentLoaded', () => {
         setShapeGood();
         hideIssueSummary();
 
-        if (scanStatus) {
-          scanStatus.textContent =
-            'Your bowl looks ready for bisque firing. You can book a firing session.';
-        }
-        if (resultText) {
-          resultText.textContent =
-            'Looks good. You can refine the rim one last time if you want.';
-        }
+        if (scanStatus) scanStatus.textContent =
+          'Your bowl looks ready for bisque firing. You can book a firing session.';
+        if (resultText) resultText.textContent =
+          'Looks good. You can refine the rim one last time if you want.';
 
         stopClayVideo();
         isScanning = false;
@@ -472,31 +337,81 @@ document.addEventListener('DOMContentLoaded', () => {
           setTimeout(() => scanSuccessPopup.classList.remove('show'), 3500);
         }
 
-        // stay on Step 8 after success
-        currentIndex = steps.length - 2;
-        updateSteps();
+        // Stay on step 8 after success
+        clayIndex = claySteps.length - 2;
+        updateClay();
 
         checkBtn.disabled = true;
         if (scanInstruction) scanInstruction.classList.remove('visible');
-
-        if (nextStepBtn) nextStepBtn.classList.remove('visible');
       }, 2500);
     });
   }
 
-    /* ------------------------------------------------------------------------
-   * 4) APPOINTMENT HANDLER
-   *    Bisque: submit -> popup "Appointment Made!" -> auto jump to Step 2
-   *    Glaze fire: keep existing behavior (submit -> popup -> show next button)
-   * ----------------------------------------------------------------------*/
-  const popup = document.getElementById('success-popup');
-  const popupText = document.getElementById('success-popup-text'); // optional
+  // initialize clay UI
+  updateClay();
 
-  const bisqueForm  = document.querySelector('#process-bisque .schedule-form');
-  const bisqueNext  = document.getElementById('bisque-next-btn');
+  /* =========================================================================
+   * 3) PROCESS 2 — BISQUE SUBSTEPS (Step 1 schedule / Step 2 timeline)
+   * ========================================================================= */
+  const bisqueStep1 = qs('#bisque-step-1');
+  const bisqueStep2 = qs('#bisque-step-2');
 
-  const glazeFireForm = document.querySelector('#process-glaze-fire .schedule-form');
-  const glazeNext     = document.getElementById('glaze-next-btn');
+  function showBisqueStep(stepNum) {
+    if (!bisqueStep1 || !bisqueStep2) return;
+    const is1 = Number(stepNum) === 1;
+    bisqueStep1.style.display = is1 ? 'block' : 'none';
+    bisqueStep2.style.display = is1 ? 'none' : 'block';
+  }
+
+  function setBisqueMenuActive(stepNum) {
+    const bisqueNav = qs('.process-nav-item[data-target="process-bisque"]');
+    if (!bisqueNav) return;
+    const items = [
+      ...qsa('.bisque-step-menu-item', bisqueNav),
+      ...qsa('.clay-step-menu-item', bisqueNav) // fallback (your HTML uses clay-step-menu-item)
+    ];
+    items.forEach(el => el.classList.toggle('active', Number(el.dataset.step) === Number(stepNum)));
+  }
+
+  // Bind clicks for bisque step items
+  const bisqueNav = qs('.process-nav-item[data-target="process-bisque"]');
+  if (bisqueNav) {
+    const bisqueStepItems = [
+      ...qsa('.bisque-step-menu-item', bisqueNav),
+      ...qsa('.clay-step-menu-item', bisqueNav)
+    ];
+
+    bisqueStepItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showProcess('process-bisque');
+        showBisqueStep(item.dataset.step);
+        setBisqueMenuActive(item.dataset.step);
+      });
+    });
+
+    const mainRow = qs('.process-main', bisqueNav);
+    if (mainRow) {
+      mainRow.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showProcess('process-bisque');
+        showBisqueStep(1);
+        setBisqueMenuActive(1);
+      });
+    }
+  }
+
+  // default bisque view state (safe)
+  showBisqueStep(1);
+  setBisqueMenuActive(1);
+
+  /* =========================================================================
+   * 4) APPOINTMENT POPUP HANDLER
+   *    Bisque: submit -> popup -> auto jump to Step 2
+   *    Glaze fire: submit -> popup -> show next button (existing)
+   * ========================================================================= */
+  const popup     = qs('#success-popup');
+  const popupText = qs('#success-popup-text'); // optional
 
   function showSuccessPopup(message) {
     if (!popup) return;
@@ -505,25 +420,21 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => popup.classList.remove('show'), 1200);
   }
 
-  // --- BISQUE: AUTO FLOW TO STEP 2 ---
+  const bisqueForm  = qs('#process-bisque .schedule-form');
+  const bisqueNext  = qs('#bisque-next-btn'); // may exist; we hide it
+
   if (bisqueForm) {
     bisqueForm.addEventListener('submit', (e) => {
       e.preventDefault();
-
-      // popup text + show
       showSuccessPopup('Appointment Made!');
 
-      // lock submit button (optional)
-      const submitBtn = bisqueForm.querySelector('button[type="submit"]');
+      const submitBtn = qs('button[type="submit"]', bisqueForm);
       if (submitBtn) {
         submitBtn.textContent = 'appointment made';
         submitBtn.disabled = true;
       }
-
-      // if you don't want a manual next button anymore
       if (bisqueNext) bisqueNext.style.display = 'none';
 
-      // after a short beat, jump to Step 2 timeline
       setTimeout(() => {
         showProcess('process-bisque');
         showBisqueStep(2);
@@ -532,21 +443,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- GLAZE FIRE: keep your existing behavior ---
-  function wireAppointmentForm(formEl, nextBtnEl) {
-    if (!formEl || !popup) return;
+  const glazeFireForm = qs('#process-glaze-fire .schedule-form');
+  const glazeNext     = qs('#glaze-next-btn');
 
+  function wireAppointmentForm(formEl, nextBtnEl) {
+    if (!formEl) return;
     formEl.addEventListener('submit', (e) => {
       e.preventDefault();
-
       showSuccessPopup('Appointment requested');
 
-      const submitBtn = formEl.querySelector('button[type="submit"]');
+      const submitBtn = qs('button[type="submit"]', formEl);
       if (submitBtn) {
         submitBtn.textContent = 'appointment requested';
         submitBtn.disabled = true;
       }
-
       if (nextBtnEl) nextBtnEl.style.display = 'inline-flex';
     });
   }
@@ -559,109 +469,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  /* =========================================================================
+   * 5) PROCESS 3 — GLAZING: step tabs + Step 1 only scan/color UI
+   * ========================================================================= */
+  const glazingScreen = qs('#process-glazing');
+  const glazeTabs     = glazingScreen ? qsa('.step-tab', glazingScreen) : [];
+  const glazePanels   = glazingScreen ? qsa('.step-panel', glazingScreen) : [];
 
-   /* ------------------------------------------------------------------------
-   * 5) GLAZING (PROCESS 3) — Step tabs + Step 1 only scan/color UI
-   * ----------------------------------------------------------------------*/
+  // Optional left menu steps for process 3 (if you add them later)
+  const glazingNav = qs('.process-nav-item[data-target="process-glazing"]');
+  const glazingMenuItems = glazingNav
+    ? [...qsa('.glaze-step-menu-item', glazingNav), ...qsa('.clay-step-menu-item', glazingNav)]
+    : [];
 
-  // --- Step tabs for process-glazing (same structure idea as process 1) ---
-  const glazingScreen = document.getElementById('process-glazing');
-  const glazeTabs   = glazingScreen ? [...glazingScreen.querySelectorAll('.step-tab')] : [];
-  const glazePanels = glazingScreen ? [...glazingScreen.querySelectorAll('.step-panel')] : [];
+  // Glaze scan/model/swatches IDs (supports your “old” ids + your “new” step-1 layout)
+  const glazeVideoOld       = qs('#glaze-video');
+  const glazeScanBtnOld     = qs('#glaze-scan-btn');
+  const glazeScanStatusOld  = qs('#glaze-scan-status');
+  const glazeOverlayOld     = qs('#glaze-scan-overlay');
 
-  function setGlazeStepActive(stepIdOrNum) {
-    if (!glazingScreen || !glazeTabs.length || !glazePanels.length) return;
+  const glazeLockBtnNew     = qs('#glaze-lock-btn');   // "Lock in scan"
+  const glazeResetBtnNew    = qs('#glaze-reset-btn');
 
-    // accept either "glaze-step-1" or 1
-    const targetId =
-      typeof stepIdOrNum === 'number' ? `glaze-step-${stepIdOrNum}` : String(stepIdOrNum);
+  const glazeModelEl        = qs('#glaze-model');
+  const glazeMeta           = qs('#glaze-meta');
+  const glazeSwatchRow      = qs('#glaze-swatches');
+  const glazeNameEl         = qs('#glaze-name');
+  const glazeNoteEl         = qs('#glaze-note');
+  const glazeSwatches       = qsa('.glaze-swatch');
+  const glazeFireBtn        = qs('#glaze-fire-btn');
+  const glazeTextureOverlay = qs('#glaze-texture-overlay');
 
-    glazeTabs.forEach(t => t.classList.toggle('active', t.dataset.step === targetId));
-    glazePanels.forEach(p => p.classList.toggle('active', p.id === targetId));
-
-    // Step 1 only: scan + color tools visible
-    const isStep1 = targetId === 'glaze-step-1';
-    setGlazeToolsVisible(isStep1);
-
-    // If leaving step 1, stop camera so it doesn’t keep running in background
-    if (!isStep1) stopGlazeVideo();
-  }
-
-  if (glazeTabs.length) {
-    glazeTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        const target = tab.dataset.step;
-        if (!target) return;
-        setGlazeStepActive(target);
-      });
-    });
-
-    // Default to step 1 if none active
-    if (!glazePanels.some(p => p.classList.contains('active'))) {
-      setGlazeStepActive(1);
-    }
-  }
-
-  // --- Glaze scan + model + swatches (supports BOTH your old ids and the new step-1 layout) ---
-
-  // Old ids (your current file)
-  const glazeVideoOld          = document.getElementById('glaze-video');
-  const glazeScanBtnOld        = document.getElementById('glaze-scan-btn');
-  const glazeScanStatusOld     = document.getElementById('glaze-scan-status');
-  const glazeScanOverlayOld    = document.getElementById('glaze-scan-overlay');
-
-  const glazeModelElOld   = document.getElementById('glaze-model');
-  const glazeMetaOld      = document.getElementById('glaze-meta');
-  const glazeSwatchRowOld = document.getElementById('glaze-swatches');
-  const glazeNameElOld    = document.getElementById('glaze-name');
-  const glazeNoteElOld    = document.getElementById('glaze-note');
-  const glazeSwatchesOld  = [...document.querySelectorAll('.glaze-swatch')];
-  const glazeFireBtnOld   = document.getElementById('glaze-fire-btn');
-  const glazeTextureOverlayOld = document.getElementById('glaze-texture-overlay');
-
-  // New ids (from the Step 1 “scan-card” structure I gave you)
-  const glazeLockBtnNew   = document.getElementById('glaze-lock-btn');   // "Lock in scan"
-  const glazeResetBtnNew  = document.getElementById('glaze-reset-btn');
-  const glazeStageNew     = document.getElementById('glaze-scan-stage'); // container (optional)
-  const glazeSwatchRowNew = document.getElementById('glaze-swatches');   // (same id is OK)
-  const brushSizeNew      = document.getElementById('brush-size');       // optional
-
-  // Choose whichever exists (old or new)
-  const glazeVideo       = glazeVideoOld; // keep using your existing <video> if you have it
-  const glazeScanOverlay = glazeScanOverlayOld;
+  const glazeVideo       = glazeVideoOld; // if you have a <video>
+  const glazeScanOverlay = glazeOverlayOld;
   const glazeScanStatus  = glazeScanStatusOld;
+  const glazeScanBtn     = glazeLockBtnNew || glazeScanBtnOld;
 
-  // “Scan” button: prefer new lock button if present; otherwise old scan button
-  const glazeScanBtn = glazeLockBtnNew || glazeScanBtnOld;
-
-  const glazeModelEl   = glazeModelElOld;
-  const glazeMeta      = glazeMetaOld;
-  const glazeSwatchRow = glazeSwatchRowOld || glazeSwatchRowNew;
-  const glazeNameEl    = glazeNameElOld;
-  const glazeNoteEl    = glazeNoteElOld;
-  const glazeSwatches  = glazeSwatchesOld;
-  const glazeFireBtn   = glazeFireBtnOld;
-  const glazeTextureOverlay = glazeTextureOverlayOld;
-
-  // Show/hide “tools” area (Step 1 only)
-  function setGlazeToolsVisible(isVisible) {
-    // If you want Step 1 to “own” the tools, hide them elsewhere.
-    // These are safe-guards even if your HTML already hides them.
-    if (glazeMeta)      glazeMeta.style.display = isVisible ? 'block' : 'none';
-    if (glazeSwatchRow) glazeSwatchRow.style.display = isVisible ? 'flex' : 'none';
-    if (glazeFireBtn)   glazeFireBtn.style.display = isVisible ? 'inline-flex' : 'none';
-
-    // model viewer can remain visible (your choice). If you want it step-1 only:
-    if (glazeModelEl) glazeModelEl.classList.toggle('hidden', !isVisible);
-
-    // status can remain visible if you want instructions in other steps:
-    // if (glazeScanStatus) glazeScanStatus.style.display = isVisible ? 'block' : 'none';
-  }
-
-  // Camera state
-  let glazeStream     = null;
-  let glazeScanning   = false;
-  let glazeMaterials  = [];
+  let glazeStream    = null;
+  let glazeScanning  = false;
+  let glazeMaterials = [];
   let currentGlazeStr = null;
   let currentSwatchEl = null;
 
@@ -684,44 +530,109 @@ document.addEventListener('DOMContentLoaded', () => {
     glazeScanning = false;
   }
 
-  // Reset button (new UI)
+  function setGlazeToolsVisible(isVisible) {
+    // Only Step 1 shows the tools
+    if (glazeMeta)      glazeMeta.style.display = isVisible ? 'block' : 'none';
+    if (glazeSwatchRow) glazeSwatchRow.style.display = isVisible ? 'flex' : 'none';
+    if (glazeFireBtn)   glazeFireBtn.style.display = isVisible ? 'inline-flex' : 'none';
+
+    // If you want the model step-1 only:
+    if (glazeModelEl) glazeModelEl.classList.toggle('hidden', !isVisible);
+  }
+
+  function setGlazeStepActive(stepIdOrNum) {
+    if (!glazingScreen || !glazeTabs.length || !glazePanels.length) return;
+
+    const targetId =
+      typeof stepIdOrNum === 'number' ? `glaze-step-${stepIdOrNum}` : String(stepIdOrNum);
+
+    glazeTabs.forEach(t => t.classList.toggle('active', t.dataset.step === targetId));
+    glazePanels.forEach(p => p.classList.toggle('active', p.id === targetId));
+
+    const isStep1 = targetId === 'glaze-step-1';
+    setGlazeToolsVisible(isStep1);
+
+    if (!isStep1) stopGlazeVideo();
+
+    // left menu highlight for process 3 (if present)
+    glazingMenuItems.forEach(item => {
+      const raw = item.dataset.step;
+      const n = Number(raw);
+      const active = Number.isNaN(n) ? raw === targetId : (`glaze-step-${n}` === targetId);
+      item.classList.toggle('active', active);
+    });
+  }
+
+  // Tabs click
+  glazeTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.step;
+      if (target) setGlazeStepActive(target);
+    });
+  });
+
+  // Left menu steps (optional)
+  glazingMenuItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showProcess('process-glazing');
+
+      const raw = item.dataset.step;
+      const n = Number(raw);
+      if (!Number.isNaN(n)) setGlazeStepActive(n);
+      else if (raw) setGlazeStepActive(raw);
+    });
+  });
+
+  // Default glaze step
+  if (glazePanels.length) {
+    if (!glazePanels.some(p => p.classList.contains('active'))) setGlazeStepActive(1);
+    else {
+      const activePanel = glazePanels.find(p => p.classList.contains('active'));
+      setGlazeStepActive(activePanel ? activePanel.id : 1);
+    }
+  }
+
+  // Reset (new UI)
   if (glazeResetBtnNew) {
     glazeResetBtnNew.addEventListener('click', () => {
       stopGlazeVideo();
 
-      // Reset UI
       if (glazeModelEl) glazeModelEl.classList.add('hidden');
       if (glazeMeta) glazeMeta.style.display = 'none';
       if (glazeSwatchRow) glazeSwatchRow.style.display = 'none';
+
       if (glazeFireBtn) {
         glazeFireBtn.style.display = 'none';
         glazeFireBtn.disabled = true;
         glazeFireBtn.textContent = 'fire this glaze ->';
       }
+
       if (glazeNameEl) glazeNameEl.textContent = '';
       if (glazeNoteEl) glazeNoteEl.textContent = '';
+
       glazeSwatches.forEach(b => b.classList.remove('active'));
       currentGlazeStr = null;
       currentSwatchEl = null;
 
-      if (glazeScanStatus) glazeScanStatus.textContent =
-        'Use the scan to “lock in” your bowl, then try glaze colors below.';
+      if (glazeScanStatus) {
+        glazeScanStatus.textContent =
+          'Use the scan to “lock in” your bowl, then try glaze colors below.';
+      }
     });
   }
 
-  // Scan / Lock-in handler (Step 1)
+  // Scan/Lock-in (Step 1 only)
   if (glazeScanBtn && glazeScanStatus) {
     glazeScanBtn.addEventListener('click', () => {
-      // only allow scanning when we are on Step 1 panel
-      const step1Panel = document.getElementById('glaze-step-1');
+      const step1Panel = qs('#glaze-step-1');
       if (step1Panel && !step1Panel.classList.contains('active')) return;
-
       if (glazeScanning) return;
 
       glazeScanStatus.textContent =
         'We are opening your camera. Allow access to start the scan.';
 
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia && glazeVideo) {
+      if (navigator.mediaDevices?.getUserMedia && glazeVideo) {
         navigator.mediaDevices.getUserMedia({ video: true })
           .then(stream => {
             glazeStream = stream;
@@ -740,22 +651,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (glazeScanOverlay) glazeScanOverlay.classList.remove('active');
                 stopGlazeVideo();
 
-                // Reveal model + controls (Step 1 only)
                 setGlazeToolsVisible(true);
-
-                if (glazeScanStatus) glazeScanStatus.textContent =
+                glazeScanStatus.textContent =
                   'Locked in. Try different glazes to preview how they look after firing.';
               }, 2000);
             }, 800);
           })
           .catch(() => {
-            // No camera: still allow preview
             setGlazeToolsVisible(true);
             glazeScanStatus.textContent =
               'Camera not available. You can still preview glaze colors on a sample bowl.';
           });
       } else {
-        // No camera support or no video element: still allow preview
         setGlazeToolsVisible(true);
         glazeScanStatus.textContent =
           'Camera not available. You can still preview glaze colors on a sample bowl.';
@@ -763,7 +670,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Swatch click -> apply “unfired” color to model
+  // Swatches -> apply “unfired” color
   if (glazeModelEl && glazeSwatches.length && glazeNameEl && glazeNoteEl) {
     glazeModelEl.addEventListener('load', () => {
       const model = glazeModelEl.model;
@@ -771,8 +678,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       glazeSwatches.forEach(btn => {
         btn.addEventListener('click', () => {
-          // only respond when Step 1 is active
-          const step1Panel = document.getElementById('glaze-step-1');
+          const step1Panel = qs('#glaze-step-1');
           if (step1Panel && !step1Panel.classList.contains('active')) return;
 
           const colorStr   = btn.getAttribute('data-color');
@@ -807,7 +713,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const [r, g, b] = colorStr.split(',').map(Number);
           glazeMaterials.forEach(mat => {
-            if (mat && mat.pbrMetallicRoughness) {
+            if (mat?.pbrMetallicRoughness) {
               mat.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1]);
             }
           });
@@ -816,11 +722,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Fire button -> apply “fired” color transform
+  // Fire -> apply “fired” transform
   if (glazeFireBtn) {
     glazeFireBtn.addEventListener('click', () => {
-      // only respond when Step 1 is active
-      const step1Panel = document.getElementById('glaze-step-1');
+      const step1Panel = qs('#glaze-step-1');
       if (step1Panel && !step1Panel.classList.contains('active')) return;
 
       if (!currentSwatchEl || !currentGlazeStr || !glazeMaterials.length) return;
@@ -829,7 +734,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const firedInfo = firedColorMap[glazeName];
 
       let finalRGB;
-      if (firedInfo && firedInfo.color) {
+      if (firedInfo?.color) {
         finalRGB = firedInfo.color.split(',').map(Number);
       } else {
         const [r, g, b] = currentGlazeStr.split(',').map(Number);
@@ -838,7 +743,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       glazeMaterials.forEach(mat => {
-        if (mat && mat.pbrMetallicRoughness) {
+        if (mat?.pbrMetallicRoughness) {
           mat.pbrMetallicRoughness.setBaseColorFactor([...finalRGB, 1]);
         }
       });
@@ -858,20 +763,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // When user switches process using the left menu: stop glaze camera
-  // (your nav click handler already exists; this is just extra safety)
+  /* =========================================================================
+   * 6) ONE SINGLE nav handler (no duplicates)
+   * ========================================================================= */
   navItems.forEach(item => {
     item.addEventListener('click', () => {
       const target = item.dataset.target;
-      if (target && target !== 'process-glazing') {
-        stopGlazeVideo();
+      if (!target) return;
+
+      // leaving clay: stop camera + reset clay scan UI
+      if (target !== 'process-clay') cleanupClayOverlaysAndCamera();
+
+      // leaving glazing: stop glaze camera
+      if (target !== 'process-glazing') stopGlazeVideo();
+
+      showProcess(target);
+
+      // defaults
+      if (target === 'process-clay') updateClay();
+
+      if (target === 'process-bisque') {
+        showBisqueStep(1);
+        setBisqueMenuActive(1);
       }
+
       if (target === 'process-glazing') {
-        // Always land on glaze step 1 so scan/tools are in the right place
         setGlazeStepActive(1);
       }
     });
   });
-
-  }
-);
+});

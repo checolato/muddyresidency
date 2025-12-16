@@ -17,24 +17,27 @@
 <body>
   <div class="page">
     <a href="index.html" class="exit-tutorial-btn" aria-label="Exit tutorial">✕</a>
-    <div id="success-popup" class="success-popup">
+
+    <!-- One global success popup ONLY -->
+    <div id="success-popup" class="success-popup" aria-live="polite" aria-atomic="true">
       <div class="popup-box">
-        <span>✓ Appointment Made!</span>
+        <span id="success-popup-text">✓ Appointment Made!</span>
       </div>
     </div>
 
-    <main class="tutorial-shell">
+    <div class="tutorial-shell">
       <!-- LEFT: process menu -->
       <aside class="process-menu">
         <div class="process-menu-title">process</div>
+
         <ul class="process-nav">
+          <!-- PROCESS 1 -->
           <li class="process-nav-item process-nav-item--has-steps active" data-target="process-clay">
             <div class="process-main">
               <span class="process-index">01</span>
               <span class="process-label">clay making</span>
             </div>
 
-            <!-- clay step sub-menu -->
             <ul class="clay-step-menu">
               <li class="clay-step-menu-item active" data-step="1">Step 1 · split the clay</li>
               <li class="clay-step-menu-item" data-step="2">Step 2 · make a ball</li>
@@ -48,37 +51,35 @@
             </ul>
           </li>
 
-          <!-- PROCESS 2 NAV ITEM -->
+          <!-- PROCESS 2 -->
           <li class="process-nav-item process-nav-item--has-steps" data-target="process-bisque">
-
             <div class="process-main">
               <span class="process-index">02</span>
               <span class="process-label">bisque fire</span>
             </div>
 
-            <!-- clay step sub-menu -->
             <ul class="clay-step-menu">
               <li class="clay-step-menu-item active" data-step="1">Step 1 · firing appointment</li>
-              <li class="clay-step-menu-item" data-step="2">Step 2 · firing progreess</li>
+              <li class="clay-step-menu-item" data-step="2">Step 2 · firing progress</li>
             </ul>
           </li>
 
-
+          <!-- PROCESS 3 (NOW has steps in menu) -->
           <li class="process-nav-item process-nav-item--has-steps" data-target="process-glazing">
             <div class="process-main">
               <span class="process-index">03</span>
               <span class="process-label">glazing</span>
             </div>
 
-            <!-- Process 3 step sub-menu (this is what you’re missing) -->
             <ul class="clay-step-menu">
-              <li class="clay-step-menu-item active" data-step="glaze-step-1">Step 1 · lock in bowl</li>
-              <li class="clay-step-menu-item" data-step="glaze-step-2">Step 2 · open your set</li>
-              <li class="clay-step-menu-item" data-step="glaze-step-3">Step 3 · build layers</li>
-              <li class="clay-step-menu-item" data-step="glaze-step-4">Step 4 · cross strokes</li>
+              <li class="clay-step-menu-item active" data-step="1">Step 1 · lock in bowl</li>
+              <li class="clay-step-menu-item" data-step="2">Step 2 · open your set</li>
+              <li class="clay-step-menu-item" data-step="3">Step 3 · build layers</li>
+              <li class="clay-step-menu-item" data-step="4">Step 4 · cross strokes</li>
             </ul>
           </li>
 
+          <!-- PROCESS 4 -->
           <li class="process-nav-item" data-target="process-glaze-fire">
             <div class="process-main">
               <span class="process-index">04</span>
@@ -86,20 +87,19 @@
             </div>
           </li>
 
+          <!-- PROCESS 5 -->
           <li class="process-nav-item" data-target="process-final">
             <div class="process-main">
               <span class="process-index">05</span>
               <span class="process-label">final piece</span>
             </div>
           </li>
-
         </ul>
-        </aside>
+      </aside>
 
-
-      <!-- RIGHT: full-screen process panels -->
-      <section class="process-content">
-        <!-- PROCESS 1: CLAY MAKING + CHECK -->
+      <!-- RIGHT: process screens -->
+      <main class="process-content">
+        <!-- PROCESS 1 -->
         <section id="process-clay" class="process-screen active">
           <div class="process-header">
             <div class="process-tag">01 · clay making</div>
@@ -107,118 +107,71 @@
           </div>
 
           <div class="clay-layout">
-            <!-- clay stepper -->
             <div class="clay-column">
-
               <button class="primary-btn" id="check-bowl-btn">
                 check my bowl before bisque firing
               </button>
-              
+
               <div class="clay-stepper">
-                <button
-                  class="step-arrow step-arrow-left"
-                  id="step-prev"
-                  aria-label="Previous step"
-                >
-                  ←
-                </button>
+                <button class="step-arrow step-arrow-left" id="step-prev" aria-label="Previous step">←</button>
 
                 <div class="clay-step-wrapper">
-                  <!-- Step 1 -->
                   <div class="clay-step active" data-step="1">
                     <div class="step-label">Step 1 / 9</div>
-                    <p class="step-body">
-                      Split the clay into 2 portions, roughly 1:4. Keep both portions covered so they don’t dry out.
-                    </p>
+                    <p class="step-body">Split the clay into 2 portions, roughly 1:4. Keep both portions covered so they don’t dry out.</p>
                   </div>
 
-                  <!-- Step 2 -->
                   <div class="clay-step" data-step="2">
                     <div class="step-label">Step 2 / 9</div>
-                    <p class="step-body">
-                      Make a smooth ball from the larger portion. This will become the main body of your bowl.
-                    </p>
+                    <p class="step-body">Make a smooth ball from the larger portion. This will become the main body of your bowl.</p>
                   </div>
 
-                  <!-- Step 3 -->
                   <div class="clay-step" data-step="3">
                     <div class="step-label">Step 3 / 9</div>
-                    <p class="step-body">
-                      Use your finger or utensil 1 to pinch a hole in the middle of the ball and gently rotate outwards.
-                    </p>
+                    <p class="step-body">Use your finger or utensil 1 to pinch a hole in the middle of the ball and gently rotate outwards.</p>
                   </div>
 
-                  <!-- Step 4 -->
                   <div class="clay-step" data-step="4">
                     <div class="step-label">Step 4 / 9</div>
-                    <p class="step-body">
-                      Slightly change the position of your hands and continue expanding out to form a bowl shape.
-                    </p>
+                    <p class="step-body">Slightly change the position of your hands and continue expanding out to form a bowl shape.</p>
                   </div>
 
-                  <!-- Step 5 -->
                   <div class="clay-step" data-step="5">
                     <div class="step-label">Step 5 / 9</div>
-                    <p class="step-body">
-                      Refine the edge of the bowl with your fingers and utensil 2 once you’re happy with the overall form.
-                    </p>
+                    <p class="step-body">Refine the edge of the bowl with your fingers and utensil 2 once you’re happy with the overall form.</p>
                   </div>
 
-                  <!-- Step 6 -->
                   <div class="clay-step" data-step="6">
                     <div class="step-label">Step 6 / 9</div>
-                    <p class="step-body">
-                      Take the smaller portion of clay and roll out a long strip with your palm to create the base ring.
-                    </p>
+                    <p class="step-body">Take the smaller portion of clay and roll out a long strip with your palm to create the base ring.</p>
                   </div>
 
-                  <!-- Step 7 -->
                   <div class="clay-step" data-step="7">
                     <div class="step-label">Step 7 / 9</div>
-                    <p class="step-body">
-                      Measure the base of your bowl, join the strip into a ring, and blend the seam. Smooth where the bowl
-                      and ring meet.
-                    </p>
+                    <p class="step-body">Measure the base of your bowl, join the strip into a ring, and blend the seam. Smooth where the bowl and ring meet.</p>
                   </div>
 
-                  <!-- Step 8 – check the bowl -->
                   <div class="clay-step" data-step="8">
                     <div class="step-label">Step 8 / 9</div>
-                    <p class="step-body">
-                      Open the webcam and scan the bowl to check if there’s improvement needed.
-                    </p>
+                    <p class="step-body">Open the webcam and scan the bowl to check if there’s improvement needed.</p>
                   </div>
 
-                  <!-- Step 9 – sponge & smooth -->
                   <div class="clay-step" data-step="9">
                     <div class="step-label">Step 9 / 9</div>
-                    <p class="step-body">
-                      Use the sponge from the box, damp it slightly, and smooth over all surfaces and edges
-                      until your piece is even and unwrinkled.
-                    </p>
+                    <p class="step-body">Use the sponge from the box, damp it slightly, and smooth over all surfaces and edges until your piece is even and unwrinkled.</p>
                   </div>
                 </div>
 
-                <button
-                  class="step-arrow step-arrow-right"
-                  id="step-next"
-                  aria-label="Next step"
-                >
-                  → 
-                </button>
+                <button class="step-arrow step-arrow-right" id="step-next" aria-label="Next step">→</button>
               </div>
 
-              <!-- keep this for JS, but hide it so no note shows -->
               <p class="small-note" id="check-result" style="display:none;">
                 Follow the clay steps. The checker will appear at step 8.
               </p>
             </div>
 
-            <!-- Illustration / scan panel -->
-            <!-- Illustration / scan panel -->
             <div class="scan-panel">
               <div class="scan-frame">
-                <!-- step illustration -->
                 <img
                   src="assets/step 1.png"
                   alt="Step 1 – split the clay into two portions"
@@ -226,31 +179,20 @@
                   id="step-illustration"
                 />
 
-                <!-- webcam preview, hidden by default -->
-                <video
-                  id="scan-video"
-                  class="scan-video"
-                  autoplay
-                  playsinline
-                  muted
-                ></video>
+                <video id="scan-video" class="scan-video" autoplay playsinline muted></video>
 
-                <!-- alignment shape overlay -->
                 <div class="shape-overlay" id="shape-overlay">
                   <img id="shape-overlay-img" src="assets/shape.png" alt="Bowl alignment guide" />
                 </div>
 
-                <!-- scanning overlay line (only during scan) -->
                 <div class="scan-overlay" id="scan-overlay">
                   <div class="scan-line"></div>
                 </div>
 
-                <!-- instruction label -->
                 <div class="scan-instruction" id="scan-instruction">
                   Align your bowl inside the shape, then tap “Scan and check”.
                 </div>
 
-                <!-- SCAN SUCCESS POPUP (inside scan-frame) -->
                 <div id="scan-success-popup" class="scan-success-popup">
                   <div class="scan-success-box">
                     <div class="scan-success-icon">✓</div>
@@ -259,280 +201,172 @@
                   </div>
                 </div>
 
-                <!-- SCAN ISSUES POPUP (inside scan-frame) -->
                 <div id="scan-issues-popup" class="scan-issues-popup">
                   <div class="scan-issues-box">
                     <div class="scan-issues-title">Fix these areas</div>
                     <div class="scan-issues-sub">Rim is uneven + wall thickness varies.</div>
                   </div>
                 </div>
-               
-                <!-- SCAN ISSUE SUMMARY (right side) -->
-              <div id="scan-issue-summary" class="scan-issue-summary">
-                <div class="scan-issue-item">
-                  <span class="issue-dot red"></span>
-                  <span class="issue-text">Wrinkled bowl surface</span>
-                </div>
 
-                <div class="scan-issue-item">
-                  <span class="issue-dot orange"></span>
-                  <span class="issue-text">Uneven rim thickness</span>
-                </div>
-
-                <div class="scan-issue-item">
-                  <span class="issue-dot yellow"></span>
-                  <span class="issue-text">Detached bottom ring from main body</span>
+                <div id="scan-issue-summary" class="scan-issue-summary">
+                  <div class="scan-issue-item"><span class="issue-dot red"></span><span class="issue-text">Wrinkled bowl surface</span></div>
+                  <div class="scan-issue-item"><span class="issue-dot orange"></span><span class="issue-text">Uneven rim thickness</span></div>
+                  <div class="scan-issue-item"><span class="issue-dot yellow"></span><span class="issue-text">Detached bottom ring from main body</span></div>
                 </div>
               </div>
-              </div> <!-- ✅ closes scan-frame -->
 
-              <!-- user-controlled scan trigger (you can keep it; JS hides it) -->
-              <button class="secondary-btn" id="scan-start-btn">
-                Scan and check
-              </button>
-
+              <button class="secondary-btn" id="scan-start-btn">Scan and check</button>
             </div>
-
           </div>
         </section>
 
-       <!-- PROCESS 2: BISQUE FIRE -->
-      <section id="process-bisque" class="process-screen">
-        <div class="process-header">
-          <div class="process-tag">02 · bisque fire</div>
-          <h1>Bisque firing</h1>
-        </div>
-
-        <!-- STEP 1: Appointment -->
-        <div id="bisque-step-1">
-          <form
-            id="bisque-form"
-            class="schedule-form"
-            style="
-              font-size:13px;
-              max-width:380px;
-              display:flex;
-              flex-direction:column;
-              gap:10px;
-              margin-bottom:14px;
-            "
-          >
-            <label>
-              Name
-              <textarea rows="1" style="width:100%; padding:6px; margin-top:4px; resize:vertical;"></textarea>
-            </label>
-
-            <label>
-              Pickup Address
-              <textarea rows="1" style="width:100%; padding:6px; margin-top:4px; resize:vertical;"></textarea>
-            </label>
-
-            <label>
-              Phone
-              <textarea rows="1" style="width:100%; padding:6px; margin-top:4px; resize:vertical;"></textarea>
-            </label>
-
-            <label>
-              Studio
-              <select style="width:100%; padding:6px; margin-top:4px;">
-                <option>Local Studio A</option>
-                <option>Community Kiln B</option>
-                <option>Pottery Cafe C</option>
-              </select>
-            </label>
-
-            <label>
-              Preferred date
-              <input type="date" style="width:100%; padding:6px; margin-top:4px;" />
-            </label>
-
-            <label>
-              Preferred time
-              <input type="time" style="width:100%; padding:6px; margin-top:4px;" />
-            </label>
-
-            <label>
-              Notes for the studio (optional)
-              <textarea
-                rows="3"
-                style="width:100%; padding:6px; margin-top:4px; resize:vertical;"
-                placeholder="Number of pieces, clay body, any special requests…"
-              ></textarea>
-            </label>
-
-            <button type="submit" class="primary-btn" style="align-self:flex-start;">
-              request bisque firing
-            </button>
-          </form>
-
-          <div id="success-popup" class="success-popup">
-            <div class="popup-box" id="success-popup-text">Appointment Made!</div>
+        <!-- PROCESS 2 -->
+        <section id="process-bisque" class="process-screen">
+          <div class="process-header">
+            <div class="process-tag">02 · bisque fire</div>
+            <h1>Bisque firing</h1>
           </div>
 
-        </div>
+          <div id="bisque-step-1">
+            <form id="bisque-form" class="schedule-form"
+              style="font-size:13px; max-width:380px; display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
+              <label>Name
+                <textarea rows="1" style="width:100%; padding:6px; margin-top:4px; resize:vertical;"></textarea>
+              </label>
 
-       <!-- STEP 2: Timeline (clean) -->
-      <div id="bisque-step-2" style="display:none; max-width:520px;">
-        <ol id="bisque-timeline" style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px;">
-          <li class="timeline-item is-active">
-            <div style="font-weight:600;">Appointment made</div>
-            <div style="font-size:12px; opacity:.8;">We’ve received your request.</div>
-          </li>
+              <label>Pickup Address
+                <textarea rows="1" style="width:100%; padding:6px; margin-top:4px; resize:vertical;"></textarea>
+              </label>
 
-          <li class="timeline-item">
-            <div style="font-weight:600;">Pickup on the way</div>
-            <div style="font-size:12px; opacity:.8;">A courier is heading to your address.</div>
-          </li>
+              <label>Phone
+                <textarea rows="1" style="width:100%; padding:6px; margin-top:4px; resize:vertical;"></textarea>
+              </label>
 
-          <li class="timeline-item">
-            <div style="font-weight:600;">Picked up</div>
-            <div style="font-size:12px; opacity:.8;">Your piece is safely collected.</div>
-          </li>
+              <label>Studio
+                <select style="width:100%; padding:6px; margin-top:4px;">
+                  <option>Local Studio A</option>
+                  <option>Community Kiln B</option>
+                  <option>Pottery Cafe C</option>
+                </select>
+              </label>
 
-          <li class="timeline-item">
-            <div style="font-weight:600;">Delivering to studio</div>
-            <div style="font-size:12px; opacity:.8;">Transporting to the kiln site.</div>
-          </li>
+              <label>Preferred date
+                <input type="date" style="width:100%; padding:6px; margin-top:4px;" />
+              </label>
 
-          <li class="timeline-item">
-            <div style="font-weight:600;">Firing</div>
-            <div style="font-size:12px; opacity:.8;">In the kiln now.</div>
-          </li>
+              <label>Preferred time
+                <input type="time" style="width:100%; padding:6px; margin-top:4px;" />
+              </label>
 
-          <li class="timeline-item">
-            <div style="font-weight:600;">Firing finished</div>
-            <div style="font-size:12px; opacity:.8;">Cooling + ready to move.</div>
-          </li>
+              <label>Notes for the studio (optional)
+                <textarea rows="3" style="width:100%; padding:6px; margin-top:4px; resize:vertical;"
+                  placeholder="Number of pieces, clay body, any special requests…"></textarea>
+              </label>
 
-          <li class="timeline-item">
-            <div style="font-weight:600;">Waiting to come home</div>
-            <div style="font-size:12px; opacity:.8;">Queued for return delivery.</div>
-          </li>
+              <button type="submit" class="primary-btn" style="align-self:flex-start;">
+                request bisque firing
+              </button>
+            </form>
+          </div>
 
-          <li class="timeline-item">
-            <div style="font-weight:600;">Delivered back home</div>
-            <div style="font-size:12px; opacity:.8;">Your bisque piece is back with you.</div>
-          </li>
-        </ol>
-      </div>
+          <div id="bisque-step-2" style="display:none; max-width:520px;">
+            <ol id="bisque-timeline" style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px;">
+              <li class="timeline-item is-active"><div style="font-weight:600;">Appointment made</div><div style="font-size:12px; opacity:.8;">We’ve received your request.</div></li>
+              <li class="timeline-item"><div style="font-weight:600;">Pickup on the way</div><div style="font-size:12px; opacity:.8;">A courier is heading to your address.</div></li>
+              <li class="timeline-item"><div style="font-weight:600;">Picked up</div><div style="font-size:12px; opacity:.8;">Your piece is safely collected.</div></li>
+              <li class="timeline-item"><div style="font-weight:600;">Delivering to studio</div><div style="font-size:12px; opacity:.8;">Transporting to the kiln site.</div></li>
+              <li class="timeline-item"><div style="font-weight:600;">Firing</div><div style="font-size:12px; opacity:.8;">In the kiln now.</div></li>
+              <li class="timeline-item"><div style="font-weight:600;">Firing finished</div><div style="font-size:12px; opacity:.8;">Cooling + ready to move.</div></li>
+              <li class="timeline-item"><div style="font-weight:600;">Waiting to come home</div><div style="font-size:12px; opacity:.8;">Queued for return delivery.</div></li>
+              <li class="timeline-item"><div style="font-weight:600;">Delivered back home</div><div style="font-size:12px; opacity:.8;">Your bisque piece is back with you.</div></li>
+            </ol>
+          </div>
+        </section>
 
-      </div>
-      </section>
+        <!-- PROCESS 3 -->
+        <section id="process-glazing" class="process-screen">
+          <div class="process-header">
+            <div class="process-tag">03 · glazing</div>
+            <h1>Glazing — see your bowl in color</h1>
+          </div>
 
+          <div class="steps-panels">
+            <div id="glaze-step-1" class="step-panel active">
+              <div class="step-shell">
+                <div class="step-left">
+                  <h2 class="step-title">Step 1 — Lock in your bowl</h2>
+                  <ol class="step-list">
+                    <li>Use the scan on the right to “lock in” your bowl, then try different glaze colors to preview how they look after firing.</li>
+                  </ol>
+                </div>
 
-       <!-- PROCESS 3: GLAZING -->
-      <section id="process-glazing" class="process-screen">
-        <div class="process-header">
-          <div class="process-tag">03 · glazing</div>
-          <h1>Glazing — see your bowl in color</h1>
-        </div>
-
-          <!-- STEP 1 -->
-          <div id="glaze-step-1" class="step-panel active">
-            <div class="step-shell">
-              <!-- LEFT (text) -->
-              <div class="step-left">
-                <h2 class="step-title">Step 1 — Lock in your bowl</h2>
-                <ol class="step-list">
-                  <li>Use the scan on the right to “lock in” your bowl, then try different glaze colors to preview how they look after firing.</li>
-                </ol>
-              </div>
-
-              <!-- RIGHT (interactive scan + preview) -->
-              <div class="step-right">
-                <div class="scan-card">
-                  <div class="scan-header">
-                    <div class="scan-title">Bowl scan</div>
-                    <div class="scan-subtitle">Point your camera at the marker</div>
-                  </div>
-
-                  <!-- Your existing scan / 3D / canvas container goes here -->
-                  <div id="glaze-scan-stage" class="scan-stage">
-                    <!-- example: <canvas id="glazeCanvas"></canvas> -->
-                    <!-- example: <model-viewer ...></model-viewer> -->
-                  </div>
-
-                  <div class="scan-controls">
-                    <button type="button" class="btn" id="glaze-lock-btn">Lock in scan</button>
-                    <button type="button" class="btn" id="glaze-reset-btn">Reset</button>
-                  </div>
-
-                  <!-- Glaze color controls live HERE (Step 1 only) -->
-                  <div class="glaze-controls">
-                    <div class="glaze-controls-title">Glaze colors</div>
-                    <div class="glaze-swatches" id="glaze-swatches">
-                      <!-- Buttons injected or hard-coded -->
-                      <button type="button" class="swatch" data-glaze="speckled-field">Speckled Field</button>
-                      <button type="button" class="swatch" data-glaze="cream">Cream</button>
-                      <button type="button" class="swatch" data-glaze="sky">Sky</button>
+                <div class="step-right">
+                  <div class="scan-card">
+                    <div class="scan-header">
+                      <div class="scan-title">Bowl scan</div>
+                      <div class="scan-subtitle">Point your camera at the marker</div>
                     </div>
 
-                    <div class="brush-row">
-                      <label class="small-label" for="brush-size">Brush size</label>
-                      <input id="brush-size" type="range" min="1" max="40" value="12" />
+                    <div id="glaze-scan-stage" class="scan-stage">
+                      <!-- your scan/canvas/model-viewer goes here -->
+                    </div>
+
+                    <div class="scan-controls">
+                      <button type="button" class="btn" id="glaze-lock-btn">Lock in scan</button>
+                      <button type="button" class="btn" id="glaze-reset-btn">Reset</button>
+                    </div>
+
+                    <div class="glaze-controls">
+                      <div class="glaze-controls-title">Glaze colors</div>
+                      <div class="glaze-swatches" id="glaze-swatches">
+                        <button type="button" class="swatch" data-glaze="speckled-field">Speckled Field</button>
+                        <button type="button" class="swatch" data-glaze="cream">Cream</button>
+                        <button type="button" class="swatch" data-glaze="sky">Sky</button>
+                      </div>
+
+                      <div class="brush-row">
+                        <label class="small-label" for="brush-size">Brush size</label>
+                        <input id="brush-size" type="range" min="1" max="40" value="12" />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- STEP 2 -->
-          <div id="glaze-step-2" class="step-panel">
-            <div class="step-shell">
-              <div class="step-left">
-                <h2 class="step-title">Step 2 — Open your set</h2>
-                <ol class="step-list">
-                  <li>Open the Speckled Field coloring set and the brushes.</li>
-                </ol>
-              </div>
-              <div class="step-right">
-                <div class="note-card">
-                  <p>Tip: Lay down newspaper, and keep a small cup of water nearby for brush cleanup.</p>
+            <div id="glaze-step-2" class="step-panel">
+              <div class="step-shell">
+                <div class="step-left">
+                  <h2 class="step-title">Step 2 — Open your set</h2>
+                  <ol class="step-list"><li>Open the Speckled Field coloring set and the brushes.</li></ol>
                 </div>
+                <div class="step-right"><div class="note-card"><p>Tip: Lay down newspaper, and keep a small cup of water nearby for brush cleanup.</p></div></div>
+              </div>
+            </div>
+
+            <div id="glaze-step-3" class="step-panel">
+              <div class="step-shell">
+                <div class="step-left">
+                  <h2 class="step-title">Step 3 — Build layers</h2>
+                  <ol class="step-list"><li>Be sure to apply multiple layers of glaze on your bowl.</li></ol>
+                </div>
+                <div class="step-right"><div class="note-card"><p>Most studio glazes need 2–3 even coats. Let each coat lose its shine before the next.</p></div></div>
+              </div>
+            </div>
+
+            <div id="glaze-step-4" class="step-panel">
+              <div class="step-shell">
+                <div class="step-left">
+                  <h2 class="step-title">Step 4 — Cross strokes</h2>
+                  <ol class="step-list"><li>Brush the stroke in opposite directions for each layer.</li></ol>
+                </div>
+                <div class="step-right"><div class="note-card"><p>Example: coat 1 horizontal, coat 2 vertical, coat 3 diagonal — helps avoid streaks.</p></div></div>
               </div>
             </div>
           </div>
+        </section>
 
-          <!-- STEP 3 -->
-          <div id="glaze-step-3" class="step-panel">
-            <div class="step-shell">
-              <div class="step-left">
-                <h2 class="step-title">Step 3 — Build layers</h2>
-                <ol class="step-list">
-                  <li>Be sure to apply multiple layers of glaze on your bowl.</li>
-                </ol>
-              </div>
-              <div class="step-right">
-                <div class="note-card">
-                  <p>Most studio glazes need 2–3 even coats. Let each coat lose its shine before the next.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- STEP 4 -->
-          <div id="glaze-step-4" class="step-panel">
-            <div class="step-shell">
-              <div class="step-left">
-                <h2 class="step-title">Step 4 — Cross strokes</h2>
-                <ol class="step-list">
-                  <li>Brush the stroke in opposite directions for each layer.</li>
-                </ol>
-              </div>
-              <div class="step-right">
-                <div class="note-card">
-                  <p>Example: coat 1 horizontal, coat 2 vertical, coat 3 diagonal — helps avoid streaks.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-
-        <!-- PROCESS 4: GLAZE FIRE – booking form inside tutorial -->
+        <!-- PROCESS 4 -->
         <section id="process-glaze-fire" class="process-screen">
           <div class="process-header">
             <div class="process-tag">04 · glaze fire</div>
@@ -543,19 +377,9 @@
             Book a firing session for your bowl. The best time will probably be about 3 days after you finish glazing.
           </p>
 
-          <form
-            class="schedule-form"
-            style="
-              font-size:13px;
-              max-width:380px;
-              display:flex;
-              flex-direction:column;
-              gap:10px;
-              margin-bottom:24px;
-            "
-          >
-            <label>
-              Studio
+          <form class="schedule-form"
+            style="font-size:13px; max-width:380px; display:flex; flex-direction:column; gap:10px; margin-bottom:24px;">
+            <label>Studio
               <select style="width:100%; padding:6px; margin-top:4px;">
                 <option>Local Studio A</option>
                 <option>Community Kiln B</option>
@@ -563,41 +387,30 @@
               </select>
             </label>
 
-            <label>
-              Preferred date
+            <label>Preferred date
               <input type="date" style="width:100%; padding:6px; margin-top:4px;" />
             </label>
 
-            <label>
-              Preferred time
+            <label>Preferred time
               <input type="time" style="width:100%; padding:6px; margin-top:4px;" />
             </label>
 
-            <label>
-              Notes for the studio (optional)
-              <textarea
-                rows="3"
-                style="width:100%; padding:6px; margin-top:4px; resize:vertical;"
-                placeholder="Number of pieces, clay body, any special requests…"
-              ></textarea>
+            <label>Notes for the studio (optional)
+              <textarea rows="3" style="width:100%; padding:6px; margin-top:4px; resize:vertical;"
+                placeholder="Number of pieces, clay body, any special requests…"></textarea>
             </label>
 
             <button type="submit" class="primary-btn" style="align-self:flex-start;">
               request glaze firing
             </button>
 
-            <button
-              type="button"
-              id="glaze-next-btn"
-              class="secondary-btn"
-              style="display:none; margin-top:10px;"
-            >
+            <button type="button" id="glaze-next-btn" class="secondary-btn" style="display:none; margin-top:10px;">
               Next step →
             </button>
           </form>
         </section>
 
-        <!-- PROCESS 5: FINAL PIECE -->
+        <!-- PROCESS 5 -->
         <section id="process-final" class="process-screen">
           <div class="process-header">
             <div class="process-tag">05 · receive the final piece</div>
@@ -608,6 +421,7 @@
             Pick up your finished bowl from the studio and bring it back into your everyday routine — on your desk, in your
             kitchen, or wherever you want a quiet reminder of the making process.
           </p>
+
           <p class="body-text">
             Over time, Glaze Diary could store a record of each piece you fire: clay body, glaze, firing notes, and photos
             from daily use.
@@ -617,9 +431,8 @@
             You can return to any step from the menu on the left if you want to revisit the process.
           </p>
         </section>
-      </section>
-
-    </main>
+      </main>
+    </div>
 
     <footer>© glaze diary</footer>
   </div>

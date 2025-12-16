@@ -1,10 +1,10 @@
 /* ========== SHELL LAYOUT ========== */
 
-.tutorial-shell {
+.tutorial-shell{
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
   gap: 24px;
-  min-height: 70vh;
+  min-height: 100vh;
 }
 
 /* left menu */
@@ -77,6 +77,11 @@
 
 .process-content {
   position: relative;
+  padding: 48px 40px;
+  min-width: 0;
+  display: flex;
+  justify-content: flex-start; /* keep content near the left edge of the right column */
+  align-items: flex-start;
 }
 
 /* each process screen takes over the content area */
@@ -85,6 +90,8 @@
   display: none;
   animation: fadeInProcess 0.25s ease-out;
   min-height: 60vh;
+  width: 800px;
+  max-width: 100%;
 }
 
 .process-screen.active {
@@ -895,11 +902,6 @@ header {
    ========================================================= */
 
 /* --- 0) Base shell (menu + right content) --- */
-.tutorial-shell{
-  display:flex;
-  min-height:100vh;
-}
-
 .process-menu{
   width:260px;
   min-width:260px;
