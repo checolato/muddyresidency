@@ -617,16 +617,6 @@ header {
   margin-top: 8px;
 }
 
-#next-step-btn {
-  display: none;
-  margin-top: 16px;
-  width: 100%;
-}
-
-#next-step-btn.visible {
-  display: inline-flex;
-}
-
 #bisque-next-btn {
   background: white;
   color: black;
@@ -645,106 +635,6 @@ header {
 }
 #success-popup.show {
   display: flex;
-}
-
-/* ========== GLAZE PREVIEW LAYOUT ========== */
-
-.glaze-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr);
-  gap: 20px;
-  align-items: flex-start;
-}
-
-.glaze-column {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* bowl preview frame */
-
-.glaze-bowl-frame {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  border-radius: 12px;
-  border: 1px solid #eee;
-  background: #f8f8f8;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.glaze-bowl-frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-/* text under the bowl */
-
-.glaze-meta-name {
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 2px;
-}
-
-.glaze-meta-note {
-  font-size: 12px;
-  color: #777;
-}
-
-/* swatches list */
-
-.glaze-swatches {
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.glaze-swatch {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-radius: 999px;
-  padding: 6px 10px;
-  border: 1px solid #ddd;
-  background: #fafafa;
-  cursor: pointer;
-  font-size: 11px;
-  text-align: left;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
-}
-
-.glaze-swatch:hover {
-  background: #f1f1f1;
-  transform: translateY(-1px);
-}
-
-.glaze-swatch.active {
-  border-color: #111;
-  background: #f0f0f0;
-}
-
-.swatch-chip {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.swatch-label {
-  font-size: 11px;
-}
-
-/* responsive tweak */
-
-@media (max-width: 900px) {
-  .glaze-layout {
-    grid-template-columns: 1fr;
-  }
 }
 
 .hidden {
@@ -886,4 +776,221 @@ header {
   to   { transform: translate(-50%, 0); opacity: 1; }
 }
 
+/* ------------------- SCAN ISSUES POPUP (inside scan-frame) ------------------- */
+
+.scan-issues-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  z-index: 6;           /* above overlay/video */
+  pointer-events: none;
+}
+
+.scan-issues-popup.show {
+  display: block;
+}
+
+.scan-issues-box {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+  text-align: center;
+  font-size: 12px;
+  max-width: 280px;
+}
+
+.scan-issues-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.scan-issues-sub {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.scan-overlay { z-index: 3; }
+.shape-overlay { z-index: 2; }
+.scan-success-popup, .scan-issues-popup { z-index: 6; }
+
+/* ---------- SCAN ISSUE SUMMARY LIST ---------- */
+
+.scan-issue-summary {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 210px;
+
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  border-radius: 10px;
+  padding: 12px 14px;
+
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+  z-index: 6;
+  font-size: 12px;
+}
+
+.scan-issue-summary.show {
+  display: flex;
+}
+
+.scan-issue-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.issue-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.issue-dot.red {
+  background: #e74c3c;
+}
+
+.issue-dot.orange {
+  background: #f39c12;
+}
+
+.issue-dot.yellow {
+  background: #f1c40f;
+}
+
+.issue-text {
+  line-height: 1.3;
+  color: #333;
+}
+
+.timeline-item {
+  padding: 10px 12px;
+  border: 1px solid rgba(0,0,0,.12);
+  border-radius: 10px;
+  opacity: .6;
+}
+
+.timeline-item.is-active {
+  opacity: 1;
+  border-color: rgba(0,0,0,.6);
+}
+
+.timeline-item.is-done {
+  opacity: .9;
+}
+
+/* =========================================================
+   UNIVERSAL PROCESS LAYOUT (Process 1–5)
+   Paste at END of your CSS. Additive + scoped.
+   ========================================================= */
+
+/* --- 0) Base shell (menu + right content) --- */
+.tutorial-shell{
+  display:flex;
+  min-height:100vh;
+}
+
+.process-menu{
+  width:260px;
+  min-width:260px;
+}
+
+.tutorial-content{
+  flex:1;
+  min-width:0; /* prevents overflow pushing content under */
+}
+
+/* --- 1) Process screens: only one visible --- */
+.process-screen{ display:none; }
+.process-screen.active{ display:block; }
+
+/* --- 2) Universal “frame width” matching Process 1 --- */
+.process-screen .process-body,
+.process-screen .clay-layout,
+.process-screen .bisque-layout,
+.process-screen .glaze-layout,
+.process-screen .step-shell,
+.process-screen .steps-tabs,
+.process-screen .steps-panels{
+  width:800px;
+  max-width:100%;
+}
+
+/* --- 3) Steps tabs: same style for all processes --- */
+/* supports: .steps-tabs .step-tab   AND   Process-1 style: .clay-step-tabs .clay-step-tab */
+.process-screen :is(.steps-tabs, .clay-step-tabs){
+  display:flex;
+  gap:8px;
+  margin:14px 0 12px;
+}
+
+.process-screen :is(.step-tab, .clay-step-tab){
+  appearance:none;
+  border:1px solid #e8e8e8;
+  background:#fff;
+  color:#111;
+  padding:8px 10px;
+  border-radius:999px;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.process-screen :is(.step-tab, .clay-step-tab):hover{
+  background:#f6f6f6;
+}
+
+.process-screen :is(.step-tab.active, .clay-step-tab.active){
+  background:#111;
+  color:#fff;
+  border-color:#111;
+}
+
+/* --- 4) Step panels: one visible --- */
+.process-screen :is(.step-panel, .clay-step-panel){ display:none; }
+.process-screen :is(.step-panel.active, .clay-step-panel.active){ display:block; }
+
+/* --- 5) Universal “Process 1 style” step layout (left text + right content) --- */
+/* Use .step-shell .step-left .step-right (recommended) */
+/* Also supports your existing cards: .clay-stepper, .bisque-stepper, etc. */
+.process-screen .step-shell{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.process-screen :is(.step-left, .clay-stepper, .bisque-stepper){
+  padding:16px 18px;
+  border-radius:12px;
+  border:1px solid #eee;
+  background:#fafafa;
+}
+
+.process-screen :is(.step-right, .scan-panel, .scan-card, .bisque-scan-panel){
+  border-radius:14px;
+  border:1px solid #eee;
+  background:#fff;
+  overflow:hidden;
+}
+
+/* --- 6) IMPORTANT: stop “Process 3 grid” from breaking consistency --- */
+/* If you still have old .glaze-layout grid, force it to behave like the others */
+#process-glazing .glaze-layout{
+  display:block; /* overrides grid without touching other glaze styles */
+}
+
+/* --- 7) Mobile: menu becomes top bar; right stays consistent --- */
+@media (max-width: 860px){
+  .tutorial-shell{ flex-direction:column; }
+  .process-menu{ width:100%; min-width:0; }
+}
 
