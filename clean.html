@@ -1,104 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Glaze Diary – Speckled Field Tutorial</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="tutorial.css" />
-
-  <!-- 3D viewer for the bowl -->
-  <script
-    type="module"
-    src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js">
-  </script>
-</head>
-
-<body>
-  <div class="page">
-    <a href="index.html" class="exit-tutorial-btn" aria-label="Exit tutorial">✕</a>
-
-    <!-- One global success popup ONLY -->
-    <div id="success-popup" class="success-popup" aria-live="polite" aria-atomic="true">
-      <div class="popup-box">
-        <span id="success-popup-text">✓ Appointment Made!</span>
-      </div>
-    </div>
-
-    <div class="tutorial-shell">
-      <!-- LEFT: process menu -->
-      <aside class="process-menu">
-        <div class="process-menu-title">process</div>
-
-        <ul class="process-nav">
-          <!-- PROCESS 1 -->
-          <li class="process-nav-item process-nav-item--has-steps active" data-target="process-clay">
-            <div class="process-main">
-              <span class="process-index">01</span>
-              <span class="process-label">clay making</span>
-            </div>
-
-            <ul class="clay-step-menu">
-              <li class="clay-step-menu-item active" data-step="1">Step 1 · split the clay</li>
-              <li class="clay-step-menu-item" data-step="2">Step 2 · make a ball</li>
-              <li class="clay-step-menu-item" data-step="3">Step 3 · pinch the center</li>
-              <li class="clay-step-menu-item" data-step="4">Step 4 · expand to bowl</li>
-              <li class="clay-step-menu-item" data-step="5">Step 5 · refine the rim</li>
-              <li class="clay-step-menu-item" data-step="6">Step 6 · roll the base strip</li>
-              <li class="clay-step-menu-item" data-step="7">Step 7 · join the ring</li>
-              <li class="clay-step-menu-item" data-step="8">Step 8 · check the bowl</li>
-              <li class="clay-step-menu-item" data-step="9">Step 9 · sponge & smooth</li>
-            </ul>
-          </li>
-
-          <!-- PROCESS 2 -->
-          <li class="process-nav-item process-nav-item--has-steps" data-target="process-bisque">
-            <div class="process-main">
-              <span class="process-index">02</span>
-              <span class="process-label">bisque fire</span>
-            </div>
-
-            <ul class="clay-step-menu">
-              <li class="clay-step-menu-item active" data-step="1">Step 1 · firing appointment</li>
-              <li class="clay-step-menu-item" data-step="2">Step 2 · firing progress</li>
-            </ul>
-          </li>
-
-          <!-- PROCESS 3 (NOW has steps in menu) -->
-          <li class="process-nav-item process-nav-item--has-steps" data-target="process-glazing">
-            <div class="process-main">
-              <span class="process-index">03</span>
-              <span class="process-label">glazing</span>
-            </div>
-
-            <ul class="clay-step-menu">
-              <li class="clay-step-menu-item active" data-step="1">Step 1 · lock in bowl</li>
-              <li class="clay-step-menu-item" data-step="2">Step 2 · open your set</li>
-              <li class="clay-step-menu-item" data-step="3">Step 3 · build layers</li>
-              <li class="clay-step-menu-item" data-step="4">Step 4 · cross strokes</li>
-            </ul>
-          </li>
-
-          <!-- PROCESS 4 -->
-          <li class="process-nav-item" data-target="process-glaze-fire">
-            <div class="process-main">
-              <span class="process-index">04</span>
-              <span class="process-label">glaze firing</span>
-            </div>
-          </li>
-
-          <!-- PROCESS 5 -->
-          <li class="process-nav-item" data-target="process-final">
-            <div class="process-main">
-              <span class="process-index">05</span>
-              <span class="process-label">final piece</span>
-            </div>
-          </li>
-        </ul>
-      </aside>
-
-      <!-- RIGHT: process screens -->
-      <main class="process-content">
         <!-- PROCESS 1 -->
         <section id="process-clay" class="process-screen active">
           <div class="process-header">
@@ -284,78 +183,87 @@
         </section>
 
         <!-- PROCESS 3 -->
-<section id="process-glazing" class="process-screen">
-  <div class="process-header">
-    <div class="process-tag">03 · glazing</div>
-    <h1>Glazing — see your bowl in color</h1>
-  </div>
-
-  <div class="clay-layout">
-    <!-- LEFT: stepper + lock button -->
-    <div class="clay-column">
-      <button class="primary-btn" id="glaze-lock-btn">lock in my bowl scan</button>
-
-      <div class="clay-stepper">
-        <button class="step-arrow step-arrow-left" id="glaze-prev" aria-label="Previous step">←</button>
-
-        <div class="clay-step-wrapper">
-          <div class="clay-step active" data-step="1">
-            <div class="step-label">Step 1 / 4</div>
-            <p class="step-body">
-              Use the scan on the right to “lock in” your bowl. Then use the glaze tools in the right sidebar to preview colors.
-            </p>
+        <section id="process-glazing" class="process-screen">
+          <div class="process-header">
+            <div class="process-tag">03 · glazing</div>
+            <h1>Glazing — see your bowl in color</h1>
           </div>
 
-          <div class="clay-step" data-step="2">
-            <div class="step-label">Step 2 / 4</div>
-            <p class="step-body">Open the Speckled Field coloring set and the brushes.</p>
+          <div class="steps-panels">
+            <div id="glaze-step-1" class="step-panel active">
+              <div class="step-shell">
+                <div class="step-left">
+                  <h2 class="step-title">Step 1 — Lock in your bowl</h2>
+                  <ol class="step-list">
+                    <li>Use the scan on the right to “lock in” your bowl, then try different glaze colors to preview how they look after firing.</li>
+                  </ol>
+                </div>
+
+                <div class="step-right">
+                  <div class="scan-card">
+                    <div class="scan-header">
+                      <div class="scan-title">Bowl scan</div>
+                      <div class="scan-subtitle">Point your camera at the marker</div>
+                    </div>
+
+                    <div id="glaze-scan-stage" class="scan-stage">
+                      <!-- your scan/canvas/model-viewer goes here -->
+                    </div>
+
+                    <div class="scan-controls">
+                      <button type="button" class="btn" id="glaze-lock-btn">Lock in scan</button>
+                      <button type="button" class="btn" id="glaze-reset-btn">Reset</button>
+                    </div>
+
+                    <div class="glaze-controls">
+                      <div class="glaze-controls-title">Glaze colors</div>
+                      <div class="glaze-swatches" id="glaze-swatches">
+                        <button type="button" class="swatch" data-glaze="speckled-field">Speckled Field</button>
+                        <button type="button" class="swatch" data-glaze="cream">Cream</button>
+                        <button type="button" class="swatch" data-glaze="sky">Sky</button>
+                      </div>
+
+                      <div class="brush-row">
+                        <label class="small-label" for="brush-size">Brush size</label>
+                        <input id="brush-size" type="range" min="1" max="40" value="12" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="glaze-step-2" class="step-panel">
+              <div class="step-shell">
+                <div class="step-left">
+                  <h2 class="step-title">Step 2 — Open your set</h2>
+                  <ol class="step-list"><li>Open the Speckled Field coloring set and the brushes.</li></ol>
+                </div>
+                <div class="step-right"><div class="note-card"><p>Tip: Lay down newspaper, and keep a small cup of water nearby for brush cleanup.</p></div></div>
+              </div>
+            </div>
+
+            <div id="glaze-step-3" class="step-panel">
+              <div class="step-shell">
+                <div class="step-left">
+                  <h2 class="step-title">Step 3 — Build layers</h2>
+                  <ol class="step-list"><li>Be sure to apply multiple layers of glaze on your bowl.</li></ol>
+                </div>
+                <div class="step-right"><div class="note-card"><p>Most studio glazes need 2–3 even coats. Let each coat lose its shine before the next.</p></div></div>
+              </div>
+            </div>
+
+            <div id="glaze-step-4" class="step-panel">
+              <div class="step-shell">
+                <div class="step-left">
+                  <h2 class="step-title">Step 4 — Cross strokes</h2>
+                  <ol class="step-list"><li>Brush the stroke in opposite directions for each layer.</li></ol>
+                </div>
+                <div class="step-right"><div class="note-card"><p>Example: coat 1 horizontal, coat 2 vertical, coat 3 diagonal — helps avoid streaks.</p></div></div>
+              </div>
+            </div>
           </div>
-
-          <div class="clay-step" data-step="3">
-            <div class="step-label">Step 3 / 4</div>
-            <p class="step-body">Apply multiple layers (usually 2–3 even coats). Let each coat lose its shine before the next.</p>
-          </div>
-
-          <div class="clay-step" data-step="4">
-            <div class="step-label">Step 4 / 4</div>
-            <p class="step-body">Cross-stroke each layer (horizontal → vertical → diagonal) to reduce streaks.</p>
-          </div>
-        </div>
-
-        <button class="step-arrow step-arrow-right" id="glaze-next" aria-label="Next step">→</button>
-      </div>
-
-      <p class="small-note" id="glaze-note">Glaze tools are in the right panel.</p>
-    </div>
-
-    <!-- MIDDLE: scan stage -->
-    <div class="scan-panel">
-      <div class="scan-frame">
-        <div id="glaze-scan-stage" class="scan-stage">
-          <!-- Live camera preview (visible before lock) -->
-          <video id="glaze-video" class="scan-video" autoplay playsinline muted></video>
-
-          <!-- 3D preview (visible after lock) -->
-          <model-viewer
-            id="glaze-model"
-            src="assets/bowl.glb"
-            camera-controls
-            interaction-prompt="none"
-            style="width:100%; height:100%; display:none;"
-            exposure="1"
-            shadow-intensity="0.3">
-          </model-viewer>
-        </div>
-
-        <div class="scan-instruction" id="glaze-instruction">
-          Point your camera at the marker, then tap “Lock in scan”.
-        </div>
-  </div>
-
-  <!-- model-viewer (include once per page; if you already added it in <head>, remove this) -->
-  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-</section>
-
+        </section>
 
         <!-- PROCESS 4 -->
         <section id="process-glaze-fire" class="process-screen">
@@ -422,58 +330,3 @@
             You can return to any step from the menu on the left if you want to revisit the process.
           </p>
         </section>
-      </main>
-
-      <!-- RIGHT: sidebar (grid column 3) -->
-    <aside class="process-sidebar" id="process-sidebar">
-      <div class="sidebar-panel glaze-panel" id="sidebar-glazing">
-
-        <div class="glaze-panel-head">
-          <div class="glaze-panel-title">Soft Mauve White</div>
-          <div class="glaze-panel-desc">
-            Soft off-white with a mauve tint, similar to the Speckled Field bowl illustration.
-            After firing, the color deepens and the surface looks richer.
-          </div>
-        </div>
-
-        <div class="glaze-pills" role="radiogroup" aria-label="Glaze options">
-
-          <label class="glaze-pill">
-            <input type="radio" name="glaze" value="speckled-field" checked>
-            <span class="glaze-dot" style="--dot:#d8d0c2;"></span>
-            <span class="glaze-name">Speckled Field</span>
-          </label>
-
-          <label class="glaze-pill">
-            <input type="radio" name="glaze" value="celadon">
-            <span class="glaze-dot" style="--dot:#b7cbbf;"></span>
-            <span class="glaze-name">Celadon Green</span>
-          </label>
-
-          <label class="glaze-pill">
-            <input type="radio" name="glaze" value="milk-white">
-            <span class="glaze-dot" style="--dot:#f2f0ea;"></span>
-            <span class="glaze-name">Milk White</span>
-          </label>
-
-          <label class="glaze-pill">
-            <input type="radio" name="glaze" value="soft-mauve">
-            <span class="glaze-dot" style="--dot:#d7c0c6;"></span>
-            <span class="glaze-name">Soft Mauve White</span>
-          </label>
-
-        </div>
-
-        <button type="button" class="glaze-fired-btn">fired</button>
-      </div>
-
-    </aside>
-
-  
-  </div>
-    <footer>© glaze diary</footer>
-  </div>
-
-  <script src="tutorial.js"></script>
-</body>
-</html>

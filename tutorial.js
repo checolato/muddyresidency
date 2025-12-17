@@ -469,299 +469,195 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* =========================================================================
-   * 5) PROCESS 3 — GLAZING: step tabs + Step 1 only scan/color UI
-   * ========================================================================= */
-  const glazingScreen = qs('#process-glazing');
-  const glazeTabs     = glazingScreen ? qsa('.step-tab', glazingScreen) : [];
-  const glazePanels   = glazingScreen ? qsa('.step-panel', glazingScreen) : [];
+// ===== Process 3: Scan -> Lock -> Model -> Glaze -> Fired Toggle =====
 
-  // Optional left menu steps for process 3 (if you add them later)
-  const glazingNav = qs('.process-nav-item[data-target="process-glazing"]');
-  const glazingMenuItems = glazingNav
-    ? [...qsa('.glaze-step-menu-item', glazingNav), ...qsa('.clay-step-menu-item', glazingNav)]
-    : [];
+const glazeVideo = document.getElementById('glaze-video');
+const glazeModel = document.getElementById('glaze-model');
+const lockBtn = document.getElementById('glaze-lock-btn');
+const firedBtn = document.querySelector('.glaze-fired-btn');
 
-  // Glaze scan/model/swatches IDs (supports your “old” ids + your “new” step-1 layout)
-  const glazeVideoOld       = qs('#glaze-video');
-  const glazeScanBtnOld     = qs('#glaze-scan-btn');
-  const glazeScanStatusOld  = qs('#glaze-scan-status');
-  const glazeOverlayOld     = qs('#glaze-scan-overlay');
+const glazeInstruction = document.getElementById('glaze-instruction');
 
-  const glazeLockBtnNew     = qs('#glaze-lock-btn');   // "Lock in scan"
-  const glazeResetBtnNew    = qs('#glaze-reset-btn');
+// NEW: overlays (match Process 1 behavior)
+const glazeScanOverlay = document.getElementById('glaze-scan-overlay');     // contains .scan-line
+const glazeShapeOverlay = document.getElementById('glaze-shape-overlay');   // optional
 
-  const glazeModelEl        = qs('#glaze-model');
-  const glazeMeta           = qs('#glaze-meta');
-  const glazeSwatchRow      = qs('#glaze-swatches');
-  const glazeNameEl         = qs('#glaze-name');
-  const glazeNoteEl         = qs('#glaze-note');
-  const glazeSwatches       = qsa('.glaze-swatch');
-  const glazeFireBtn        = qs('#glaze-fire-btn');
-  const glazeTextureOverlay = qs('#glaze-texture-overlay');
+const sidebar = document.getElementById('sidebar-glazing');
+const glazeTitleEl = sidebar?.querySelector('.glaze-panel-title');
+const glazeDescEl  = sidebar?.querySelector('.glaze-panel-desc');
+const glazeInputs  = sidebar ? [...sidebar.querySelectorAll('input[name="glaze"]')] : [];
 
-  const glazeVideo       = glazeVideoOld; // if you have a <video>
-  const glazeScanOverlay = glazeOverlayOld;
-  const glazeScanStatus  = glazeScanStatusOld;
-  const glazeScanBtn     = glazeLockBtnNew || glazeScanBtnOld;
+let glazeStream = null;
 
-  let glazeStream    = null;
-  let glazeScanning  = false;
-  let glazeMaterials = [];
-  let currentGlazeStr = null;
-  let currentSwatchEl = null;
+const state = {
+  cameraOn: false,
+  locked: false,
+  fired: false, // toggle
+  selected: glazeInputs.find(i => i.checked)?.value || glazeInputs[0]?.value || null
+};
 
-  const firedColorMap = {
-    "Speckled Field":   { color: "0.78,0.72,0.61" },
-    "Celadon Green":    { color: "0.60,0.72,0.62" },
-    "Milk White":       { color: "0.90,0.89,0.82" },
-    "Soft Mauve White": { color: "0.61,0.33,0.40" }
-  };
+// ---------------- helpers ----------------
 
-  function stopGlazeVideo() {
-    if (glazeStream) {
-      glazeStream.getTracks().forEach(t => t.stop());
-      glazeStream = null;
-    }
-    if (glazeVideo) {
-      glazeVideo.classList.remove('active');
-      glazeVideo.srcObject = null;
-    }
-    glazeScanning = false;
+function setHeaderFromSelected() {
+  const input = glazeInputs.find(i => i.value === state.selected);
+  if (!input) return;
+  if (glazeTitleEl) glazeTitleEl.textContent = input.dataset.title || input.value;
+  if (glazeDescEl)  glazeDescEl.textContent  = input.dataset.desc  || '';
+}
+
+function showModel(show) {
+  if (!glazeModel) return;
+  glazeModel.style.display = show ? 'block' : 'none';
+}
+
+function showScanUI(show) {
+  // show/hide scanning animation + guides
+  if (glazeScanOverlay) glazeScanOverlay.classList.toggle('active', show);
+  if (glazeShapeOverlay) glazeShapeOverlay.classList.toggle('active', show);
+
+  if (glazeInstruction) {
+    glazeInstruction.textContent = show
+      ? 'Align your bowl inside the guide. Tap “Lock in scan” to capture.'
+      : 'Choose a glaze on the right to preview color.';
+  }
+}
+
+function hexToRgba01(hex) {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!m) return null;
+  return [parseInt(m[1],16)/255, parseInt(m[2],16)/255, parseInt(m[3],16)/255, 1];
+}
+
+function applyGlazeToModel() {
+  if (!glazeModel) return;
+
+  const input = glazeInputs.find(i => i.value === state.selected);
+  if (!input) return;
+
+  const color = state.fired ? input.dataset.fired : input.dataset.unfired;
+  if (!color) return;
+
+  const mv = glazeModel;
+
+  // wait for glTF to load
+  if (!mv.model) {
+    mv.addEventListener('load', () => applyGlazeToModel(), { once: true });
+    return;
   }
 
-  function setGlazeToolsVisible(isVisible) {
-    // Only Step 1 shows the tools
-    if (glazeMeta)      glazeMeta.style.display = isVisible ? 'block' : 'none';
-    if (glazeSwatchRow) glazeSwatchRow.style.display = isVisible ? 'flex' : 'none';
-    if (glazeFireBtn)   glazeFireBtn.style.display = isVisible ? 'inline-flex' : 'none';
+  const rgba = hexToRgba01(color);
+  if (!rgba) return;
 
-    // If you want the model step-1 only:
-    if (glazeModelEl) glazeModelEl.classList.toggle('hidden', !isVisible);
-  }
-
-  function setGlazeStepActive(stepIdOrNum) {
-    if (!glazingScreen || !glazeTabs.length || !glazePanels.length) return;
-
-    const targetId =
-      typeof stepIdOrNum === 'number' ? `glaze-step-${stepIdOrNum}` : String(stepIdOrNum);
-
-    glazeTabs.forEach(t => t.classList.toggle('active', t.dataset.step === targetId));
-    glazePanels.forEach(p => p.classList.toggle('active', p.id === targetId));
-
-    const isStep1 = targetId === 'glaze-step-1';
-    setGlazeToolsVisible(isStep1);
-
-    if (!isStep1) stopGlazeVideo();
-
-    // left menu highlight for process 3 (if present)
-    glazingMenuItems.forEach(item => {
-      const raw = item.dataset.step;
-      const n = Number(raw);
-      const active = Number.isNaN(n) ? raw === targetId : (`glaze-step-${n}` === targetId);
-      item.classList.toggle('active', active);
-    });
-  }
-
-  // Tabs click
-  glazeTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      const target = tab.dataset.step;
-      if (target) setGlazeStepActive(target);
-    });
+  // tint all materials (MVP)
+  mv.model.materials.forEach(mat => {
+    mat.pbrMetallicRoughness.setBaseColorFactor(rgba);
   });
+}
 
-  // Left menu steps (optional)
-  glazingMenuItems.forEach(item => {
-    item.addEventListener('click', (e) => {
-      e.stopPropagation();
-      showProcess('process-glazing');
+// ---------------- camera ----------------
 
-      const raw = item.dataset.step;
-      const n = Number(raw);
-      if (!Number.isNaN(n)) setGlazeStepActive(n);
-      else if (raw) setGlazeStepActive(raw);
-    });
+async function startGlazeCamera() {
+  if (!glazeVideo) return;
+  if (glazeStream) return;
+
+  glazeStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+  glazeVideo.srcObject = glazeStream;
+  glazeVideo.style.display = 'block';
+  state.cameraOn = true;
+
+  // While scanning: hide model, show overlays
+  showModel(false);
+  showScanUI(true);
+}
+
+function stopGlazeCamera() {
+  if (glazeStream) glazeStream.getTracks().forEach(t => t.stop());
+  glazeStream = null;
+
+  if (glazeVideo) {
+    glazeVideo.srcObject = null;
+    glazeVideo.style.display = 'none';
+  }
+  state.cameraOn = false;
+
+  // Stop scanning visuals
+  showScanUI(false);
+}
+
+// ---------------- events ----------------
+
+// swatch changes (apply only after lock)
+glazeInputs.forEach(input => {
+  input.addEventListener('change', () => {
+    state.selected = input.value;
+    setHeaderFromSelected();
+    if (state.locked) applyGlazeToModel();
   });
+});
 
-  // Default glaze step
-  if (glazePanels.length) {
-    if (!glazePanels.some(p => p.classList.contains('active'))) setGlazeStepActive(1);
-    else {
-      const activePanel = glazePanels.find(p => p.classList.contains('active'));
-      setGlazeStepActive(activePanel ? activePanel.id : 1);
+// lock button:
+// 1st click opens webcam (starts scan animation)
+// 2nd click locks scan (stops webcam, shows model)
+lockBtn?.addEventListener('click', async () => {
+  // If already locked, allow re-open camera by toggling (optional)
+  // If you want lock to be one-way, replace this block with `if (state.locked) return;`
+  if (state.locked) {
+    // "Rescan" behavior: go back to camera
+    state.locked = false;
+    state.fired = false;
+    showModel(false);
+    lockBtn.disabled = false;
+    lockBtn.textContent = 'open webcam';
+    await startGlazeCamera();
+    return;
+  }
+
+  // First click: start camera
+  if (!state.cameraOn) {
+    try {
+      await startGlazeCamera();
+      lockBtn.textContent = 'lock in scan';
+      return;
+    } catch (e) {
+      console.error(e);
+      lockBtn.textContent = 'camera blocked';
+      return;
     }
   }
 
-  // Reset (new UI)
-  if (glazeResetBtnNew) {
-    glazeResetBtnNew.addEventListener('click', () => {
-      stopGlazeVideo();
+  // Second click: lock
+  state.locked = true;
+  state.fired = false;
 
-      if (glazeModelEl) glazeModelEl.classList.add('hidden');
-      if (glazeMeta) glazeMeta.style.display = 'none';
-      if (glazeSwatchRow) glazeSwatchRow.style.display = 'none';
+  stopGlazeCamera();
 
-      if (glazeFireBtn) {
-        glazeFireBtn.style.display = 'none';
-        glazeFireBtn.disabled = true;
-        glazeFireBtn.textContent = 'fire this glaze ->';
-      }
+  // show model in scan window
+  showModel(true);
 
-      if (glazeNameEl) glazeNameEl.textContent = '';
-      if (glazeNoteEl) glazeNoteEl.textContent = '';
-
-      glazeSwatches.forEach(b => b.classList.remove('active'));
-      currentGlazeStr = null;
-      currentSwatchEl = null;
-
-      if (glazeScanStatus) {
-        glazeScanStatus.textContent =
-          'Use the scan to “lock in” your bowl, then try glaze colors below.';
-      }
-    });
+  // ensure model uses the white bowl glb
+  // (in case it was changed elsewhere)
+  if (glazeModel && glazeModel.getAttribute('src') !== 'assets/bowl-white.glb') {
+    glazeModel.setAttribute('src', 'assets/bowl-white.glb');
   }
 
-  // Scan/Lock-in (Step 1 only)
-  if (glazeScanBtn && glazeScanStatus) {
-    glazeScanBtn.addEventListener('click', () => {
-      const step1Panel = qs('#glaze-step-1');
-      if (step1Panel && !step1Panel.classList.contains('active')) return;
-      if (glazeScanning) return;
+  setHeaderFromSelected();
+  applyGlazeToModel();
 
-      glazeScanStatus.textContent =
-        'We are opening your camera. Allow access to start the scan.';
+  // lock button becomes a toggle: "rescan" capability
+  lockBtn.textContent = 'rescan';
+});
 
-      if (navigator.mediaDevices?.getUserMedia && glazeVideo) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-          .then(stream => {
-            glazeStream = stream;
-            glazeVideo.srcObject = stream;
-            glazeVideo.classList.add('active');
+// fired toggle (works after lock)
+firedBtn?.addEventListener('click', () => {
+  if (!state.locked) return;
+  state.fired = !state.fired; // toggle
+  applyGlazeToModel();
+});
 
-            glazeScanStatus.textContent =
-              'Align your bowl in the frame. We will run a quick scan.';
-            glazeScanning = true;
-
-            setTimeout(() => {
-              if (glazeScanOverlay) glazeScanOverlay.classList.add('active');
-              glazeScanStatus.textContent = 'Scanning your bowl.';
-
-              setTimeout(() => {
-                if (glazeScanOverlay) glazeScanOverlay.classList.remove('active');
-                stopGlazeVideo();
-
-                setGlazeToolsVisible(true);
-                glazeScanStatus.textContent =
-                  'Locked in. Try different glazes to preview how they look after firing.';
-              }, 2000);
-            }, 800);
-          })
-          .catch(() => {
-            setGlazeToolsVisible(true);
-            glazeScanStatus.textContent =
-              'Camera not available. You can still preview glaze colors on a sample bowl.';
-          });
-      } else {
-        setGlazeToolsVisible(true);
-        glazeScanStatus.textContent =
-          'Camera not available. You can still preview glaze colors on a sample bowl.';
-      }
-    });
-  }
-
-  // Swatches -> apply “unfired” color
-  if (glazeModelEl && glazeSwatches.length && glazeNameEl && glazeNoteEl) {
-    glazeModelEl.addEventListener('load', () => {
-      const model = glazeModelEl.model;
-      glazeMaterials = (model && model.materials) ? [...model.materials] : [];
-
-      glazeSwatches.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const step1Panel = qs('#glaze-step-1');
-          if (step1Panel && !step1Panel.classList.contains('active')) return;
-
-          const colorStr   = btn.getAttribute('data-color');
-          const name       = btn.getAttribute('data-name') || '';
-          const note       = btn.getAttribute('data-note') || '';
-          const isSpeckled = btn.hasAttribute('data-speckled');
-
-          currentGlazeStr = colorStr;
-          currentSwatchEl = btn;
-
-          glazeSwatches.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-
-          glazeNameEl.textContent = name;
-          glazeNoteEl.textContent = note;
-
-          if (glazeTextureOverlay) {
-            if (isSpeckled) {
-              glazeTextureOverlay.classList.add('has-speckles');
-              glazeTextureOverlay.classList.remove('fired');
-            } else {
-              glazeTextureOverlay.classList.remove('has-speckles', 'fired');
-            }
-          }
-
-          if (glazeFireBtn) {
-            glazeFireBtn.disabled = !colorStr;
-            glazeFireBtn.textContent = 'fire this glaze ->';
-          }
-
-          if (!colorStr || !glazeMaterials.length) return;
-
-          const [r, g, b] = colorStr.split(',').map(Number);
-          glazeMaterials.forEach(mat => {
-            if (mat?.pbrMetallicRoughness) {
-              mat.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1]);
-            }
-          });
-        });
-      });
-    });
-  }
-
-  // Fire -> apply “fired” transform
-  if (glazeFireBtn) {
-    glazeFireBtn.addEventListener('click', () => {
-      const step1Panel = qs('#glaze-step-1');
-      if (step1Panel && !step1Panel.classList.contains('active')) return;
-
-      if (!currentSwatchEl || !currentGlazeStr || !glazeMaterials.length) return;
-
-      const glazeName = currentSwatchEl.getAttribute('data-name') || '';
-      const firedInfo = firedColorMap[glazeName];
-
-      let finalRGB;
-      if (firedInfo?.color) {
-        finalRGB = firedInfo.color.split(',').map(Number);
-      } else {
-        const [r, g, b] = currentGlazeStr.split(',').map(Number);
-        const factor = 0.75;
-        finalRGB = [r * factor, g * factor, b * factor];
-      }
-
-      glazeMaterials.forEach(mat => {
-        if (mat?.pbrMetallicRoughness) {
-          mat.pbrMetallicRoughness.setBaseColorFactor([...finalRGB, 1]);
-        }
-      });
-
-      if (glazeTextureOverlay && currentSwatchEl.hasAttribute('data-speckled')) {
-        glazeTextureOverlay.classList.add('fired');
-      }
-
-      if (glazeNoteEl) {
-        const baseNote = currentSwatchEl.getAttribute('data-note') || '';
-        glazeNoteEl.textContent =
-          baseNote + ' After firing, the color deepens and the surface looks richer.';
-      }
-
-      glazeFireBtn.disabled = true;
-      glazeFireBtn.textContent = 'fired';
-    });
-  }
+// init
+setHeaderFromSelected();
+showModel(false);
+showScanUI(false);
 
   /* =========================================================================
    * 6) ONE SINGLE nav handler (no duplicates)
