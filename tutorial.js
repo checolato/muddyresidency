@@ -469,23 +469,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-// ===== Process 3: Scan -> Lock -> Model -> Glaze -> Fired Toggle =====
+// ===============================
+// PROCESS 3: Webcam -> Scan line -> Lock -> Model -> Glaze -> Fired toggle
+// ===============================
 
-const glazeVideo = document.getElementById('glaze-video');
-const glazeModel = document.getElementById('glaze-model');
-const lockBtn = document.getElementById('glaze-lock-btn');
-const firedBtn = document.querySelector('.glaze-fired-btn');
+const glazeVideo = document.getElementById("glaze-video");
+const glazeModel = document.getElementById("glaze-model");
+const glazeOverlay = document.getElementById("glaze-scan-overlay");
 
-const glazeInstruction = document.getElementById('glaze-instruction');
+const lockBtn = document.getElementById("glaze-lock-btn");
+const firedBtn = document.querySelector(".glaze-fired-btn");
 
-// NEW: overlays (match Process 1 behavior)
-const glazeScanOverlay = document.getElementById('glaze-scan-overlay');     // contains .scan-line
-const glazeShapeOverlay = document.getElementById('glaze-shape-overlay');   // optional
-
-const sidebar = document.getElementById('sidebar-glazing');
-const glazeTitleEl = sidebar?.querySelector('.glaze-panel-title');
-const glazeDescEl  = sidebar?.querySelector('.glaze-panel-desc');
-const glazeInputs  = sidebar ? [...sidebar.querySelectorAll('input[name="glaze"]')] : [];
+const sidebar = document.getElementById("sidebar-glazing");
+const glazeInputs = sidebar ? [...sidebar.querySelectorAll('input[name="glaze"]')] : [];
+const glazeTitleEl = sidebar?.querySelector(".glaze-panel-title") || null;
+const glazeDescEl  = sidebar?.querySelector(".glaze-panel-desc") || null;
 
 let glazeStream = null;
 
@@ -493,33 +491,30 @@ const state = {
   cameraOn: false,
   locked: false,
   fired: false, // toggle
-  selected: glazeInputs.find(i => i.checked)?.value || glazeInputs[0]?.value || null
+  selected: glazeInputs.find(i => i.checked)?.value || glazeInputs[0]?.value || null,
 };
 
-// ---------------- helpers ----------------
+// ---------- UI helpers ----------
+function showScanOverlay(on) {
+  if (!glazeOverlay) return;
+  glazeOverlay.classList.toggle("active", on);
+}
+
+function showVideo(on) {
+  if (!glazeVideo) return;
+  glazeVideo.style.display = on ? "block" : "none";
+}
+
+function showModel(on) {
+  if (!glazeModel) return;
+  glazeModel.style.display = on ? "block" : "none";
+}
 
 function setHeaderFromSelected() {
   const input = glazeInputs.find(i => i.value === state.selected);
   if (!input) return;
   if (glazeTitleEl) glazeTitleEl.textContent = input.dataset.title || input.value;
-  if (glazeDescEl)  glazeDescEl.textContent  = input.dataset.desc  || '';
-}
-
-function showModel(show) {
-  if (!glazeModel) return;
-  glazeModel.style.display = show ? 'block' : 'none';
-}
-
-function showScanUI(show) {
-  // show/hide scanning animation + guides
-  if (glazeScanOverlay) glazeScanOverlay.classList.toggle('active', show);
-  if (glazeShapeOverlay) glazeShapeOverlay.classList.toggle('active', show);
-
-  if (glazeInstruction) {
-    glazeInstruction.textContent = show
-      ? 'Align your bowl inside the guide. Tap “Lock in scan” to capture.'
-      : 'Choose a glaze on the right to preview color.';
-  }
+  if (glazeDescEl)  glazeDescEl.textContent  = input.dataset.desc || "";
 }
 
 function hexToRgba01(hex) {
@@ -537,90 +532,70 @@ function applyGlazeToModel() {
   const color = state.fired ? input.dataset.fired : input.dataset.unfired;
   if (!color) return;
 
-  const mv = glazeModel;
-
-  // wait for glTF to load
-  if (!mv.model) {
-    mv.addEventListener('load', () => applyGlazeToModel(), { once: true });
+  // model-viewer: wait until GLB is loaded
+  if (!glazeModel.model) {
+    glazeModel.addEventListener("load", applyGlazeToModel, { once: true });
     return;
   }
 
   const rgba = hexToRgba01(color);
   if (!rgba) return;
 
-  // tint all materials (MVP)
-  mv.model.materials.forEach(mat => {
+  // MVP: tint all materials
+  glazeModel.model.materials.forEach(mat => {
     mat.pbrMetallicRoughness.setBaseColorFactor(rgba);
   });
 }
 
-// ---------------- camera ----------------
-
+// ---------- Camera ----------
 async function startGlazeCamera() {
   if (!glazeVideo) return;
   if (glazeStream) return;
 
   glazeStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
   glazeVideo.srcObject = glazeStream;
-  glazeVideo.style.display = 'block';
-  state.cameraOn = true;
 
-  // While scanning: hide model, show overlays
-  showModel(false);
-  showScanUI(true);
+  // Make sure it actually shows
+  showVideo(true);
+
+  // Scan animation ON while camera is ON
+  showScanOverlay(true);
+
+  state.cameraOn = true;
 }
 
 function stopGlazeCamera() {
-  if (glazeStream) glazeStream.getTracks().forEach(t => t.stop());
-  glazeStream = null;
-
+  if (glazeStream) {
+    glazeStream.getTracks().forEach(t => t.stop());
+    glazeStream = null;
+  }
   if (glazeVideo) {
     glazeVideo.srcObject = null;
-    glazeVideo.style.display = 'none';
   }
-  state.cameraOn = false;
 
-  // Stop scanning visuals
-  showScanUI(false);
+  // Hide camera + scan animation
+  showVideo(false);
+  showScanOverlay(false);
+
+  state.cameraOn = false;
 }
 
-// ---------------- events ----------------
+// ---------- Main button behavior ----------
+// Click 1: open webcam + start scan line
+// Click 2: lock scan -> stop webcam -> show model -> enable glazing
+lockBtn?.addEventListener("click", async () => {
+  // If locked already, do nothing (you can add "rescan" later if you want)
+  if (state.locked) return;
 
-// swatch changes (apply only after lock)
-glazeInputs.forEach(input => {
-  input.addEventListener('change', () => {
-    state.selected = input.value;
-    setHeaderFromSelected();
-    if (state.locked) applyGlazeToModel();
-  });
-});
-
-// lock button:
-// 1st click opens webcam (starts scan animation)
-// 2nd click locks scan (stops webcam, shows model)
-lockBtn?.addEventListener('click', async () => {
-  // If already locked, allow re-open camera by toggling (optional)
-  // If you want lock to be one-way, replace this block with `if (state.locked) return;`
-  if (state.locked) {
-    // "Rescan" behavior: go back to camera
-    state.locked = false;
-    state.fired = false;
-    showModel(false);
-    lockBtn.disabled = false;
-    lockBtn.textContent = 'open webcam';
-    await startGlazeCamera();
-    return;
-  }
-
-  // First click: start camera
+  // First click: open webcam
   if (!state.cameraOn) {
     try {
       await startGlazeCamera();
-      lockBtn.textContent = 'lock in scan';
+      lockBtn.textContent = "lock in scan";
       return;
     } catch (e) {
       console.error(e);
-      lockBtn.textContent = 'camera blocked';
+      lockBtn.textContent = "camera blocked";
       return;
     }
   }
@@ -631,33 +606,40 @@ lockBtn?.addEventListener('click', async () => {
 
   stopGlazeCamera();
 
-  // show model in scan window
+  // Show model in the scan window
   showModel(true);
 
-  // ensure model uses the white bowl glb
-  // (in case it was changed elsewhere)
-  if (glazeModel && glazeModel.getAttribute('src') !== 'assets/bowl-white.glb') {
-    glazeModel.setAttribute('src', 'assets/bowl-white.glb');
-  }
-
+  // Apply initial glaze (unfired)
   setHeaderFromSelected();
   applyGlazeToModel();
 
-  // lock button becomes a toggle: "rescan" capability
-  lockBtn.textContent = 'rescan';
+  lockBtn.textContent = "scan locked";
+  lockBtn.disabled = true;
 });
 
-// fired toggle (works after lock)
-firedBtn?.addEventListener('click', () => {
+// ---------- Swatches ----------
+glazeInputs.forEach(input => {
+  input.addEventListener("change", () => {
+    state.selected = input.value;
+    setHeaderFromSelected();
+
+    // Only apply to model after lock (when model is visible)
+    if (state.locked) applyGlazeToModel();
+  });
+});
+
+// ---------- Fired toggle ----------
+firedBtn?.addEventListener("click", () => {
   if (!state.locked) return;
-  state.fired = !state.fired; // toggle
+  state.fired = !state.fired; // toggle unfired <-> fired
   applyGlazeToModel();
 });
 
-// init
+// ---------- Init ----------
 setHeaderFromSelected();
 showModel(false);
-showScanUI(false);
+showVideo(false);
+showScanOverlay(false);
 
   /* =========================================================================
    * 6) ONE SINGLE nav handler (no duplicates)
