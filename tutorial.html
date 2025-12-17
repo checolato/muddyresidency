@@ -284,88 +284,123 @@
         </section>
 
         <!-- PROCESS 3 -->
-<section id="process-glazing" class="process-screen">
-  <div class="process-header">
-    <div class="process-tag">03 · glazing</div>
-    <h1>Glazing — see your bowl in color</h1>
-  </div>
-
-  <div class="clay-layout">
-    <!-- LEFT: stepper + lock button -->
-    <div class="clay-column">
-      <button class="primary-btn" id="glaze-lock-btn">lock in my bowl scan</button>
-
-      <div class="clay-stepper">
-        <button class="step-arrow step-arrow-left" id="glaze-prev" aria-label="Previous step">←</button>
-
-        <div class="clay-step-wrapper">
-          <div class="clay-step active" data-step="1">
-            <div class="step-label">Step 1 / 4</div>
-            <p class="step-body">
-              Use the scan on the right to “lock in” your bowl. Then use the glaze tools in the right sidebar to preview colors.
-            </p>
+        <section id="process-glazing" class="process-screen">
+          <div class="process-header">
+            <div class="process-tag">03 · glazing</div>
+            <h1>Glazing — see your bowl in color</h1>
           </div>
 
-          <div class="clay-step" data-step="2">
-            <div class="step-label">Step 2 / 4</div>
-            <p class="step-body">Open the Speckled Field coloring set and the brushes.</p>
+          <!-- Process 3 only: 2 columns inside the content area -->
+          <div class="glazing-layout">
+            <!-- LEFT: stepper -->
+            <div class="clay-column">
+              <button class="primary-btn" id="glaze-lock-btn">lock in my bowl scan</button>
+
+              <div class="clay-stepper">
+                <button class="step-arrow step-arrow-left" id="glaze-prev" aria-label="Previous step">←</button>
+
+                <div class="clay-step-wrapper">
+                  <div class="clay-step active" data-step="1">
+                    <div class="step-label">Step 1 / 4</div>
+                    <p class="step-body">Lock in your bowl scan, then preview glaze colors on the right.</p>
+                  </div>
+
+                  <div class="clay-step" data-step="2">
+                    <div class="step-label">Step 2 / 4</div>
+                    <p class="step-body">Open the Speckled Field coloring set and brushes.</p>
+                  </div>
+
+                  <div class="clay-step" data-step="3">
+                    <div class="step-label">Step 3 / 4</div>
+                    <p class="step-body">Apply 2–3 even coats. Let each coat lose its shine before the next.</p>
+                  </div>
+
+                  <div class="clay-step" data-step="4">
+                    <div class="step-label">Step 4 / 4</div>
+                    <p class="step-body">Cross-stroke each layer to reduce streaks.</p>
+                  </div>
+                </div>
+
+                <button class="step-arrow step-arrow-right" id="glaze-next" aria-label="Next step">→</button>
+              </div>
+            </div>
+
+            <!-- MIDDLE: scan window -->
+            <div class="scan-panel">
+              <div class="scan-frame">
+                <div id="glaze-scan-stage" class="scan-stage">
+                  <video id="glaze-video" class="scan-video" autoplay playsinline muted style="display:none;"></video>
+
+                  <model-viewer
+                    id="glaze-model"
+                    src="assets/bowl-white.glb"
+                    camera-controls
+                    interaction-prompt="none"
+                    camera-orbit="0deg 75deg 3.2m"
+                    style="display:none; width:100%; height:100%;">
+                  </model-viewer>
+                </div>
+
+                <div class="scan-overlay" id="glaze-scan-overlay">
+                  <div class="scan-line"></div>
+                </div>
+
+                <div class="scan-instruction" id="glaze-instruction">
+                  Tap “lock in my bowl scan” to start scanning.
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT: glaze tools (ONLY inside process 3) -->
+            <aside id="sidebar-glazing" class="glaze-panel">
+              <div class="glaze-panel-title">Soft Mauve White</div>
+              <div class="glaze-panel-desc">
+                Soft off-white with a mauve tint, similar to the Speckled Field bowl illustration. After firing, the color deepens and the surface looks richer.
+              </div>
+
+              <div class="glaze-pills">
+                <!-- example pill (repeat for all) -->
+                <label class="glaze-pill">
+                  <input type="radio" name="glaze" value="speckled-field" checked
+                        data-unfired="#d8d0c2" data-fired="#bda88c"
+                        data-title="Speckled Field"
+                        data-desc="Warm off-white with soft speckles. After firing, it deepens and becomes richer.">
+                  <span class="glaze-dot" style="--dot:#d8d0c2;"></span>
+                  <span class="glaze-name">Speckled Field</span>
+                </label>
+
+                <label class="glaze-pill">
+                  <input type="radio" name="glaze" value="celadon"
+                        data-unfired="#c8d6cc" data-fired="#7fa99a"
+                        data-title="Celadon Green"
+                        data-desc="Cool green tone. After firing, it becomes deeper and glossier.">
+                  <span class="glaze-dot" style="--dot:#c8d6cc;"></span>
+                  <span class="glaze-name">Celadon Green</span>
+                </label>
+
+                <label class="glaze-pill">
+                  <input type="radio" name="glaze" value="milk"
+                        data-unfired="#f2efe8" data-fired="#e7ddcf"
+                        data-title="Milk White"
+                        data-desc="Milky neutral. After firing, slightly warmer with depth.">
+                  <span class="glaze-dot" style="--dot:#f2efe8;"></span>
+                  <span class="glaze-name">Milk White</span>
+                </label>
+
+                <label class="glaze-pill">
+                  <input type="radio" name="glaze" value="mauve"
+                        data-unfired="#e6d7da" data-fired="#c8a3ad"
+                        data-title="Soft Mauve White"
+                        data-desc="Soft off-white with a mauve tint. After firing, it deepens and looks richer.">
+                  <span class="glaze-dot" style="--dot:#e6d7da;"></span>
+                  <span class="glaze-name">Soft Mauve White</span>
+                </label>
+              </div>
+
+              <button type="button" class="glaze-fired-btn">fired</button>
+            </aside>
           </div>
-
-          <div class="clay-step" data-step="3">
-            <div class="step-label">Step 3 / 4</div>
-            <p class="step-body">Apply multiple layers (usually 2–3 even coats). Let each coat lose its shine before the next.</p>
-          </div>
-
-          <div class="clay-step" data-step="4">
-            <div class="step-label">Step 4 / 4</div>
-            <p class="step-body">Cross-stroke each layer (horizontal → vertical → diagonal) to reduce streaks.</p>
-          </div>
-        </div>
-
-        <button class="step-arrow step-arrow-right" id="glaze-next" aria-label="Next step">→</button>
-      </div>
-
-      <p class="small-note" id="glaze-note">Glaze tools are in the right panel.</p>
-    </div>
-
-    <!-- MIDDLE: scan stage -->
-    <div class="scan-panel">
-      <div class="scan-frame">
-
-        <!-- scan stage -->
-        <div id="glaze-scan-stage" class="scan-stage">
-          <!-- webcam feed -->
-          <video
-            id="glaze-video"
-            class="scan-video"
-            autoplay
-            playsinline
-            muted
-            style="display:none;">
-          </video>
-
-          <!-- 3D model preview (hidden until scan is locked) -->
-          <model-viewer
-            id="glaze-model"
-            src="assets/bowl-white.glb"
-            camera-controls
-            interaction-prompt="none"
-            style="display:none; width:100%; height:100%;">
-          </model-viewer>
-        </div>
-
-        <!-- scan animation overlay (line only) -->
-        <div class="scan-overlay" id="glaze-scan-overlay">
-          <div class="scan-line"></div>
-        </div>
-
-        <!-- instruction text -->
-        <div class="scan-instruction" id="glaze-instruction">
-          Tap “lock in my bowl scan” to start scanning.
-        </div>
-
-      </div>
-    </div>
+        </section>
 
 
   <!-- model-viewer (include once per page; if you already added it in <head>, remove this) -->
