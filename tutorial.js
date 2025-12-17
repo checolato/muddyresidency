@@ -3,8 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
   /* =========================================================================
    * Helpers
    * ========================================================================= */
-  const qs  = (sel, root = document) => root.querySelector(sel);
-  const qsa = (sel, root = document) => [...root.querySelectorAll(sel)];
+  const qs = (sel, root = document) => root.querySelector(sel);
+  const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const clamp = (i, min, max) => Math.max(min, Math.min(max, i));
 
   /* =========================================================================
    * 1) PROCESS MENU — only one screen visible
@@ -17,13 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
     navItems.forEach(n => n.classList.toggle('active', n.dataset.target === id));
   }
 
-  // Ensure there is an active screen
   if (!screens.some(s => s.classList.contains('active')) && screens.length) {
     showProcess('process-clay');
   }
 
   /* =========================================================================
-   * 2) PROCESS 1 — CLAY STEPPER + LEFT MENU STEP TABS
+   * 2) PROCESS 1 — CLAY STEPPER + SCAN CHECK (step 8)
    * ========================================================================= */
   const clayScreen    = qs('#process-clay');
   const claySteps     = qsa('.clay-step', clayScreen || document);
@@ -35,15 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const clayMenuItems = clayNav ? qsa('.clay-step-menu-item', clayNav) : [];
 
   const stepImages = [
-    'assets/step 1.png',
-    'assets/step 2.png',
-    'assets/step 3.png',
-    'assets/step 4.png',
-    'assets/step 5.png',
-    'assets/step 6.png',
-    'assets/step 7.png',
-    'assets/step 8.png',
-    'assets/step 9.png'
+    'assets/step 1.png','assets/step 2.png','assets/step 3.png',
+    'assets/step 4.png','assets/step 5.png','assets/step 6.png',
+    'assets/step 7.png','assets/step 8.png','assets/step 9.png'
   ];
 
   const stepAlts = [
@@ -60,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let clayIndex = 0;
 
-  // Clay scan/check UI (Process 1 step 8)
   const checkBtn        = qs('#check-bowl-btn');
   const resultText      = qs('#check-result');
   const scanStatus      = qs('#scan-status'); // optional
@@ -142,10 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (scanInstruction) scanInstruction.classList.remove('visible');
   }
 
-  function clamp(i, min, max) {
-    return Math.max(min, Math.min(max, i));
-  }
-
   function updateClay() {
     if (!claySteps.length) return;
 
@@ -155,7 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     claySteps.forEach((el, i) => el.classList.toggle('active', i === clayIndex));
 
-    // left menu highlight (only inside process 1 nav)
     clayMenuItems.forEach(item => {
       const n = Number(item.dataset.step);
       item.classList.toggle('active', n === stepNum);
@@ -187,30 +175,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
-      clayIndex -= 1;
-      updateClay();
-    });
-  }
+  prevBtn?.addEventListener('click', () => {
+    clayIndex -= 1;
+    updateClay();
+  });
 
-  if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-      const totalSteps = claySteps.length || 0;
+  nextBtn?.addEventListener('click', () => {
+    const totalSteps = claySteps.length || 0;
 
-      // Step 9 -> Process 2 Step 1
-      if (totalSteps && clayIndex === totalSteps - 1) {
-        cleanupClayOverlaysAndCamera();
-        showProcess('process-bisque');
-        showBisqueStep(1);
-        setBisqueMenuActive(1);
-        return;
-      }
+    // Step 9 -> Process 2 Step 1
+    if (totalSteps && clayIndex === totalSteps - 1) {
+      cleanupClayOverlaysAndCamera();
+      showProcess('process-bisque');
+      showBisqueStep(1);
+      setBisqueMenuActive(1);
+      return;
+    }
 
-      clayIndex += 1;
-      updateClay();
-    });
-  }
+    clayIndex += 1;
+    updateClay();
+  });
 
   clayMenuItems.forEach(item => {
     item.addEventListener('click', (e) => {
@@ -224,130 +208,122 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Clay scan/check click
-  if (checkBtn) {
-    checkBtn.addEventListener('click', () => {
-      // PASS 0: open camera + enter scan mode
-      if (!canScan) {
-        hideScanPopups();
-        hideIssueSummary();
-        hasShownIssues = false;
+  // Clay scan/check click (step 8)
+  checkBtn?.addEventListener('click', () => {
+    // PASS 0: open camera + enter scan mode
+    if (!canScan) {
+      hideScanPopups();
+      hideIssueSummary();
+      hasShownIssues = false;
 
-        setShapeGood();
-        if (shapeOverlay) shapeOverlay.classList.add('active');
+      setShapeGood();
+      shapeOverlay?.classList.add('active');
+
+      if (scanStatus) scanStatus.textContent =
+        'We are opening your camera. Allow access, then you can start scanning.';
+      if (resultText) resultText.textContent =
+        'When the camera appears, place your bowl roughly inside the shape.';
+
+      const enterScanMode = () => {
+        canScan = true;
+        checkBtn.disabled = false;
+        checkBtn.textContent = 'Scan and check';
+        checkBtn.classList.add('is-scan-mode');
+        scanInstruction?.classList.add('visible');
+        if (scanStatus) scanStatus.textContent =
+          'Align your bowl inside the shape, then tap Scan and check.';
+      };
+
+      if (navigator.mediaDevices?.getUserMedia && video) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(stream => {
+            videoStream = stream;
+            video.srcObject = stream;
+            video.classList.add('active');
+
+            const onReady = () => {
+              video.removeEventListener('loadedmetadata', onReady);
+              illustration?.classList.add('hidden');
+              shapeOverlay?.classList.add('active');
+              enterScanMode();
+            };
+            video.addEventListener('loadedmetadata', onReady);
+          })
+          .catch(() => {
+            if (scanStatus) scanStatus.textContent =
+              'Camera not available. You can still tap Scan and check to continue.';
+            enterScanMode();
+          });
+      } else {
+        if (scanStatus) scanStatus.textContent =
+          'Camera not available. You can still tap Scan and check to continue.';
+        enterScanMode();
+      }
+      return;
+    }
+
+    // PASS 1/2: run scan
+    if (isScanning || !overlay) return;
+    isScanning = true;
+
+    checkBtn.disabled = true;
+    scanInstruction?.classList.remove('visible');
+    hideScanPopups();
+    hideIssueSummary();
+
+    overlay.classList.add('active');
+    if (scanStatus) scanStatus.textContent = 'Scanning your bowl. Hold still.';
+    if (resultText) resultText.textContent = 'Checking proportions and surface.';
+
+    setTimeout(() => {
+      overlay.classList.remove('active');
+
+      // PASS 1: issues
+      if (!hasShownIssues) {
+        hasShownIssues = true;
+
+        setShapeBad();
+        showIssueSummary();
 
         if (scanStatus) scanStatus.textContent =
-          'We are opening your camera. Allow access, then you can start scanning.';
+          'We found a few areas to improve. Smooth the highlighted spots, then scan again.';
         if (resultText) resultText.textContent =
-          'When the camera appears, place your bowl roughly inside the shape.';
+          'Focus on smoothing the rim and evening the wall thickness, then scan again.';
 
-        const enterScanMode = () => {
-          canScan = true;
-          checkBtn.disabled = false;
-          checkBtn.textContent = 'Scan and check';
-          checkBtn.classList.add('is-scan-mode');
-          if (scanInstruction) scanInstruction.classList.add('visible');
-          if (scanStatus) scanStatus.textContent =
-            'Align your bowl inside the shape, then tap Scan and check.';
-        };
+        scanIssuesPopup?.classList.add('show');
+        if (scanIssuesPopup) setTimeout(() => scanIssuesPopup.classList.remove('show'), 4200);
 
-        if (navigator.mediaDevices?.getUserMedia && video) {
-          navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-              videoStream = stream;
-              video.srcObject = stream;
-              video.classList.add('active');
+        checkBtn.disabled = false;
+        checkBtn.textContent = 'Scan and check';
+        scanInstruction?.classList.add('visible');
 
-              const onReady = () => {
-                video.removeEventListener('loadedmetadata', onReady);
-                if (illustration) illustration.classList.add('hidden');
-                if (shapeOverlay) shapeOverlay.classList.add('active');
-                enterScanMode();
-              };
-              video.addEventListener('loadedmetadata', onReady);
-            })
-            .catch(() => {
-              if (scanStatus) scanStatus.textContent =
-                'Camera not available. You can still tap Scan and check to continue.';
-              enterScanMode();
-            });
-        } else {
-          if (scanStatus) scanStatus.textContent =
-            'Camera not available. You can still tap Scan and check to continue.';
-          enterScanMode();
-        }
+        isScanning = false;
         return;
       }
 
-      // PASS 1/2: run scan
-      if (isScanning || !overlay) return;
-      isScanning = true;
-
-      checkBtn.disabled = true;
-      if (scanInstruction) scanInstruction.classList.remove('visible');
-      hideScanPopups();
+      // PASS 2: success
+      setShapeGood();
       hideIssueSummary();
 
-      overlay.classList.add('active');
-      if (scanStatus) scanStatus.textContent = 'Scanning your bowl. Hold still.';
-      if (resultText) resultText.textContent = 'Checking proportions and surface.';
+      if (scanStatus) scanStatus.textContent =
+        'Your bowl looks ready for bisque firing. You can book a firing session.';
+      if (resultText) resultText.textContent =
+        'Looks good. You can refine the rim one last time if you want.';
 
-      setTimeout(() => {
-        overlay.classList.remove('active');
+      stopClayVideo();
+      isScanning = false;
 
-        // PASS 1: issues
-        if (!hasShownIssues) {
-          hasShownIssues = true;
+      scanSuccessPopup?.classList.add('show');
+      if (scanSuccessPopup) setTimeout(() => scanSuccessPopup.classList.remove('show'), 3500);
 
-          setShapeBad();
-          showIssueSummary();
+      clayIndex = claySteps.length - 2; // stay on step 8
+      updateClay();
 
-          if (scanStatus) scanStatus.textContent =
-            'We found a few areas to improve. Smooth the highlighted spots, then scan again.';
-          if (resultText) resultText.textContent =
-            'Focus on smoothing the rim and evening the wall thickness, then scan again.';
+      checkBtn.disabled = true;
+      scanInstruction?.classList.remove('visible');
+    }, 2500);
+  });
 
-          if (scanIssuesPopup) {
-            scanIssuesPopup.classList.add('show');
-            setTimeout(() => scanIssuesPopup.classList.remove('show'), 4200);
-          }
-
-          checkBtn.disabled = false;
-          checkBtn.textContent = 'Scan and check';
-          if (scanInstruction) scanInstruction.classList.add('visible');
-
-          isScanning = false;
-          return;
-        }
-
-        // PASS 2: success
-        setShapeGood();
-        hideIssueSummary();
-
-        if (scanStatus) scanStatus.textContent =
-          'Your bowl looks ready for bisque firing. You can book a firing session.';
-        if (resultText) resultText.textContent =
-          'Looks good. You can refine the rim one last time if you want.';
-
-        stopClayVideo();
-        isScanning = false;
-
-        if (scanSuccessPopup) {
-          scanSuccessPopup.classList.add('show');
-          setTimeout(() => scanSuccessPopup.classList.remove('show'), 3500);
-        }
-
-        // Stay on step 8 after success
-        clayIndex = claySteps.length - 2;
-        updateClay();
-
-        checkBtn.disabled = true;
-        if (scanInstruction) scanInstruction.classList.remove('visible');
-      }, 2500);
-    });
-  }
-
-  // initialize clay UI
   updateClay();
 
   /* =========================================================================
@@ -368,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!bisqueNav) return;
     const items = [
       ...qsa('.bisque-step-menu-item', bisqueNav),
-      ...qsa('.clay-step-menu-item', bisqueNav) // fallback (your HTML uses clay-step-menu-item)
+      ...qsa('.clay-step-menu-item', bisqueNav),
     ];
     items.forEach(el => el.classList.toggle('active', Number(el.dataset.step) === Number(stepNum)));
   }
@@ -378,7 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (bisqueNav) {
     const bisqueStepItems = [
       ...qsa('.bisque-step-menu-item', bisqueNav),
-      ...qsa('.clay-step-menu-item', bisqueNav)
+      ...qsa('.clay-step-menu-item', bisqueNav),
     ];
 
     bisqueStepItems.forEach(item => {
@@ -391,24 +367,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const mainRow = qs('.process-main', bisqueNav);
-    if (mainRow) {
-      mainRow.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showProcess('process-bisque');
-        showBisqueStep(1);
-        setBisqueMenuActive(1);
-      });
-    }
+    mainRow?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showProcess('process-bisque');
+      showBisqueStep(1);
+      setBisqueMenuActive(1);
+    });
   }
 
-  // default bisque view state (safe)
   showBisqueStep(1);
   setBisqueMenuActive(1);
 
   /* =========================================================================
    * 4) APPOINTMENT POPUP HANDLER
-   *    Bisque: submit -> popup -> auto jump to Step 2
-   *    Glaze fire: submit -> popup -> show next button (existing)
    * ========================================================================= */
   const popup     = qs('#success-popup');
   const popupText = qs('#success-popup-text'); // optional
@@ -421,225 +392,301 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const bisqueForm  = qs('#process-bisque .schedule-form');
-  const bisqueNext  = qs('#bisque-next-btn'); // may exist; we hide it
+  const bisqueNext  = qs('#bisque-next-btn');
 
-  if (bisqueForm) {
-    bisqueForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      showSuccessPopup('Appointment Made!');
+  bisqueForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    showSuccessPopup('Appointment Made!');
 
-      const submitBtn = qs('button[type="submit"]', bisqueForm);
-      if (submitBtn) {
-        submitBtn.textContent = 'appointment made';
-        submitBtn.disabled = true;
-      }
-      if (bisqueNext) bisqueNext.style.display = 'none';
+    const submitBtn = qs('button[type="submit"]', bisqueForm);
+    if (submitBtn) {
+      submitBtn.textContent = 'appointment made';
+      submitBtn.disabled = true;
+    }
+    if (bisqueNext) bisqueNext.style.display = 'none';
 
-      setTimeout(() => {
-        showProcess('process-bisque');
-        showBisqueStep(2);
-        setBisqueMenuActive(2);
-      }, 900);
-    });
-  }
+    setTimeout(() => {
+      showProcess('process-bisque');
+      showBisqueStep(2);
+      setBisqueMenuActive(2);
+    }, 900);
+  });
 
   const glazeFireForm = qs('#process-glaze-fire .schedule-form');
   const glazeNext     = qs('#glaze-next-btn');
 
-  function wireAppointmentForm(formEl, nextBtnEl) {
-    if (!formEl) return;
-    formEl.addEventListener('submit', (e) => {
-      e.preventDefault();
-      showSuccessPopup('Appointment requested');
+  glazeFireForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    showSuccessPopup('Appointment requested');
 
-      const submitBtn = qs('button[type="submit"]', formEl);
-      if (submitBtn) {
-        submitBtn.textContent = 'appointment requested';
-        submitBtn.disabled = true;
-      }
-      if (nextBtnEl) nextBtnEl.style.display = 'inline-flex';
-    });
-  }
-
-  wireAppointmentForm(glazeFireForm, glazeNext);
-
-  if (glazeNext) {
-    glazeNext.addEventListener('click', () => {
-      showProcess('process-final');
-    });
-  }
-
-// ===============================
-// PROCESS 3: Webcam -> Scan line -> Lock -> Model -> Glaze -> Fired toggle
-// ===============================
-
-const glazeVideo = document.getElementById("glaze-video");
-const glazeModel = document.getElementById("glaze-model");
-const glazeOverlay = document.getElementById("glaze-scan-overlay");
-
-const lockBtn = document.getElementById("glaze-lock-btn");
-const firedBtn = document.querySelector(".glaze-fired-btn");
-
-const sidebar = document.getElementById("sidebar-glazing");
-const glazeInputs = sidebar ? [...sidebar.querySelectorAll('input[name="glaze"]')] : [];
-const glazeTitleEl = sidebar?.querySelector(".glaze-panel-title") || null;
-const glazeDescEl  = sidebar?.querySelector(".glaze-panel-desc") || null;
-
-let glazeStream = null;
-
-const state = {
-  cameraOn: false,
-  locked: false,
-  fired: false, // toggle
-  selected: glazeInputs.find(i => i.checked)?.value || glazeInputs[0]?.value || null,
-};
-
-// ---------- UI helpers ----------
-function showScanOverlay(on) {
-  if (!glazeOverlay) return;
-  glazeOverlay.classList.toggle("active", on);
-}
-
-function showVideo(on) {
-  if (!glazeVideo) return;
-  glazeVideo.style.display = on ? "block" : "none";
-}
-
-function showModel(on) {
-  if (!glazeModel) return;
-  glazeModel.style.display = on ? "block" : "none";
-}
-
-function setHeaderFromSelected() {
-  const input = glazeInputs.find(i => i.value === state.selected);
-  if (!input) return;
-  if (glazeTitleEl) glazeTitleEl.textContent = input.dataset.title || input.value;
-  if (glazeDescEl)  glazeDescEl.textContent  = input.dataset.desc || "";
-}
-
-function hexToRgba01(hex) {
-  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  if (!m) return null;
-  return [parseInt(m[1],16)/255, parseInt(m[2],16)/255, parseInt(m[3],16)/255, 1];
-}
-
-function applyGlazeToModel() {
-  if (!glazeModel) return;
-
-  const input = glazeInputs.find(i => i.value === state.selected);
-  if (!input) return;
-
-  const color = state.fired ? input.dataset.fired : input.dataset.unfired;
-  if (!color) return;
-
-  // model-viewer: wait until GLB is loaded
-  if (!glazeModel.model) {
-    glazeModel.addEventListener("load", applyGlazeToModel, { once: true });
-    return;
-  }
-
-  const rgba = hexToRgba01(color);
-  if (!rgba) return;
-
-  // MVP: tint all materials
-  glazeModel.model.materials.forEach(mat => {
-    mat.pbrMetallicRoughness.setBaseColorFactor(rgba);
+    const submitBtn = qs('button[type="submit"]', glazeFireForm);
+    if (submitBtn) {
+      submitBtn.textContent = 'appointment requested';
+      submitBtn.disabled = true;
+    }
+    if (glazeNext) glazeNext.style.display = 'inline-flex';
   });
-}
 
-// ---------- Camera ----------
-async function startGlazeCamera() {
-  if (!glazeVideo) return;
-  if (glazeStream) return;
+  glazeNext?.addEventListener('click', () => {
+    showProcess('process-final');
+  });
 
-  glazeStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-  glazeVideo.srcObject = glazeStream;
+  /* =========================================================================
+   * 5) PROCESS 3 — GLAZING (one-tap scan + model + swatches + fired)
+   * ========================================================================= */
+  const glazingScreen = qs('#process-glazing');
 
-  // Make sure it actually shows
-  showVideo(true);
+  const glazeStepsWrap = glazingScreen ? qs('.clay-step-wrapper', glazingScreen) : null;
+  const glazeSteps     = glazingScreen ? qsa('.clay-step', glazingScreen) : [];
+  const glazePrev      = qs('#glaze-prev');
+  const glazeNextArrow = qs('#glaze-next');
 
-  // Scan animation ON while camera is ON
-  showScanOverlay(true);
+  const glazeLockBtn   = qs('#glaze-lock-btn');
+  const glazeResetBtn  = qs('#glaze-reset-btn'); // optional if you still have it
+  const glazeNote      = qs('#glaze-note');
 
-  state.cameraOn = true;
-}
+  const glazeVideo     = qs('#glaze-video');
+  const glazeOverlay   = qs('#glaze-scan-overlay');
+  const glazeModel     = qs('#glaze-model');
 
-function stopGlazeCamera() {
-  if (glazeStream) {
-    glazeStream.getTracks().forEach(t => t.stop());
-    glazeStream = null;
+  const sidebarGlazing = qs('#sidebar-glazing'); // your right column tool panel
+  const firedBtn       = sidebarGlazing ? qs('.glaze-fired-btn, #glaze-fired-btn', sidebarGlazing) : null;
+
+  // Support BOTH:
+  // A) radio inputs: input[name="glaze"][data-unfired][data-fired]
+  // B) button swatches: button.swatch[data-unfired][data-fired]
+  const glazeInputs = sidebarGlazing ? qsa('input[name="glaze"]', sidebarGlazing) : [];
+  const glazeButtons = sidebarGlazing ? qsa('button.swatch, .glaze-swatch', sidebarGlazing) : [];
+
+  let glazeStepIndex = 0;
+
+  let glazeStream = null;
+  let glazeScanTimer = null;
+
+  const glazeState = {
+    scanning: false,
+    locked: false,
+    fired: false,
+    selected: null,
+  };
+
+  function setSidebarVisible(on) {
+    if (!sidebarGlazing) return;
+    sidebarGlazing.style.display = on ? 'block' : 'none';
   }
-  if (glazeVideo) {
-    glazeVideo.srcObject = null;
-  }
 
-  // Hide camera + scan animation
-  showVideo(false);
-  showScanOverlay(false);
+  function setGlazeStep(n) {
+    if (!glazeSteps.length) return;
 
-  state.cameraOn = false;
-}
+    glazeStepIndex = clamp(n, 0, glazeSteps.length - 1);
+    const stepNum = glazeStepIndex + 1;
 
-// ---------- Main button behavior ----------
-// Click 1: open webcam + start scan line
-// Click 2: lock scan -> stop webcam -> show model -> enable glazing
-lockBtn?.addEventListener("click", async () => {
-  // If locked already, do nothing (you can add "rescan" later if you want)
-  if (state.locked) return;
+    glazeSteps.forEach((el, i) => el.classList.toggle('active', i === glazeStepIndex));
 
-  // First click: open webcam
-  if (!state.cameraOn) {
-    try {
-      await startGlazeCamera();
-      lockBtn.textContent = "lock in scan";
-      return;
-    } catch (e) {
-      console.error(e);
-      lockBtn.textContent = "camera blocked";
-      return;
+    if (glazePrev) glazePrev.disabled = glazeStepIndex === 0;
+    if (glazeNextArrow) glazeNextArrow.disabled = false;
+
+    // Only show sidebar tools on step 1
+    setSidebarVisible(stepNum === 1);
+
+    // If leaving step 1, stop camera + overlay (prevents background camera)
+    if (stepNum !== 1) {
+      stopGlazeCamera();
+      showGlazeScanOverlay(false);
     }
   }
 
-  // Second click: lock
-  state.locked = true;
-  state.fired = false;
+  function showGlazeVideo(on) {
+    if (!glazeVideo) return;
+    glazeVideo.style.display = on ? 'block' : 'none';
+  }
 
-  stopGlazeCamera();
+  function showGlazeModel(on) {
+    if (!glazeModel) return;
+    glazeModel.style.display = on ? 'block' : 'none';
+  }
 
-  // Show model in the scan window
-  showModel(true);
+  function showGlazeScanOverlay(on) {
+    if (!glazeOverlay) return;
+    glazeOverlay.classList.toggle('active', on);
+  }
 
-  // Apply initial glaze (unfired)
-  setHeaderFromSelected();
-  applyGlazeToModel();
+  async function startGlazeCamera() {
+    if (!glazeVideo) return;
+    if (glazeStream) return;
 
-  lockBtn.textContent = "scan locked";
-  lockBtn.disabled = true;
-});
+    glazeStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    glazeVideo.srcObject = glazeStream;
+    showGlazeVideo(true);
+  }
 
-// ---------- Swatches ----------
-glazeInputs.forEach(input => {
-  input.addEventListener("change", () => {
-    state.selected = input.value;
-    setHeaderFromSelected();
+  function stopGlazeCamera() {
+    if (glazeScanTimer) {
+      clearTimeout(glazeScanTimer);
+      glazeScanTimer = null;
+    }
 
-    // Only apply to model after lock (when model is visible)
-    if (state.locked) applyGlazeToModel();
+    if (glazeStream) {
+      glazeStream.getTracks().forEach(t => t.stop());
+      glazeStream = null;
+    }
+
+    if (glazeVideo) glazeVideo.srcObject = null;
+    showGlazeVideo(false);
+    glazeState.scanning = false;
+  }
+
+  function hexToRgba01(hex) {
+    const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || '');
+    if (!m) return null;
+    return [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255, 1];
+  }
+
+  function getSelectedGlazeData() {
+    // radio input route
+    const checked = glazeInputs.find(i => i.checked);
+    if (checked) {
+      return {
+        id: checked.value,
+        unfired: checked.dataset.unfired,
+        fired: checked.dataset.fired,
+      };
+    }
+
+    // button swatch route
+    const activeBtn = glazeButtons.find(b => b.classList.contains('active'));
+    if (activeBtn) {
+      return {
+        id: activeBtn.dataset.glaze || activeBtn.textContent.trim(),
+        unfired: activeBtn.dataset.unfired,
+        fired: activeBtn.dataset.fired,
+      };
+    }
+
+    return null;
+  }
+
+  function applyGlazeToModel() {
+    if (!glazeModel) return;
+    const data = getSelectedGlazeData();
+    if (!data) return;
+
+    const colorHex = glazeState.fired ? data.fired : data.unfired;
+    const rgba = hexToRgba01(colorHex);
+    if (!rgba) return;
+
+    // wait model-viewer to be ready
+    if (!glazeModel.model) {
+      glazeModel.addEventListener('load', applyGlazeToModel, { once: true });
+      return;
+    }
+
+    glazeModel.model.materials.forEach(mat => {
+      mat.pbrMetallicRoughness.setBaseColorFactor(rgba);
+    });
+  }
+
+  function lockScanAndShowModel() {
+    glazeState.scanning = false;
+    glazeState.locked = true;
+    glazeState.fired = false;
+
+    showGlazeScanOverlay(false);
+    stopGlazeCamera();
+
+    // show model in same window
+    if (glazeModel) {
+      glazeModel.setAttribute('src', 'assets/bowl-white.glb');
+      glazeModel.style.width = '100%';
+      glazeModel.style.height = '100%';
+    }
+
+    showGlazeModel(true);
+    applyGlazeToModel();
+
+    if (glazeLockBtn) {
+      glazeLockBtn.textContent = 'scan complete';
+      glazeLockBtn.disabled = true;
+    }
+  }
+
+  // Step arrows
+  glazePrev?.addEventListener('click', () => setGlazeStep(glazeStepIndex - 1));
+  glazeNextArrow?.addEventListener('click', () => setGlazeStep(glazeStepIndex + 1));
+
+  // One-tap scan (only meaningful on Step 1)
+  glazeLockBtn?.addEventListener('click', async () => {
+    const stepNum = glazeStepIndex + 1;
+    if (stepNum !== 1) return;
+    if (glazeState.locked || glazeState.scanning) return;
+
+    glazeState.scanning = true;
+
+    // during scan: show webcam, hide model
+    showGlazeModel(false);
+
+    try {
+      await startGlazeCamera();
+    } catch (e) {
+      console.error(e);
+      glazeState.scanning = false;
+      glazeLockBtn.textContent = 'camera blocked';
+      return;
+    }
+
+    showGlazeScanOverlay(true);
+    glazeLockBtn.textContent = 'scanning…';
+
+    glazeScanTimer = setTimeout(() => {
+      lockScanAndShowModel();
+    }, 1200);
   });
-});
 
-// ---------- Fired toggle ----------
-firedBtn?.addEventListener("click", () => {
-  if (!state.locked) return;
-  state.fired = !state.fired; // toggle unfired <-> fired
-  applyGlazeToModel();
-});
+  // Optional reset button support
+  glazeResetBtn?.addEventListener('click', () => {
+    glazeState.locked = false;
+    glazeState.fired = false;
 
-// ---------- Init ----------
-setHeaderFromSelected();
-showModel(false);
-showVideo(false);
-showScanOverlay(false);
+    stopGlazeCamera();
+    showGlazeScanOverlay(false);
+
+    showGlazeModel(false);
+    if (glazeModel) glazeModel.removeAttribute('src');
+
+    if (glazeLockBtn) {
+      glazeLockBtn.disabled = false;
+      glazeLockBtn.textContent = 'lock in my bowl scan';
+    }
+  });
+
+  // Swatch listeners
+  glazeInputs.forEach(input => {
+    input.addEventListener('change', () => {
+      if (glazeState.locked) applyGlazeToModel();
+    });
+  });
+
+  glazeButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      glazeButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (glazeState.locked) applyGlazeToModel();
+    });
+  });
+
+  // Fired toggle (optional)
+  firedBtn?.addEventListener('click', () => {
+    if (!glazeState.locked) return;
+    glazeState.fired = !glazeState.fired;
+    applyGlazeToModel();
+  });
+
+  // Initial glazing state
+  setGlazeStep(0);          // step 1
+  setSidebarVisible(true);  // show tools at step 1
+  showGlazeModel(false);
+  showGlazeVideo(false);
+  showGlazeScanOverlay(false);
 
   /* =========================================================================
    * 6) ONE SINGLE nav handler (no duplicates)
@@ -652,12 +699,11 @@ showScanOverlay(false);
       // leaving clay: stop camera + reset clay scan UI
       if (target !== 'process-clay') cleanupClayOverlaysAndCamera();
 
-      // leaving glazing: stop glaze camera
-      if (target !== 'process-glazing') stopGlazeVideo();
+      // leaving glazing: stop glaze camera + timers
+      if (target !== 'process-glazing') stopGlazeCamera();
 
       showProcess(target);
 
-      // defaults
       if (target === 'process-clay') updateClay();
 
       if (target === 'process-bisque') {
@@ -666,7 +712,7 @@ showScanOverlay(false);
       }
 
       if (target === 'process-glazing') {
-        setGlazeStepActive(1);
+        setGlazeStep(0);
       }
     });
   });
