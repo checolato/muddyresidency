@@ -1144,3 +1144,26 @@ header {
   gap: 24px;
   align-items: start;
 }
+
+/* Process 3: place main content in column 2, glaze panel in column 3 */
+#process-glazing.active{
+  display: contents; /* lets children participate in tutorial-shell grid */
+}
+
+/* the main body of process 3 goes in the middle column */
+#process-glazing .clay-layout{
+  grid-column: 2;
+  width: 100%;
+  max-width: none;
+}
+
+/* glaze tools live in the right column */
+#process-glazing #sidebar-glazing{
+  grid-column: 3;
+  align-self: start;
+}
+
+/* hide glaze tools unless process 3 is active */
+#process-glazing:not(.active) #sidebar-glazing{
+  display: none;
+}
