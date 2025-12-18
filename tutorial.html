@@ -12,6 +12,7 @@
     type="module"
     src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js">
   </script>
+
 </head>
 
 <body>
@@ -282,8 +283,7 @@
             </ol>
           </div>
         </section>
-
-        <!-- PROCESS 3 -->
+<!-- PROCESS 3 -->
 <section id="process-glazing" class="process-screen">
   <div class="process-header">
     <div class="process-tag">03 · glazing</div>
@@ -295,15 +295,14 @@
     <div class="scan-panel">
       <div class="scan-frame">
         <div id="glaze-scan-stage" class="scan-stage">
-          <video id="glaze-video" class="scan-video" autoplay playsinline muted style="display:none;"></video>
+          <video id="glaze-video" class="scan-video" autoplay playsinline muted></video>
 
           <model-viewer
             id="glaze-model"
             src="assets/bowl-white.glb"
             camera-controls
             interaction-prompt="none"
-            camera-orbit="0deg 75deg 3.2m"
-            style="display:none; width:100%; height:100%;">
+            camera-orbit="0deg 75deg 3.2m">
           </model-viewer>
         </div>
 
@@ -317,7 +316,7 @@
       </div>
     </div>
 
-    <!-- STEPS (under scan) -->
+    <!-- STEPS (below scan) -->
     <div class="clay-column">
       <button class="primary-btn" id="glaze-lock-btn">lock in my bowl scan</button>
 
@@ -351,8 +350,6 @@
     </div>
   </div>
 </section>
-
-
 
         <!-- PROCESS 4 -->
         <section id="process-glaze-fire" class="process-screen">
