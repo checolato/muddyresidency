@@ -4,19 +4,35 @@ html {
   font-size: 12px; /* was effectively ~14–15px */
 }
 
+html, body{
+  margin: 0;
+  padding: 0;
+}
+
+.page{
+  width: 100%;
+  max-width: none !important;   /* kill the centered max-width */
+  margin: 0 !important;
+  padding-left: 48px;   /* ← increase this */
+  padding-right: 48px;          
+}
+
 .tutorial-shell{
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr) 260px;
+  grid-template-columns: 260px 800px 200px;
   gap: 24px;
   min-height: 100vh;
+  align-items: start;
+  justify-content: start;   
 }
 
 /* left menu */
 
 .process-menu {
   border-right: 1px solid #eee;
-  padding-right: 12px;
+  padding-right: 0px;
   padding-top: 4px;
+  max-width: 240px;
 }
 
 .process-menu-title {
@@ -43,6 +59,7 @@ html {
 
 .process-nav-item:hover {
   background: #f4f4f4;
+  width: 210px;
 }
 
 /* Active tab background is applied only to the top row */
@@ -51,13 +68,14 @@ html {
   background: #111;
   color: #fff;
   border-radius: 999px;
-  padding: 6px 8px;   /* same padding as before */
+  padding: 6px 6px;   /* same padding as before */
   font-size: 12px;
+  width: 240px;
 }
 
 /* Default (non-active) tab */
 .process-main {
-  padding: 6px 8px;
+  padding: 6px 6px;
   border-radius: 999px;
   transition: background 0.2s ease;
 }
@@ -81,9 +99,9 @@ html {
 
 .process-content {
   position: relative;
-  padding: 48px 40px;
+  padding: 0px;
   min-width: 0;
-  display: flex;
+  display: block;
   justify-content: flex-start; /* keep content near the left edge of the right column */
   align-items: flex-start;
   grid-column: 2;
@@ -94,8 +112,8 @@ html {
 .process-screen {
   display: none;
   animation: fadeInProcess 0.25s ease-out;
-  min-height: 60vh;
-  max-width: 880px;
+  width: 800px;             /* hard match the grid column */
+  max-width: 800px;
   width: 100%;
 }
 
@@ -135,7 +153,7 @@ html {
 /* Right column container (grid column 3) */
 .process-sidebar{
   grid-column: 3;
-  padding: 48px 24px;
+  padding: 24px 24px;
   border-left: 1px solid #eee;
   min-width: 0;
 }
@@ -1145,11 +1163,6 @@ header {
   align-items: start;
 }
 
-/* Process 3: place main content in column 2, glaze panel in column 3 */
-#process-glazing.active{
-  display: contents; /* lets children participate in tutorial-shell grid */
-}
-
 /* the main body of process 3 goes in the middle column */
 #process-glazing .clay-layout{
   grid-column: 2;
@@ -1166,4 +1179,18 @@ header {
 /* hide glaze tools unless process 3 is active */
 #process-glazing:not(.active) #sidebar-glazing{
   display: none;
+}
+
+/* Process 3: stack scan on top, steps under it */
+#process-glazing .glazing-layout{
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 800px;      /* match your frame */
+  max-width: 100%;
+}
+
+/* Put scan first even if HTML order differs */
+#process-glazing .glazing-layout .scan-panel{
+  order: -1;
 }
