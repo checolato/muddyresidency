@@ -431,18 +431,20 @@ document.addEventListener('DOMContentLoaded', () => {
     showProcess('process-final');
   });
 
-/* =========================================================================
- * 5) PROCESS 3 — GLAZING (scan → show model → swatches only when model shows)
+  /* =========================================================================
+ * 5) PROCESS 3 — GLAZING (scan → model → swatches only when model shows)
+ *     + step arrows + menu step clicks
  * ========================================================================= */
 (() => {
   const qs = (sel, root = document) => root.querySelector(sel);
   const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const clamp = (i, min, max) => Math.max(min, Math.min(max, i));
 
+  // Process 3 screen
   const glazingScreen = qs('#process-glazing');
   if (!glazingScreen) return;
 
-  // Stepper content
+  // Inside process 3
   const glazeSteps = qsa('.clay-step', glazingScreen);
   let glazeStepIndex = 0;
 
@@ -450,21 +452,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const glazeNextArrow = qs('#glaze-next', glazingScreen);
   const glazeLockBtn = qs('#glaze-lock-btn', glazingScreen);
 
-  // Scan stage
   const glazeStage = qs('#glaze-scan-stage', glazingScreen);
   const glazeVideo = qs('#glaze-video', glazingScreen);
   const glazeOverlay = qs('#glaze-scan-overlay', glazingScreen);
   const glazeModel = qs('#glaze-model', glazingScreen);
 
-  // Swatch sidebar (may live outside process 3, so query globally)
+  // Right sidebar swatches (usually in the right column)
   const sidebarGlazing = qs('#sidebar-glazing');
 
+  // Optional fired button + swatches inside sidebar
   const firedBtn = sidebarGlazing
     ? (qs('#glaze-fired-btn', sidebarGlazing) || qs('.glaze-fired-btn', sidebarGlazing))
     : null;
 
   const glazeInputs = sidebarGlazing ? qsa('input[name="glaze"]', sidebarGlazing) : [];
   const glazeButtons = sidebarGlazing ? qsa('button.swatch, .glaze-swatch', sidebarGlazing) : [];
+
+  // Left menu (outside process 3 screen)
+  const glazingNav = qs('.process-nav-item[data-target="process-glazing"]');
+  const glazeMenuItems = glazingNav ? qsa('.clay-step-menu-item', glazingNav) : [];
+  const glazingMainRow = glazingNav ? qs('.process-main', glazingNav) : null;
 
   // State
   let glazeStream = null;
@@ -492,7 +499,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ---------------------------
-   * Scan stage sizing helpers
+   * Left menu highlight
+   * --------------------------- */
+  function setGlazeMenuActive(stepNum) {
+    glazeMenuItems.forEach(li => {
+      li.classList.toggle('active', Number(li.dataset.step) === Number(stepNum));
+    });
+  }
+
+  /* ---------------------------
+   * Stage sizing helpers
    * --------------------------- */
   function ensureStageFills() {
     if (glazeStage) {
@@ -520,7 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
     glazeOverlay.classList.toggle('active', !!on);
   }
 
-  // IMPORTANT: your CSS shows scan video only when .active
+  // IMPORTANT: your CSS shows scan video only when it has .active
   function showGlazeVideo(on) {
     if (!glazeVideo) return;
     glazeVideo.classList.toggle('active', !!on);
@@ -530,7 +546,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function showGlazeModel(on) {
     if (!glazeModel) return;
     glazeModel.style.display = on ? 'block' : 'none';
-    // swatch must track this
     syncSwatchToModel();
   }
 
@@ -613,26 +628,63 @@ document.addEventListener('DOMContentLoaded', () => {
     glazeSteps.forEach((el, i) => el.classList.toggle('active', i === glazeStepIndex));
 
     if (glazePrev) glazePrev.disabled = glazeStepIndex === 0;
-    if (glazeNextArrow) glazeNextArrow.disabled = false;
+    if (glazeNextArrow) glazeNextArrow.disabled = glazeStepIndex === glazeSteps.length - 1;
 
-    // Leaving step 1: stop camera + hide overlay
+    // If leaving step 1, stop scan overlay + camera
     if (stepNum !== 1) {
       showGlazeScanOverlay(false);
       stopGlazeCamera();
-      // optional: you can choose to hide model when leaving step 1
-      // showGlazeModel(false);
     }
 
-    // swatches depend ONLY on model visibility
+    // Sync menu highlight + swatch (swatch depends ONLY on model visibility)
+    setGlazeMenuActive(stepNum);
     syncSwatchToModel();
   }
 
-  // If you had a global ReferenceError before, this prevents it:
-  // (safe even if you don’t use it)
-  window.setGlazeStep = setGlazeStep;
+  /* ---------------------------
+   * Arrow navigation (inside process 3)
+   * --------------------------- */
+  glazePrev?.addEventListener('click', () => {
+    setGlazeStep(glazeStepIndex - 1);
+  });
 
-  glazePrev?.addEventListener('click', () => setGlazeStep(glazeStepIndex - 1));
-  glazeNextArrow?.addEventListener('click', () => setGlazeStep(glazeStepIndex + 1));
+  glazeNextArrow?.addEventListener('click', () => {
+    setGlazeStep(glazeStepIndex + 1);
+  });
+
+  /* ---------------------------
+   * Menu step clicks (left menu)
+   * --------------------------- */
+  glazeMenuItems.forEach(li => {
+    li.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation(); // critical: prevents parent nav from resetting to step 1
+      const stepNum = Number(li.dataset.step || 1);
+
+      // show the glazing screen using your existing nav system
+      // if you have a global showProcess(), use it; otherwise simulate a click on the parent item
+      if (typeof window.showProcess === 'function') {
+        window.showProcess('process-glazing');
+      } else {
+        // fallback: click the parent process item to switch screens
+        glazingNav?.click?.();
+      }
+
+      setGlazeStep(stepNum - 1);
+    });
+  });
+
+  // Clicking the main “03 glazing” row goes to Step 1
+  glazingMainRow?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof window.showProcess === 'function') {
+      window.showProcess('process-glazing');
+    } else {
+      glazingNav?.click?.();
+    }
+    setGlazeStep(0);
+  });
 
   /* ---------------------------
    * Scan → show model
@@ -644,19 +696,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     showGlazeScanOverlay(false);
     stopGlazeCamera();
-
     ensureStageFills();
 
     if (!glazeModel) return;
 
-    // Show the model box first
+    // show model and force src refresh
     showGlazeModel(true);
-
-    // Force reload src (helps if the element was previously hidden)
     glazeModel.removeAttribute('src');
     glazeModel.setAttribute('src', 'assets/bowl-white.glb');
 
-    // Wait for it to load before applying color
+    // wait for model-viewer load before applying glaze
     await new Promise((resolve) => {
       let done = false;
       const finish = () => { if (!done) { done = true; resolve(); } };
@@ -665,8 +714,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     applyGlazeToModel();
-
-    // Ensure swatch appears at the same moment as visible model
     requestAnimationFrame(syncSwatchToModel);
 
     if (glazeLockBtn) {
@@ -676,8 +723,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   glazeLockBtn?.addEventListener('click', async () => {
-    // Only meaningful on step 1
+    // Only scan on Step 1
     if ((glazeStepIndex + 1) !== 1) return;
+
+    // Prevent double tap
     if (glazeState.locked || glazeState.scanning) return;
 
     glazeState.scanning = true;
@@ -726,19 +775,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ---------------------------
-   * Safety: hide swatch when leaving process 3
-   * (works because showProcess() toggles .active on screens)
+   * Hide swatches when leaving process 3 (click-based safety)
    * --------------------------- */
-  const navItems = qsa('.process-nav-item');
-  navItems.forEach(item => {
+  qsa('.process-nav-item').forEach(item => {
     item.addEventListener('click', () => {
       const target = item.dataset.target;
       if (target !== 'process-glazing') {
-        // leaving glazing: hide swatch no matter what
         if (sidebarGlazing) sidebarGlazing.style.display = 'none';
         stopGlazeCamera();
       } else {
-        // returning: sync to model state
+        // when returning, swatches still depend on model visibility
         syncSwatchToModel();
       }
     });
@@ -749,9 +795,8 @@ document.addEventListener('DOMContentLoaded', () => {
    * --------------------------- */
   setGlazeStep(0);
 
-  // Start state
   showGlazeVideo(false);
-  showGlazeModel(false);       // this also hides swatch
+  showGlazeModel(false);
   showGlazeScanOverlay(false);
 
   if (glazeLockBtn) {
@@ -759,7 +804,7 @@ document.addEventListener('DOMContentLoaded', () => {
     glazeLockBtn.textContent = 'lock in my bowl scan';
   }
 
-  // Ensure swatch starts hidden
+  // Ensure sidebar starts hidden
   syncSwatchToModel();
 })();
 
