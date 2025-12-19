@@ -60,7 +60,7 @@
             </div>
 
             <ul class="clay-step-menu">
-              <li class="clay-step-menu-item active" data-step="1">Step 1 · firing appointment</li>
+              <li class="clay-step-menu-item" data-step="1">Step 1 · firing appointment</li>
               <li class="clay-step-menu-item" data-step="2">Step 2 · firing progress</li>
             </ul>
           </li>
@@ -73,7 +73,7 @@
             </div>
 
             <ul class="clay-step-menu">
-              <li class="clay-step-menu-item active" data-step="1">Step 1 · lock in bowl</li>
+              <li class="clay-step-menu-item" data-step="1">Step 1 · lock in bowl</li>
               <li class="clay-step-menu-item" data-step="2">Step 2 · open your set</li>
               <li class="clay-step-menu-item" data-step="3">Step 3 · build layers</li>
               <li class="clay-step-menu-item" data-step="4">Step 4 · cross strokes</li>
@@ -81,11 +81,12 @@
           </li>
 
           <!-- PROCESS 4 -->
-          <li class="process-nav-item" data-target="process-glaze-fire">
-            <div class="process-main">
-              <span class="process-index">04</span>
-              <span class="process-label">glaze firing</span>
-            </div>
+          <li class="process-nav-item process-nav-item--has-steps" data-target="process-glaze-firing">
+          <div class="process-main">04 glaze firing</div>
+          <ul class="clay-step-menu">
+            <li class="clay-step-menu-item" data-step="1">Step 1 · firing appointment</li>
+            <li class="clay-step-menu-item" data-step="2">Step 2 · firing progress</li>
+          </ul>
           </li>
 
           <!-- PROCESS 5 -->
@@ -271,16 +272,68 @@
           </div>
 
           <div id="bisque-step-2" style="display:none; max-width:520px;">
-            <ol id="bisque-timeline" style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px;">
-              <li class="timeline-item is-active"><div style="font-weight:600;">Appointment made</div><div style="font-size:12px; opacity:.8;">We’ve received your request.</div></li>
-              <li class="timeline-item"><div style="font-weight:600;">Pickup on the way</div><div style="font-size:12px; opacity:.8;">A courier is heading to your address.</div></li>
-              <li class="timeline-item"><div style="font-weight:600;">Picked up</div><div style="font-size:12px; opacity:.8;">Your piece is safely collected.</div></li>
-              <li class="timeline-item"><div style="font-weight:600;">Delivering to studio</div><div style="font-size:12px; opacity:.8;">Transporting to the kiln site.</div></li>
-              <li class="timeline-item"><div style="font-weight:600;">Firing</div><div style="font-size:12px; opacity:.8;">In the kiln now.</div></li>
-              <li class="timeline-item"><div style="font-weight:600;">Firing finished</div><div style="font-size:12px; opacity:.8;">Cooling + ready to move.</div></li>
-              <li class="timeline-item"><div style="font-weight:600;">Waiting to come home</div><div style="font-size:12px; opacity:.8;">Queued for return delivery.</div></li>
-              <li class="timeline-item"><div style="font-weight:600;">Delivered back home</div><div style="font-size:12px; opacity:.8;">Your bisque piece is back with you.</div></li>
-            </ol>
+          <ol id="bisque-timeline" class="v-timeline">
+            <li class="v-tl-item is-active" data-stage="appointment">
+              <div class="v-tl-time"><div class="v-tl-date" data-date></div></div>
+              <div class="v-tl-marker" aria-hidden="true"></div>
+              <div class="v-tl-content">
+                <div class="v-tl-title">Appointment made</div>
+                <div class="v-tl-desc">We’ve received your request.</div>
+                <div class="v-tl-confirm" data-confirm></div>
+              </div>
+            </li>
+
+            <li class="v-tl-item" data-stage="pickup">
+              <div class="v-tl-time"><div class="v-tl-date" data-date></div></div>
+              <div class="v-tl-marker" aria-hidden="true"></div>
+              <div class="v-tl-content">
+                <div class="v-tl-title">Pickup on the way</div>
+                <div class="v-tl-desc">A courier is heading to your address.</div>
+                <div class="v-tl-confirm" data-confirm></div>
+              </div>
+            </li>
+
+            <li class="v-tl-item" data-stage="picked">
+              <div class="v-tl-time"><div class="v-tl-date" data-date></div></div>
+              <div class="v-tl-marker" aria-hidden="true"></div>
+              <div class="v-tl-content">
+                <div class="v-tl-title">Picked up</div>
+                <div class="v-tl-desc">Your piece is safely collected.</div>
+                <div class="v-tl-confirm" data-confirm></div>
+              </div>
+            </li>
+
+            <li class="v-tl-item" data-stage="deliver">
+              <div class="v-tl-time"><div class="v-tl-date" data-date></div></div>
+              <div class="v-tl-marker" aria-hidden="true"></div>
+              <div class="v-tl-content">
+                <div class="v-tl-title">Delivering to studio</div>
+                <div class="v-tl-desc">Transporting to the kiln site.</div>
+                <div class="v-tl-confirm" data-confirm></div>
+              </div>
+            </li>
+
+            <li class="v-tl-item" data-stage="firing">
+              <div class="v-tl-time"><div class="v-tl-date" data-date></div></div>
+              <div class="v-tl-marker" aria-hidden="true"></div>
+              <div class="v-tl-content">
+                <div class="v-tl-title">Firing</div>
+                <div class="v-tl-desc">In the kiln now.</div>
+                <div class="v-tl-confirm" data-confirm></div>
+              </div>
+            </li>
+
+            <li class="v-tl-item" data-stage="done">
+              <div class="v-tl-time"><div class="v-tl-date" data-date></div></div>
+              <div class="v-tl-marker" aria-hidden="true"></div>
+              <div class="v-tl-content">
+                <div class="v-tl-title">Ready for glazing</div>
+                <div class="v-tl-desc">Bisque firing finished. You can glaze next.</div>
+                <div class="v-tl-confirm" data-confirm></div>
+              </div>
+            </li>
+          </ol>
+
           </div>
         </section>
 <!-- PROCESS 3 -->
@@ -351,71 +404,192 @@
   </div>
 </section>
 
-        <!-- PROCESS 4 -->
-        <section id="process-glaze-fire" class="process-screen">
-          <div class="process-header">
-            <div class="process-tag">04 · glaze fire</div>
-            <h1>Glaze firing schedule</h1>
-          </div>
+<!-- PROCESS 4 -->
+<section id="process-glaze-firing" class="process-screen">
+  <div class="process-header">
+    <div class="process-tag">04 · glaze firing</div>
+    <h1>Glaze firing</h1>
+  </div>
 
-          <p class="body-text" style="font-size:13px; max-width:520px; margin:0 0 16px;">
-            Book a firing session for your bowl. The best time will probably be about 3 days after you finish glazing.
-          </p>
+  <!-- Step 1: form (same look as Process 2) -->
+  <div id="glaze-firing-step-1">
+    <form id="glaze-firing-form" class="schedule-form"
+      style="font-size:13px; max-width:380px; display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
 
-          <form class="schedule-form"
-            style="font-size:13px; max-width:380px; display:flex; flex-direction:column; gap:10px; margin-bottom:24px;">
-            <label>Studio
-              <select style="width:100%; padding:6px; margin-top:4px;">
-                <option>Local Studio A</option>
-                <option>Community Kiln B</option>
-                <option>Pottery Cafe C</option>
-              </select>
-            </label>
+      <label>Name
+        <textarea rows="1" style="width:100%; padding:6px; margin-top:4px; resize:vertical;"></textarea>
+      </label>
 
-            <label>Preferred date
-              <input type="date" style="width:100%; padding:6px; margin-top:4px;" />
-            </label>
+      <label>Pickup Address
+        <textarea rows="1" style="width:100%; padding:6px; margin-top:4px; resize:vertical;"></textarea>
+      </label>
 
-            <label>Preferred time
-              <input type="time" style="width:100%; padding:6px; margin-top:4px;" />
-            </label>
+      <label>Phone
+        <textarea rows="1" style="width:100%; padding:6px; margin-top:4px; resize:vertical;"></textarea>
+      </label>
 
-            <label>Notes for the studio (optional)
-              <textarea rows="3" style="width:100%; padding:6px; margin-top:4px; resize:vertical;"
-                placeholder="Number of pieces, clay body, any special requests…"></textarea>
-            </label>
+      <label>Studio
+        <select style="width:100%; padding:6px; margin-top:4px;">
+          <option>Local Studio A</option>
+          <option>Community Kiln B</option>
+          <option>Pottery Cafe C</option>
+        </select>
+      </label>
 
-            <button type="submit" class="primary-btn" style="align-self:flex-start;">
-              request glaze firing
-            </button>
+      <label>Preferred date
+        <input type="date" style="width:100%; padding:6px; margin-top:4px;" />
+      </label>
 
-            <button type="button" id="glaze-next-btn" class="secondary-btn" style="display:none; margin-top:10px;">
-              Next step →
-            </button>
-          </form>
-        </section>
+      <label>Preferred time
+        <input type="time" style="width:100%; padding:6px; margin-top:4px;" />
+      </label>
 
-        <!-- PROCESS 5 -->
-        <section id="process-final" class="process-screen">
-          <div class="process-header">
-            <div class="process-tag">05 · receive the final piece</div>
-            <h1>Bringing the bowl back home</h1>
-          </div>
+      <label>Notes for the studio (optional)
+        <textarea rows="3" style="width:100%; padding:6px; margin-top:4px; resize:vertical;"
+          placeholder="Glaze name, cone, special requests…"></textarea>
+      </label>
 
-          <p class="body-text">
-            Pick up your finished bowl from the studio and bring it back into your everyday routine — on your desk, in your
-            kitchen, or wherever you want a quiet reminder of the making process.
-          </p>
+      <button type="submit" class="primary-btn" style="align-self:flex-start;">
+        request glaze firing
+      </button>
+    </form>
+  </div>
 
-          <p class="body-text">
-            Over time, Glaze Diary could store a record of each piece you fire: clay body, glaze, firing notes, and photos
-            from daily use.
-          </p>
+  <!-- Step 2: timeline (same vertical dots/line system you built for Process 2) -->
+  <div id="glaze-firing-step-2" style="display:none; max-width:520px;">
+    <ol id="glaze-firing-timeline" class="v-timeline">
+      <li class="v-tl-item is-active" data-stage="appointment">
+        <div class="v-tl-time"><div class="v-tl-date" data-date></div></div>
+        <div class="v-tl-marker" aria-hidden="true"></div>
+        <div class="v-tl-content">
+          <div class="v-tl-title">Appointment made</div>
+          <div class="v-tl-desc">We’ve received your request.</div>
+          <div class="v-tl-confirm" data-confirm></div>
+        </div>
+      </li>
 
-          <p class="small-note">
-            You can return to any step from the menu on the left if you want to revisit the process.
-          </p>
-        </section>
+      <li class="v-tl-item" data-stage="dropoff">
+        <div class="v-tl-time"><div class="v-tl-date" data-date></div></div>
+        <div class="v-tl-marker" aria-hidden="true"></div>
+        <div class="v-tl-content">
+          <div class="v-tl-title">Dropped off</div>
+          <div class="v-tl-desc">Your piece is at the kiln site.</div>
+          <div class="v-tl-confirm" data-confirm></div>
+        </div>
+      </li>
+
+      <li class="v-tl-item" data-stage="firing">
+        <div class="v-tl-time"><div class="v-tl-date" data-date></div></div>
+        <div class="v-tl-marker" aria-hidden="true"></div>
+        <div class="v-tl-content">
+          <div class="v-tl-title">Firing</div>
+          <div class="v-tl-desc">In the kiln now.</div>
+          <div class="v-tl-confirm" data-confirm></div>
+        </div>
+      </li>
+
+      <li class="v-tl-item" data-stage="cooldown">
+        <div class="v-tl-time"><div class="v-tl-date" data-date></div></div>
+        <div class="v-tl-marker" aria-hidden="true"></div>
+        <div class="v-tl-content">
+          <div class="v-tl-title">Cooling down</div>
+          <div class="v-tl-desc">Waiting for safe opening temperature.</div>
+          <div class="v-tl-confirm" data-confirm></div>
+        </div>
+      </li>
+
+      <li class="v-tl-item" data-stage="done">
+        <div class="v-tl-time"><div class="v-tl-date" data-date></div></div>
+        <div class="v-tl-marker" aria-hidden="true"></div>
+        <div class="v-tl-content">
+          <div class="v-tl-title">Ready for pickup</div>
+          <div class="v-tl-desc">Glaze firing finished.</div>
+          <div class="v-tl-confirm" data-confirm></div>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- PROCESS 5 -->
+<section id="process-final" class="process-screen">
+  <div class="process-header">
+    <div class="process-tag">05 · final piece</div>
+    <h1>Your piece is on the way</h1>
+  </div>
+
+  <!-- SAME 3-column pattern: left menu | 800px content | right sidebar -->
+  <div class="glazing-layout final-layout">
+    <!-- MIDDLE: reuse scan window -->
+    <div class="scan-panel">
+      <div class="scan-frame">
+        <div class="scan-stage" id="final-stage">
+          <!-- Final image in scan stage -->
+          <img
+            id="final-piece-img"
+            src="assets/pinkbowl.png"
+            alt="Finished bowl"
+            class="final-scan-img"
+          />
+        </div>
+
+        <!-- optional small label (like scan instruction) -->
+        <div class="scan-instruction" id="final-instruction">
+          Final preview — expect pickup confirmation after glaze firing cooldown.
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: summary sidebar (same vibe as glaze swatches) -->
+    <aside id="sidebar-final" class="glaze-sidebar">
+      <div class="glaze-title" id="final-piece-title">Speckled Field</div>
+      <div class="glaze-desc" id="final-piece-desc">
+        Your bowl will be ready after firing + cooldown. Here’s your status.
+      </div>
+
+      <div class="final-summary">
+        <div class="final-row">
+          <div class="final-label">Bisque firing</div>
+          <div class="final-value" id="final-bisque-status">—</div>
+        </div>
+
+        <div class="final-row">
+          <div class="final-label">Glaze</div>
+          <div class="final-value" id="final-glaze-status">—</div>
+        </div>
+
+        <div class="final-row">
+          <div class="final-label">Glaze firing</div>
+          <div class="final-value" id="final-glaze-firing-status">—</div>
+        </div>
+
+        <div class="final-row">
+          <div class="final-label">Estimated ready</div>
+          <div class="final-value" id="final-ready-date">—</div>
+        </div>
+      </div>
+
+      <div class="final-divider"></div>
+
+      <div class="final-next">
+        <div class="final-smalltitle">What happens next</div>
+        <ul class="final-bullets">
+          <li>Cooldown (24–48h)</li>
+          <li>Studio quality check</li>
+          <li>Pickup confirmation message</li>
+        </ul>
+      </div>
+
+      <div class="final-actions">
+        <button class="primary-btn" id="final-back-to-glaze">review glaze</button>
+        <button class="secondary-btn" id="final-restart">start a new bowl</button>
+      </div>
+    </aside>
+  </div>
+</section>
+
+
+
       </main>
 
                 <!-- RIGHT: glaze tools (ONLY inside process 3) -->

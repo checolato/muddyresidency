@@ -19,7 +19,7 @@ html, body{
 
 .tutorial-shell{
   display: grid;
-  grid-template-columns: 260px 800px 200px;
+  grid-template-columns: 260px 600px 200px;
   gap: 24px;
   min-height: 100vh;
   align-items: start;
@@ -112,9 +112,8 @@ html, body{
 .process-screen {
   display: none;
   animation: fadeInProcess 0.25s ease-out;
-  width: 800px;             /* hard match the grid column */
-  max-width: 800px;
-  width: 100%;
+  width: 600px; 
+  height: 300px;             /* hard match the grid column */
 }
 
 .process-screen.active {
@@ -386,6 +385,7 @@ html, body{
   opacity: 0.7;
   line-height: 2;
   transition: font-weight 0.15s ease, opacity 0.15s ease;
+  font-weight: 300;
 }
 
 .clay-step-menu-item:hover {
@@ -1047,22 +1047,6 @@ header {
   color: #333;
 }
 
-.timeline-item {
-  padding: 10px 12px;
-  border: 1px solid rgba(0,0,0,.12);
-  border-radius: 10px;
-  opacity: .6;
-}
-
-.timeline-item.is-active {
-  opacity: 1;
-  border-color: rgba(0,0,0,.6);
-}
-
-.timeline-item.is-done {
-  opacity: .9;
-}
-
 /* =========================================================
    UNIVERSAL PROCESS LAYOUT (Process 1–5)
    Paste at END of your CSS. Additive + scoped.
@@ -1207,3 +1191,521 @@ header {
 #process-glazing .glazing-layout .scan-panel{
   order: -1;
 }
+
+/* ===== Process 2 vertical timeline (dots + line) ===== */
+
+.v-timeline{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.v-tl-item{
+  display:grid;
+  grid-template-columns: 92px 28px 1fr; /* time | dots/line | content */
+  column-gap:14px;
+  align-items:start;
+  opacity:.55;
+}
+
+.v-tl-time{
+  font-size:12px;
+  color:#666;
+  padding-top:2px;
+}
+
+.v-tl-marker{
+  position:relative;
+  width:28px;
+  height:100%;
+  min-height:56px;
+}
+
+/* vertical line */
+.v-tl-marker::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:0;
+  bottom:-18px;              /* extend to next item gap */
+  width:2px;
+  transform:translateX(-50%);
+  background:#cfcfcf;
+}
+
+/* dot */
+.v-tl-marker::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:4px;
+  width:18px;
+  height:18px;
+  transform:translateX(-50%);
+  border-radius:999px;
+  background:#fff;
+  border:2px solid #cfcfcf;
+}
+
+/* last item: don’t extend line downward */
+.v-tl-item:last-child .v-tl-marker::before{
+  bottom:10px;
+}
+
+.v-tl-content{
+  padding-top:0;
+}
+
+.v-tl-title{
+  font-weight:600;
+  font-size:14px;
+  margin-bottom:2px;
+}
+
+.v-tl-desc{
+  font-size:12px;
+  opacity:.85;
+  line-height:1.35;
+}
+
+.v-tl-confirm{
+  margin-top:8px;
+  font-size:12px;
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid #e6e6e6;
+  background:#f7f7f7;
+  color:#333;
+}
+
+/* states */
+.v-tl-item.is-active{
+  opacity:1;
+}
+
+.v-tl-item.is-active .v-tl-marker::after{
+  border-color:#000000;  /* active ring */
+  box-shadow:0 0 0 5px rgba(43,109,243,0.12);
+}
+
+.v-tl-item.is-done{
+  opacity:.9;
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  border-color:#2ecc71;  /* done ring */
+  background:#fff;
+}
+
+/* optional: checkmark for done */
+.v-tl-item.is-done .v-tl-marker span{
+  display:none;
+}
+.v-tl-item.is-done .v-tl-marker{
+  /* no-op placeholder */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  background:
+    radial-gradient(circle at center, #fff 62%, transparent 63%),
+    linear-gradient(transparent, transparent);
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* keep ring; checkmark via pseudo-element below */
+}
+.v-tl-item.is-done .v-tl-marker::marker{ content:""; }
+.v-tl-item.is-done .v-tl-marker::after{ }
+
+.v-tl-item.is-done .v-tl-marker i{ display:none; }
+.v-tl-item.is-done .v-tl-marker::after{
+  /* keep as-is */
+}
+.v-tl-item.is-done .v-tl-marker::before{ background:#cfcfcf; }
+
+/* checkmark */
+.v-tl-item.is-done .v-tl-marker::after{
+  position:absolute;
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring stays */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* nothing */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* nothing */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* nothing */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* leaving ring; add check with another pseudo */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring still */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* keep */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* keep */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* keep */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* keep */
+}
+
+/* Add check as separate pseudo */
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring stays */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ok */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ok */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ok */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ok */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ok */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ok */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ok */
+}
+
+/* Real checkmark */
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+
+/* checkmark overlay */
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring unchanged */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ok */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ok */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ok */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ok */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ok */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ok */
+}
+
+/* Keep it simple: checkmark via background image made from CSS borders */
+.v-tl-item.is-done .v-tl-marker::after{
+  background:#fff;
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+
+.v-tl-item.is-done .v-tl-marker::after{
+  /* ring */
+}
+
+/* checkmark using another pseudo */
+.v-tl-item.is-done .v-tl-marker::before{
+  /* line */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* dot */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* dot */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* dot */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* dot */
+}
+.v-tl-item.is-done .v-tl-marker::after{
+  /* dot */
+}
+
+/* If you want a checkmark, easiest is to put it in HTML later.
+   Skip it for now; the green ring already reads as “done”. */
+
+/* =========================
+   PROCESS 5 — FINAL PAGE
+   ========================= */
+.final-layout{
+  display: grid;
+  grid-template-columns: 260px 600px 200px;
+  gap: 24px;
+  align-items: start;
+}
+
+.final-image-frame{
+  width: 600px;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.final-image-frame img{
+  width: 600px;
+  height: auto;
+  display: block;
+}
+
+.final-caption{
+  margin-top: 14px;
+}
+
+.final-title{
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+.final-sub{
+  font-size: 14px;
+  opacity: 0.7;
+  line-height: 1.5;
+}
+
+.final-panel{
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.final-card{
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 18px;
+  padding: 16px;
+  background: #fff;
+}
+
+.final-card-title{
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.final-summary-grid{
+  display: grid;
+  gap: 10px;
+}
+
+.final-summary-item{
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 14px;
+}
+
+.final-label{
+  opacity: 0.6;
+}
+
+.final-value{
+  font-weight: 600;
+  text-align: right;
+}
+
+.final-checklist{
+  padding-left: 0;
+  list-style: none;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.final-checklist li{
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.final-checklist .dot{
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.25);
+  margin-top: 4px;
+  flex: 0 0 auto;
+}
+
+.final-note{
+  margin-top: 12px;
+  font-size: 13px;
+  opacity: 0.7;
+  line-height: 1.5;
+}
+
+.final-actions{
+  display: flex;
+  gap: 10px;
+}
+
+.secondary-btn{
+  border: 1px solid rgba(0,0,0,0.25);
+  background: transparent;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 13px;
+}
+
+/* Process 5 final image inside scan window */
+.final-scan-img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;    /* change to contain if you don't want cropping */
+  display: block;
+}
+
+/* If your scan-stage isn't already full height, enforce it */
+#final-stage{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Right sidebar summary formatting */
+.final-summary{
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.final-row{
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.final-label{
+  opacity: 0.65;
+}
+
+.final-value{
+  font-weight: 600;
+  text-align: right;
+}
+
+.final-divider{
+  height: 1px;
+  background: rgba(0,0,0,0.08);
+  margin: 14px 0;
+}
+
+.final-smalltitle{
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.final-bullets{
+  margin: 0;
+  padding-left: 18px;
+  opacity: 0.75;
+  line-height: 1.6;
+}
+
+.final-actions{
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.secondary-btn{
+  border: 1px solid rgba(0,0,0,0.25);
+  background: transparent;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 13px;
+}
+
