@@ -881,122 +881,224 @@ document.addEventListener('DOMContentLoaded', () => {
   })();
 
   /* =========================================================================
-   * ONE SINGLE nav handler (no duplicates)
-   * ========================================================================= */
-  navItems.forEach(item => {
-    item.addEventListener('click', (e) => {
-      // If user clicks a sub-step row, that row's handler will call showProcess + setOnlyOneActiveStep
-      // We still allow the main process click to switch screens.
-      const target = item.dataset.target;
-      if (!target) return;
-
-      // leaving clay: stop camera + reset
-      if (target !== 'process-clay') cleanupClayOverlaysAndCamera();
-
-      // leaving glazing: stop glaze camera
-      if (target !== 'process-glazing') window.stopGlazeCamera?.();
-
-      showProcess(target);
-
-      // default step highlight when switching process by clicking the main process row
-      // (Sub-step clicks will override this immediately)
-      setOnlyOneActiveStep(target, 1);
-
-      if (target === 'process-clay') updateClay();
-      if (target === 'process-bisque') window.showBisqueStep?.(1);
-      if (target === 'process-glazing') window.setGlazeStep?.(0);
-      if (target === 'process-glaze-firing') window.showGlazeFiringStep?.(1);
-    });
-  
-/* =========================================================================
- * PROCESS 5 — FINAL (scan window image + right sidebar summary)
+ * ONE SINGLE nav handler (no duplicates)
  * ========================================================================= */
+navItems.forEach(item => {
+  item.addEventListener('click', (e) => {
+    const target = item.dataset.target;
+    if (!target) return;
+
+    // leaving clay: stop camera + reset
+    if (target !== 'process-clay') cleanupClayOverlaysAndCamera();
+
+    // leaving glazing: stop glaze camera
+    if (target !== 'process-glazing') window.stopGlazeCamera?.();
+
+    showProcess(target);
+
+    // default step highlight when switching process by clicking the main process row
+    setOnlyOneActiveStep(target, 1);
+
+    if (target === 'process-clay') updateClay();
+    if (target === 'process-bisque') window.showBisqueStep?.(1);
+    if (target === 'process-glazing') window.setGlazeStep?.(0);
+    if (target === 'process-glaze-firing') window.showGlazeFiringStep?.(1);
+  });
+}); // ✅ IMPORTANT: closes forEach
+
+// =========================
+// PROCESS 5 — FINAL PIECE
+// upload + camera + preview
+// =========================
 (() => {
-  const screen = document.querySelector('#process-final');
-  if (!screen) return;
+  const finalFile = document.getElementById("final-file");
+  const finalCamera = document.getElementById("final-camera");
+  const takeBtn = document.getElementById("final-take-btn");
 
-  const sidebar = document.querySelector('#sidebar-final');
-  const bisqueEl = screen.querySelector('#final-bisque-status');
-  const glazeEl = screen.querySelector('#final-glaze-status');
-  const glazeFiringEl = screen.querySelector('#final-glaze-firing-status');
-  const readyEl = screen.querySelector('#final-ready-date');
+  const preview = document.getElementById("final-preview");
+  const previewFrame = document.getElementById("final-preview-frame");
+  const emptyState = document.getElementById("final-empty-state");
+  const fileNameEl = document.getElementById("final-file-name");
 
-  const btnBack = screen.querySelector('#final-back-to-glaze');
-  const btnRestart = screen.querySelector('#final-restart');
+  if (!finalFile || !finalCamera || !takeBtn || !preview || !previewFrame) return;
 
-  const pad2 = (n) => String(n).padStart(2, '0');
-  const fmt = (d) => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
-  const addDays = (date, days) => { const x = new Date(date); x.setDate(x.getDate()+days); return x; };
+  let currentObjectUrl = null;
 
-  const readJSON = (k) => {
-    try { return JSON.parse(localStorage.getItem(k) || '{}'); } catch { return {}; }
-  };
-
-  function getSelectedGlazeName() {
-    const glazeSidebar = document.querySelector('#sidebar-glazing');
-    if (!glazeSidebar) return null;
-
-    const checked = glazeSidebar.querySelector('input[name="glaze"]:checked');
-    if (checked) return checked.value || checked.dataset.name || checked.dataset.label || null;
-
-    const activeBtn = glazeSidebar.querySelector('button.swatch.active, .glaze-swatch.active');
-    if (activeBtn) return activeBtn.textContent.trim() || activeBtn.dataset.name || null;
-
-    return null;
+  function showFileName(name) {
+    if (!fileNameEl) return;
+    fileNameEl.textContent = name || "";
+    fileNameEl.style.display = name ? "block" : "none";
   }
 
-  function renderSummary() {
-    const bisque = readJSON('bisqueTimelineState_v1');
-    const glazeFiring = readJSON('glazeFiringTimelineState_v1');
+  function showPreview(file) {
+    if (!file) return;
 
-    bisqueEl.textContent = bisque.baseDate ? 'Requested' : 'Not started';
-    glazeFiringEl.textContent = glazeFiring.baseDate ? 'Requested' : 'Not started';
+    if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+    currentObjectUrl = URL.createObjectURL(file);
 
-    const glazeName = getSelectedGlazeName();
-    glazeEl.textContent = glazeName || '—';
-
-    if (glazeFiring.baseDate) {
-      readyEl.textContent = fmt(addDays(new Date(glazeFiring.baseDate), 6));
-    } else if (bisque.baseDate) {
-      readyEl.textContent = fmt(addDays(new Date(bisque.baseDate), 7));
-    } else {
-      readyEl.textContent = '—';
-    }
+    preview.src = currentObjectUrl;
+    previewFrame.classList.remove("hidden");
+    emptyState?.classList.add("hidden");
+    showFileName(file.name);
   }
 
-  // Show sidebar only when Process 5 is active
-  const nav = document.querySelector('.process-nav-item[data-target="process-final"]');
-  nav?.addEventListener('click', () => {
-    sidebar && (sidebar.style.display = 'block');
-    setTimeout(renderSummary, 0);
-  });
+  finalFile.addEventListener("change", (e) => showPreview(e.target.files?.[0]));
+  finalCamera.addEventListener("change", (e) => showPreview(e.target.files?.[0]));
 
-  // Hide final sidebar when leaving process 5
-  document.querySelectorAll('.process-nav-item').forEach(item => {
-    item.addEventListener('click', () => {
-      const target = item.dataset.target;
-      if (target !== 'process-final') sidebar && (sidebar.style.display = 'none');
-    });
-  });
-
-  btnBack?.addEventListener('click', () => {
-    window.showProcess?.('process-glazing');
-    window.setGlazeStep?.(0);
-  });
-
-  btnRestart?.addEventListener('click', () => {
-    localStorage.removeItem('bisqueTimelineState_v1');
-    localStorage.removeItem('glazeFiringTimelineState_v1');
-    window.showProcess?.('process-clay');
-  });
-
-  renderSummary();
+  takeBtn.addEventListener("click", () => finalCamera.click());
 })();
 
+// =========================
+// Process 5 — Share popup
+// =========================
+const shareBtn = document.getElementById('final-share-btn');
+const noteBox = document.getElementById('final-note');
+const previewImgEl = document.getElementById('final-preview'); // <-- get element safely
 
+function openCongratsPopup({ imgSrc, noteText }) {
+  const existing = document.getElementById('final-congrats-overlay');
+  if (existing) existing.remove();
+
+  if (!document.getElementById('final-congrats-style')) {
+    const style = document.createElement('style');
+    style.id = 'final-congrats-style';
+    style.textContent = `
+      #final-congrats-overlay{
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.35);
+        display: grid; place-items: center;
+        z-index: 9999;
+        padding: 24px;
+      }
+      #final-congrats-modal{
+        width: min(520px, 92vw);
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+        overflow: hidden;
+      }
+      #final-congrats-body{
+        padding: 18px 18px 18px;
+        display: grid;
+        gap: 12px;
+      }
+      #final-congrats-title{
+        font-size: 18px;
+        margin: 0;
+      }
+      #final-congrats-img{
+        width: 100%;
+        aspect-ratio: 5 / 3;
+        object-fit: cover;
+        border-radius: 12px;
+        background: #f6f6f6;
+        border: 1px solid #eee;
+      }
+      #final-congrats-note{
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.6;
+        opacity: 0.85;
+        white-space: pre-wrap;
+      }
+      #final-congrats-actions{
+        display: flex;
+        justify-content: flex-end;
+        padding: 0 18px 18px;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  const overlay = document.createElement('div');
+  overlay.id = 'final-congrats-overlay';
+
+  const modal = document.createElement('div');
+  modal.id = 'final-congrats-modal';
+
+  // prevent user text from breaking HTML if it contains < >
+  const safeNote = (noteText || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  modal.innerHTML = `
+    <div id="final-congrats-body">
+      <h3 id="final-congrats-title">Congratulations! Thanks for sharing your final piece with the community.</h3>
+      <img id="final-congrats-img" src="${imgSrc}" alt="Uploaded piece">
+      <p id="final-congrats-note">${safeNote || 'It is my first piece. So Excited!'}</p>
+    </div>
+    <div id="final-congrats-actions">
+      <button type="button" class="primary-btn" id="final-congrats-close-btn">Exit Tutorial</button>
+    </div>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  const exitTutorial = () => {
+  overlay.remove();
+  window.location.href = 'index.html'; // your homepage file
+};
+
+modal.querySelector('#final-congrats-close-btn')?.addEventListener('click', exitTutorial);
+
+
+  const onKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      close();
+      window.removeEventListener('keydown', onKeyDown);
+    }
+  };
+  window.addEventListener('keydown', onKeyDown);
+}
+
+if (shareBtn) {
+  shareBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    const hasUserImg =
+      previewImgEl &&
+      previewImgEl.getAttribute('src') &&
+      previewImgEl.style.display !== 'none';
+
+    const imgSrc = hasUserImg ? previewImgEl.getAttribute('src') : 'assets/upload.png';
+    const noteText = noteBox ? noteBox.value.trim() : '';
+
+    openCongratsPopup({ imgSrc, noteText });
   });
 
-  // final: ensure current view has only one active step
-  // if clay is default:
-  setOnlyOneActiveStep('process-clay', clayIndex + 1);
+  const ribbonLayer = document.createElement('div');
+ribbonLayer.className = 'final-ribbon-layer';
+overlay.appendChild(ribbonLayer);
+
+function launchRibbons(){
+  const colors = ['#E8CFC3', '#F2B8A2', '#E6D9C6', '#C9B8A6'];
+
+  const count = 24; // calm, not overwhelming
+
+  for(let i = 0; i < count; i++){
+    const ribbon = document.createElement('div');
+    ribbon.className = 'ribbon';
+
+    const left = Math.random() * 100;
+    const delay = Math.random() * 0.6;
+    const duration = 2 + Math.random() * 1;
+
+    ribbon.style.left = `${left}vw`;
+    ribbon.style.background = colors[Math.floor(Math.random() * colors.length)];
+    ribbon.style.animationDelay = `${delay}s`;
+    ribbon.style.animationDuration = `${duration}s`;
+
+    ribbonLayer.appendChild(ribbon);
+
+    // cleanup
+    setTimeout(() => ribbon.remove(), (duration + delay) * 1000);
+  }
+
+  // remove whole layer after animation
+  setTimeout(() => ribbonLayer.remove(), 4000);
+}
+
+launchRibbons();
+
+}
+
 });

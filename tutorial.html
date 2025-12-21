@@ -515,76 +515,76 @@
 <section id="process-final" class="process-screen">
   <div class="process-header">
     <div class="process-tag">05 · final piece</div>
-    <h1>Your piece is on the way</h1>
+    <h1>Share your bowl</h1>
   </div>
 
-  <!-- SAME 3-column pattern: left menu | 800px content | right sidebar -->
-  <div class="glazing-layout final-layout">
-    <!-- MIDDLE: reuse scan window -->
+  <div class="process-body final-layout">
+    <!-- SCREEN PANEL (always visible) -->
     <div class="scan-panel">
       <div class="scan-frame">
         <div class="scan-stage" id="final-stage">
-          <!-- Final image in scan stage -->
-          <img
-            id="final-piece-img"
-            src="assets/pinkbowl.png"
-            alt="Finished bowl"
-            class="final-scan-img"
-          />
-        </div>
+          <!-- This is the fixed preview panel area -->
+          <div class="final-preview-frame" id="final-preview-frame">
+            <!-- Image preview (JS will show after upload) -->
+            <img id="final-preview" alt="Final piece preview" />
 
-        <!-- optional small label (like scan instruction) -->
-        <div class="scan-instruction" id="final-instruction">
-          Final preview — expect pickup confirmation after glaze firing cooldown.
+            <!-- Centered empty state: text ABOVE buttons (no overlap) -->
+            <div class="final-empty-state" id="final-empty-state">
+              <div class="final-preview-placeholder">
+                Upload a photo to preview it here.
+              </div>
+
+              <div class="final-upload-actions">
+                <!-- Hidden real file input -->
+                <input
+                  id="final-file"
+                  class="final-file-hidden"
+                  type="file"
+                  accept="image/*"
+                />
+                <!-- Visible pill button -->
+                <label for="final-file" class="primary-btn final-pill-btn">
+                  choose file
+                </label>
+
+                <!-- Hidden real camera input -->
+                <input
+                  id="final-camera"
+                  class="final-file-hidden"
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                />
+                <!-- Visible pill button -->
+                <button type="button" class="primary-btn final-pill-btn" id="final-take-btn">
+                  take picture
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- /final-preview-frame -->
         </div>
       </div>
+
+      <!-- Optional filename line (JS will toggle display) -->
+      <p class="final-file-name" id="final-file-name" style="display:none;"></p>
     </div>
 
-    <!-- RIGHT: summary sidebar (same vibe as glaze swatches) -->
-    <aside id="sidebar-final" class="glaze-sidebar">
-      <div class="glaze-title" id="final-piece-title">Speckled Field</div>
-      <div class="glaze-desc" id="final-piece-desc">
-        Your bowl will be ready after firing + cooldown. Here’s your status.
-      </div>
+    <!-- BELOW the panel -->
+    <textarea
+      id="final-note"
+      class="final-note"
+      rows="3"
+      placeholder="A short note about your process, glaze choice, or what surprised you…"
+    ></textarea>
 
-      <div class="final-summary">
-        <div class="final-row">
-          <div class="final-label">Bisque firing</div>
-          <div class="final-value" id="final-bisque-status">—</div>
-        </div>
+    <div class="final-actions">
+    <button class="primary-btn" id="final-share-btn">
+      share with the community
+    </button>
 
-        <div class="final-row">
-          <div class="final-label">Glaze</div>
-          <div class="final-value" id="final-glaze-status">—</div>
-        </div>
+    </div>
 
-        <div class="final-row">
-          <div class="final-label">Glaze firing</div>
-          <div class="final-value" id="final-glaze-firing-status">—</div>
-        </div>
-
-        <div class="final-row">
-          <div class="final-label">Estimated ready</div>
-          <div class="final-value" id="final-ready-date">—</div>
-        </div>
-      </div>
-
-      <div class="final-divider"></div>
-
-      <div class="final-next">
-        <div class="final-smalltitle">What happens next</div>
-        <ul class="final-bullets">
-          <li>Cooldown (24–48h)</li>
-          <li>Studio quality check</li>
-          <li>Pickup confirmation message</li>
-        </ul>
-      </div>
-
-      <div class="final-actions">
-        <button class="primary-btn" id="final-back-to-glaze">review glaze</button>
-        <button class="secondary-btn" id="final-restart">start a new bowl</button>
-      </div>
-    </aside>
   </div>
 </section>
 

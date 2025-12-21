@@ -824,7 +824,7 @@ header {
   text-decoration: none;
   color: #000;
   opacity: 0.7;
-  padding: 8px 12px;
+  padding: 6px 6px;
   border-radius: 6px;
   transition: all 0.2s ease;
 }
@@ -1155,7 +1155,7 @@ header {
 
 .glazing-layout{
   display: grid;
-  grid-template-columns: 420px minmax(520px, 1fr) 320px;
+  grid-template-columns: 420px minmax(720px, 1fr) 320px;
   gap: 24px;
   align-items: start;
 }
@@ -1623,6 +1623,8 @@ header {
   font-size: 13px;
   opacity: 0.7;
   line-height: 1.5;
+  width: 100%;
+  max-width: 720px;   /* SAME value as scan panel */
 }
 
 .final-actions{
@@ -1709,3 +1711,181 @@ header {
   font-size: 13px;
 }
 
+#final-camera{ display:none !important; }
+
+#process-final .final-layout{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:14px;
+}
+
+#process-final .final-upload-frame,
+#process-final #final-note{
+  width: 720px;
+  max-width: 100%;
+  min-height: 112px;   /* ← matches instruction panel height */
+  resize: vertical; 
+}
+
+/* =========================
+   FINAL PIECE – IMAGE PREVIEW
+   ========================= */
+
+.final-preview-frame{
+  width: 720px;
+  max-width: 100%;
+  aspect-ratio: 5 / 3;          /* calm, landscape */
+  border-radius: 14px;
+  overflow: hidden;             /* 🔑 prevents image overflow */
+  border: 1px solid #eee;
+  background: #f6f6f6;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.final-preview-frame.hidden{
+  display: none;
+}
+
+#final-preview{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;          /* 🔑 keeps whole bowl visible */
+}
+
+/* hide native file inputs */
+.final-file-hidden{
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* make the fake pills match your share button sizing */
+.final-pill-btn{
+  padding: 7px 9px;      /* same as .primary-btn baseline */
+  line-height: 1;
+  text-transform: none;    /* keep it like your UI */
+}
+
+/* optional: show filename nicely */
+.final-file-name{
+  margin-top: 8px;
+  font-size: 12px;
+  color: #777;
+}
+
+/* keep preview image constrained inside the panel */
+#final-preview{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: none; /* hidden until we have a file */
+}
+
+/* placeholder text shown until upload */
+.final-preview-placeholder{
+  position: static;        /* ← KEY FIX */
+  display: block;          /* no grid overlay */
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* controls overlay inside the preview frame */
+.final-overlay-controls{
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  display: flex;
+  gap: 10px;
+}
+
+/* preview frame is the positioning context */
+.final-preview-frame{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ONE centered column */
+.final-empty-state{
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;              /* space between text and buttons */
+  text-align: center;
+}
+
+/* text sits above buttons */
+.final-preview-placeholder{
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+/* buttons row */
+.final-upload-actions{
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.final-actions{
+  display: flex;
+  justify-content: space-between; /* ← key line */
+  align-items: center;
+  width: 720px;                   /* same as scan panel */
+  max-width: 100%;
+}
+
+#process-final #final-share-btn{
+  width: 720px;
+  max-width: 100%;
+  display: inline-flex;     /* keep same button behavior */
+  justify-content: center;
+}
+
+/* =========================
+   Ribbon animation
+   ========================= */
+
+.final-ribbon-layer{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 9998; /* below modal */
+}
+
+.ribbon{
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 28px;
+  border-radius: 2px;
+  opacity: 0.9;
+  animation: ribbon-fall 2.4s ease-out forwards;
+}
+
+@keyframes ribbon-fall{
+  0%{
+    transform: translateY(-40px) rotate(0deg);
+    opacity: 0;
+  }
+  15%{
+    opacity: 1;
+  }
+  100%{
+    transform: translateY(110vh) rotate(540deg);
+    opacity: 0;
+  }
+}
