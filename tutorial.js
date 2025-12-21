@@ -951,17 +951,21 @@ navItems.forEach(item => {
 // =========================
 // Process 5 — Share popup
 // =========================
-const shareBtn = document.getElementById('final-share-btn');
-const noteBox = document.getElementById('final-note');
-const previewImgEl = document.getElementById('final-preview'); // <-- get element safely
+const shareBtn = document.getElementById("final-share-btn");
+const noteBox = document.getElementById("final-note");
+const previewImgEl = document.getElementById("final-preview");
 
 function openCongratsPopup({ imgSrc, noteText }) {
-  const existing = document.getElementById('final-congrats-overlay');
+  const existing = document.getElementById("final-congrats-overlay");
   if (existing) existing.remove();
 
-  if (!document.getElementById('final-congrats-style')) {
-    const style = document.createElement('style');
-    style.id = 'final-congrats-style';
+  // (Optional) remove any leftover ribbons from previous popups
+  document.querySelectorAll(".final-ribbon-layer").forEach((n) => n.remove());
+
+  // Popup CSS (kept as you had it)
+  if (!document.getElementById("final-congrats-style")) {
+    const style = document.createElement("style");
+    style.id = "final-congrats-style";
     style.textContent = `
       #final-congrats-overlay{
         position: fixed; inset: 0;
@@ -989,7 +993,7 @@ function openCongratsPopup({ imgSrc, noteText }) {
       #final-congrats-img{
         width: 100%;
         aspect-ratio: 5 / 3;
-        object-fit: cover;
+        object-fit: contain;
         border-radius: 12px;
         background: #f6f6f6;
         border: 1px solid #eee;
@@ -1010,20 +1014,49 @@ function openCongratsPopup({ imgSrc, noteText }) {
     document.head.appendChild(style);
   }
 
-  const overlay = document.createElement('div');
-  overlay.id = 'final-congrats-overlay';
+  const overlay = document.createElement("div");
+  overlay.id = "final-congrats-overlay";
 
-  const modal = document.createElement('div');
-  modal.id = 'final-congrats-modal';
+  // ✅ RIBBONS: must be created INSIDE this function so overlay exists
+  const ribbonLayer = document.createElement("div");
+  ribbonLayer.className = "final-ribbon-layer";
+  overlay.appendChild(ribbonLayer);
 
-  // prevent user text from breaking HTML if it contains < >
-  const safeNote = (noteText || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  function launchRibbons() {
+    const colors = ["#E8CFC3", "#F2B8A2", "#E6D9C6", "#C9B8A6"];
+    const count = 24;
+
+    for (let i = 0; i < count; i++) {
+      const ribbon = document.createElement("div");
+      ribbon.className = "ribbon";
+
+      const left = Math.random() * 100;
+      const delay = Math.random() * 0.6;
+      const duration = 2 + Math.random() * 1;
+
+      ribbon.style.left = `${left}vw`;
+      ribbon.style.background = colors[Math.floor(Math.random() * colors.length)];
+      ribbon.style.animationDelay = `${delay}s`;
+      ribbon.style.animationDuration = `${duration}s`;
+
+      ribbonLayer.appendChild(ribbon);
+
+      setTimeout(() => ribbon.remove(), (duration + delay) * 1000);
+    }
+
+    setTimeout(() => ribbonLayer.remove(), 4000);
+  }
+
+  const modal = document.createElement("div");
+  modal.id = "final-congrats-modal";
+
+  const safeNote = (noteText || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
   modal.innerHTML = `
     <div id="final-congrats-body">
       <h3 id="final-congrats-title">Congratulations! Thanks for sharing your final piece with the community.</h3>
       <img id="final-congrats-img" src="${imgSrc}" alt="Uploaded piece">
-      <p id="final-congrats-note">${safeNote || 'It is my first piece. So Excited!'}</p>
+      <p id="final-congrats-note">${safeNote || "It is my first piece. So Excited!"}</p>
     </div>
     <div id="final-congrats-actions">
       <button type="button" class="primary-btn" id="final-congrats-close-btn">Exit Tutorial</button>
@@ -1033,71 +1066,45 @@ function openCongratsPopup({ imgSrc, noteText }) {
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
 
+  // Start ribbons AFTER overlay is in the DOM (safe either way, but this is clean)
+  launchRibbons();
+
   const exitTutorial = () => {
-  overlay.remove();
-  window.location.href = 'index.html'; // your homepage file
-};
+    overlay.remove();
+    window.location.href = "index.html"; // your homepage file
+  };
 
-modal.querySelector('#final-congrats-close-btn')?.addEventListener('click', exitTutorial);
+  modal.querySelector("#final-congrats-close-btn")?.addEventListener("click", exitTutorial);
 
+  // close on clicking backdrop
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) exitTutorial();
+  });
 
+  // ESC to exit
   const onKeyDown = (e) => {
-    if (e.key === 'Escape') {
-      close();
-      window.removeEventListener('keydown', onKeyDown);
+    if (e.key === "Escape") {
+      exitTutorial();
+      window.removeEventListener("keydown", onKeyDown);
     }
   };
-  window.addEventListener('keydown', onKeyDown);
+  window.addEventListener("keydown", onKeyDown);
 }
 
 if (shareBtn) {
-  shareBtn.addEventListener('click', (e) => {
+  shareBtn.addEventListener("click", (e) => {
     e.preventDefault();
 
     const hasUserImg =
       previewImgEl &&
-      previewImgEl.getAttribute('src') &&
-      previewImgEl.style.display !== 'none';
+      previewImgEl.getAttribute("src") &&
+      previewImgEl.style.display !== "none";
 
-    const imgSrc = hasUserImg ? previewImgEl.getAttribute('src') : 'assets/upload.png';
-    const noteText = noteBox ? noteBox.value.trim() : '';
+    const imgSrc = hasUserImg ? previewImgEl.getAttribute("src") : "assets/upload.png";
+    const noteText = noteBox ? noteBox.value.trim() : "";
 
     openCongratsPopup({ imgSrc, noteText });
   });
-
-  const ribbonLayer = document.createElement('div');
-ribbonLayer.className = 'final-ribbon-layer';
-overlay.appendChild(ribbonLayer);
-
-function launchRibbons(){
-  const colors = ['#E8CFC3', '#F2B8A2', '#E6D9C6', '#C9B8A6'];
-
-  const count = 24; // calm, not overwhelming
-
-  for(let i = 0; i < count; i++){
-    const ribbon = document.createElement('div');
-    ribbon.className = 'ribbon';
-
-    const left = Math.random() * 100;
-    const delay = Math.random() * 0.6;
-    const duration = 2 + Math.random() * 1;
-
-    ribbon.style.left = `${left}vw`;
-    ribbon.style.background = colors[Math.floor(Math.random() * colors.length)];
-    ribbon.style.animationDelay = `${delay}s`;
-    ribbon.style.animationDuration = `${duration}s`;
-
-    ribbonLayer.appendChild(ribbon);
-
-    // cleanup
-    setTimeout(() => ribbon.remove(), (duration + delay) * 1000);
-  }
-
-  // remove whole layer after animation
-  setTimeout(() => ribbonLayer.remove(), 4000);
-}
-
-launchRibbons();
 
 }
 

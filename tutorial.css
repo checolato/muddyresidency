@@ -9,7 +9,7 @@ html, body{
   padding: 0;
 }
 
-.page{
+.tutorial-page .page{
   width: 100%;
   max-width: none !important;   /* kill the centered max-width */
   margin: 0 !important;
@@ -711,7 +711,7 @@ html, body{
 }
 
 /* Remove the empty space that header used to take */
-header {
+.tutorial-page header {
   display: none !important;
 }
 

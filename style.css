@@ -58,6 +58,14 @@ header {
   margin-bottom: 14px;
 }
 
+header .brand-name img{
+  height: 18px !important;
+  width: auto !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .main-nav {
   display: flex;
   flex-wrap: wrap;
@@ -334,4 +342,5 @@ footer {
 .tutorial-btn:hover {
   opacity: 0.85;
 }
+
 
